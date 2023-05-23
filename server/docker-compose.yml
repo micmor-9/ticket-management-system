@@ -11,7 +11,7 @@ services:
       POSTGRES_DB: products
     volumes:
       - db-data:/var/lib/postgresql/data
-    container_name: lab04-db
+    container_name: lab05-db
 
   keycloak:
     image: michelemorgigno/keycloak_g35:latest
@@ -22,10 +22,10 @@ services:
     environment:
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
-    container_name: lab04-keycloak
+    container_name: lab05-keycloak
 
   server:
-    image: lab04-server:latest
+    image: lab05-server:latest
     ports:
       - "8081:8081"
     depends_on:
@@ -36,7 +36,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/SpringBootKeycloak
-    container_name: lab04-server
+    container_name: lab05-server
 
 volumes:
   db-data:
