@@ -34,6 +34,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.0.3")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.springframework.security:spring-security-oauth2-jose")
+    implementation("org.keycloak:keycloak-admin-client:15.0.2")
 }
 
 tasks.withType<KotlinCompile> {
