@@ -1,6 +1,5 @@
 package it.polito.wa2.g35.server.authentication
 
-import it.polito.wa2.g35.server.profiles.DuplicateProfileException
 import it.polito.wa2.g35.server.profiles.customer.CustomerDTO
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
 import org.keycloak.admin.client.CreatedResponseUtil
@@ -16,7 +15,7 @@ import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.util.MultiValueMap
 import org.springframework.http.HttpStatus
-
+import org.springframework.security.access.prepost.PreAuthorize
 
 
 @RestController
@@ -73,7 +72,7 @@ class AuthController {
 
 
     @PostMapping("/signup")
-    fun signup(@RequestBody signupRequest: SignupRequest): ResponseEntity<String> {
+    fun signup(@RequestBody signupRequest: SignupCustomerRequest): ResponseEntity<String> {
 
         val userRepresentation = UserRepresentation().apply {
             firstName = signupRequest.name
@@ -93,7 +92,7 @@ class AuthController {
             passwordCredentials.add(passwordCredential)
             userRepresentation.credentials = passwordCredentials
 
-        var keycloak: Keycloak = Keycloak.getInstance(
+        val keycloak: Keycloak = Keycloak.getInstance(
             "http://localhost:8080",
             "master",
             adminUsername,
@@ -128,4 +127,63 @@ class AuthController {
         customerService.createCustomer(customerDTO)
         return ResponseEntity.ok("User created successfully!")
     }
+
+    @PostMapping("/createExpert")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    fun createExpert(@RequestBody signupRequest: SignupExpertRequest) : ResponseEntity<String>{
+        val expertRepresentation = UserRepresentation().apply {
+            firstName = signupRequest.name
+            lastName = signupRequest.surname
+            username = signupRequest.email
+            isEnabled = true
+            email = signupRequest.email
+            isEmailVerified = true
+        }
+
+
+        val passwordCredentials = ArrayList<CredentialRepresentation>()
+        val passwordCredential = CredentialRepresentation().apply {
+            type = CredentialRepresentation.PASSWORD
+            value = signupRequest.password
+            isTemporary = false
+        }
+        passwordCredentials.add(passwordCredential)
+        expertRepresentation.credentials = passwordCredentials
+
+        val keycloak: Keycloak = Keycloak.getInstance(
+            "http://localhost:8080",
+            "master",
+            adminUsername,
+            adminPassword,
+            "admin-cli"
+        )
+
+        val realmResource = keycloak.realm(realmName)
+        val customerDTO = CustomerDTO (
+            signupRequest.email,
+            signupRequest.name,
+            signupRequest.surname
+        )
+
+        try {
+            val expertResource = realmResource.users()
+            val experts = expertResource.search(signupRequest.email)
+            if (experts.isNotEmpty()) {
+                return ResponseEntity("Expert already exists!", HttpStatus.BAD_REQUEST)
+            }
+            val response = expertResource.create(expertRepresentation)
+            val userId = CreatedResponseUtil.getCreatedId(response)
+            val user = expertResource.get(userId)
+
+            val roleRepresentation = realmResource.roles().get("app_client").toRepresentation()
+            val rolesResource = user.roles()
+            rolesResource.realmLevel().add(listOf(roleRepresentation))
+        } catch (e: RuntimeException) {
+            println(e.message)
+            return ResponseEntity("Problem during registration!", HttpStatus.BAD_REQUEST)
+        }
+        customerService.createCustomer(customerDTO)
+        return ResponseEntity.ok("User created successfully!")
+    }
+
 }
