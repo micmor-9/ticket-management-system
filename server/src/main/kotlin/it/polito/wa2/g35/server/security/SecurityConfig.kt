@@ -40,7 +40,7 @@ class SecurityConfig() {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.csrf().disable()
         http.authorizeHttpRequests()
-            .requestMatchers(HttpMethod.POST, "/login/").permitAll()
+            .requestMatchers(HttpMethod.POST, "/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/profiles/").permitAll()
             .requestMatchers(HttpMethod.POST, "/signup").permitAll()
             .anyRequest().authenticated()

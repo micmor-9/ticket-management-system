@@ -125,11 +125,11 @@ class AuthController {
             return ResponseEntity("Problem during registration!", HttpStatus.BAD_REQUEST)
         }
         customerService.createCustomer(customerDTO)
-        return ResponseEntity.ok("User created successfully!")
+        return ResponseEntity("User created successfully!", HttpStatus.CREATED)
     }
 
     @PostMapping("/createExpert")
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasRole('Manager')")
     fun createExpert(@RequestBody signupRequest: SignupExpertRequest) : ResponseEntity<String>{
         val expertRepresentation = UserRepresentation().apply {
             firstName = signupRequest.name
@@ -175,15 +175,16 @@ class AuthController {
             val userId = CreatedResponseUtil.getCreatedId(response)
             val user = expertResource.get(userId)
 
-            val roleRepresentation = realmResource.roles().get("app_client").toRepresentation()
+            val roleRepresentation = realmResource.roles().get("app_expert").toRepresentation()
             val rolesResource = user.roles()
+            roleRepresentation.attributes["specialization"] = listOf(signupRequest.specialization)
             rolesResource.realmLevel().add(listOf(roleRepresentation))
         } catch (e: RuntimeException) {
             println(e.message)
             return ResponseEntity("Problem during registration!", HttpStatus.BAD_REQUEST)
         }
         customerService.createCustomer(customerDTO)
-        return ResponseEntity.ok("User created successfully!")
+        return ResponseEntity("User created successfully!", HttpStatus.CREATED)
     }
 
 }
