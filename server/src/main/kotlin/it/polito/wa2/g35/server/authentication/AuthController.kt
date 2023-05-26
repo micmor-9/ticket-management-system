@@ -42,6 +42,9 @@ class AuthController {
     @Autowired
     lateinit var customerService: CustomerServiceImpl
 
+    @Autowired
+    lateinit var authService: AuthServiceImpl
+
     @PostMapping("/login")
     fun login(@RequestBody loginRequest: AuthRequest): ResponseEntity<AuthResponse> {
         val headers = HttpHeaders()
@@ -74,7 +77,16 @@ class AuthController {
     @PostMapping("/signup")
     fun signup(@RequestBody signupRequest: SignupCustomerRequest): ResponseEntity<String> {
 
-        val userRepresentation = UserRepresentation().apply {
+        if (authService.signupCustomer(signupRequest) != null) {
+            return ResponseEntity.ok("User created!")
+        } else {
+            return ResponseEntity("User already exists", HttpStatus.CONFLICT)
+        }
+
+
+
+
+        /*val userRepresentation = UserRepresentation().apply {
             firstName = signupRequest.name
             lastName = signupRequest.surname
             username = signupRequest.email
@@ -125,11 +137,11 @@ class AuthController {
             return ResponseEntity("Problem during registration!", HttpStatus.BAD_REQUEST)
         }
         customerService.createCustomer(customerDTO)
-        return ResponseEntity.ok("User created successfully!")
+        return ResponseEntity.ok("User created successfully!")*/
     }
 
     @PostMapping("/createExpert")
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasRole('Manager')")
     fun createExpert(@RequestBody signupRequest: SignupExpertRequest) : ResponseEntity<String>{
         val expertRepresentation = UserRepresentation().apply {
             firstName = signupRequest.name
