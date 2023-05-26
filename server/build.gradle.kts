@@ -56,6 +56,6 @@ dependencyManagement {
 
 jib {
     to {
-        image ="lab04-server:latest"
+        image ="lab05-server:latest"
     }
 }

@@ -23,8 +23,8 @@ class ExpertController(private val expertService: ExpertService){
 
     @PostMapping("/experts")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyRole('Manager', 'Expert')")
-    fun postExpert(
+    @PreAuthorize("hasRole('Manager')")
+    fun createExpert(
         @RequestBody @Valid p: ExpertDTO,
         br: BindingResult
     ) : ExpertDTO? {
