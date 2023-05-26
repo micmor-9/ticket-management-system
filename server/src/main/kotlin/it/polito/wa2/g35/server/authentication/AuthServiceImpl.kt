@@ -4,24 +4,25 @@ import it.polito.wa2.g35.server.profiles.DuplicateProfileException
 import it.polito.wa2.g35.server.profiles.customer.CustomerDTO
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
 import it.polito.wa2.g35.server.profiles.employee.expert.ExpertDTO
+import it.polito.wa2.g35.server.profiles.employee.expert.ExpertServiceImpl
 import org.keycloak.admin.client.CreatedResponseUtil
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
+import org.springframework.http.*
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
+import org.springframework.web.client.RestTemplate
 
 @Service
-class AuthServiceImpl {
+class AuthServiceImpl() : AuthService  {
 
     @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     lateinit var keycloakUrlIssuer: String
-
-    @Value("\${http://localhost:8080/realms/SpringBootKeycloak/protocol/openid-connect/auth}")
-    lateinit var keycloakUrl: String
 
     @Value("\${spring.security.oauth2.resourceserver.jwt.resource-id}")
     final lateinit var resourceId: String
@@ -38,14 +39,17 @@ class AuthServiceImpl {
     @Autowired
     lateinit var customerService: CustomerServiceImpl
 
-    var  keycloak: Keycloak = Keycloak.getInstance(
-        "http://localhost:8080",
-        "master",
-        adminUsername,
-        adminPassword,
-        "admin-cli"
-    )
-    fun signupCustomer(signupRequest: SignupCustomerRequest): CustomerDTO? {
+    @Autowired
+    lateinit var expertService: ExpertServiceImpl
+
+    override fun signupCustomer(signupRequest: SignupCustomerRequest): CustomerDTO? {
+        val keycloak: Keycloak = Keycloak.getInstance(
+            "http://localhost:8080",
+            "master",
+            adminUsername,
+            adminPassword,
+            "admin-cli"
+        )
         val userRepresentation = UserRepresentation().apply {
             firstName = signupRequest.name
             lastName = signupRequest.surname
@@ -64,7 +68,7 @@ class AuthServiceImpl {
         userRepresentation.credentials = passwordCredentials
 
         val realmResource = keycloak.realm(realmName)
-        val customerDTO = CustomerDTO (
+        val customerDTO = CustomerDTO(
             signupRequest.email,
             signupRequest.name,
             signupRequest.surname
@@ -90,11 +94,89 @@ class AuthServiceImpl {
         return customerDTO
     }
 
-    fun signupExpert(request: SignupExpertRequest): ExpertDTO? {
-        TODO()
+    override fun signupExpert(signupRequest: SignupExpertRequest): ExpertDTO? {
+        val expertRepresentation = UserRepresentation().apply {
+            firstName = signupRequest.name
+            lastName = signupRequest.surname
+            username = signupRequest.email
+            isEnabled = true
+            email = signupRequest.email
+            isEmailVerified = true
+        }
+
+        val passwordCredentials = ArrayList<CredentialRepresentation>()
+        val passwordCredential = CredentialRepresentation().apply {
+            type = CredentialRepresentation.PASSWORD
+            value = signupRequest.password
+            isTemporary = false
+        }
+        passwordCredentials.add(passwordCredential)
+        expertRepresentation.credentials = passwordCredentials
+
+        val keycloak: Keycloak = Keycloak.getInstance(
+            "http://localhost:8080",
+            "master",
+            adminUsername,
+            adminPassword,
+            "admin-cli"
+        )
+
+        val realmResource = keycloak.realm(realmName)
+
+        val expertDTO = ExpertDTO(
+            signupRequest.id,
+            signupRequest.name,
+            signupRequest.surname,
+            signupRequest.specialization,
+            signupRequest.specialization
+        )
+
+        try {
+            val expertResource = realmResource.users()
+            val experts = expertResource.search(signupRequest.email)
+            if (experts.isNotEmpty()) {
+                return null
+            }
+            val response = expertResource.create(expertRepresentation)
+            val userId = CreatedResponseUtil.getCreatedId(response)
+            val user = expertResource.get(userId)
+
+            val roleRepresentation = realmResource.roles().get("app_expert").toRepresentation()
+            val rolesResource = user.roles()
+            roleRepresentation.attributes["specialization"] = listOf(signupRequest.specialization)
+            rolesResource.realmLevel().add(listOf(roleRepresentation))
+        } catch (e: RuntimeException) {
+            return null
+        }
+        expertService.createExpert(expertDTO)
+        return expertDTO
     }
 
-    fun login(request: AuthRequest): AuthResponse? {
-        TODO()
+
+    override fun login(loginRequest: AuthRequest): AuthResponse? {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
+
+        val requestBody: MultiValueMap<String, String> = LinkedMultiValueMap()
+        requestBody.add("grant_type", "password")
+        requestBody.add("client_id", resourceId)
+        requestBody.add("username", loginRequest.username)
+        requestBody.add("password", loginRequest.password)
+
+        val requestEntity = HttpEntity(requestBody, headers)
+
+        val keycloakUrlTokenRequest = "$keycloakUrlIssuer/protocol/openid-connect/token"
+
+        try {
+            val tokenResponse: AuthResponse? = RestTemplate().exchange(
+                keycloakUrlTokenRequest,
+                HttpMethod.POST,
+                requestEntity,
+                AuthResponse::class.java
+            ).body
+            return tokenResponse
+        } catch (e: Exception) {
+            return null
+        }
     }
 }
