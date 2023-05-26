@@ -42,7 +42,7 @@ class SecurityConfig() {
         http.authorizeHttpRequests()
             .requestMatchers(HttpMethod.POST, "/login/").permitAll()
             .requestMatchers(HttpMethod.POST, "/profiles/").permitAll()
-            .requestMatchers(HttpMethod.POST, "/signup/").permitAll()
+            .requestMatchers(HttpMethod.POST, "/signup").permitAll()
             .anyRequest().authenticated()
         http.oauth2ResourceServer()
             .jwt()

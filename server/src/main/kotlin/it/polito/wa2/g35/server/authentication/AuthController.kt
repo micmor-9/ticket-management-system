@@ -1,6 +1,7 @@
 package it.polito.wa2.g35.server.authentication
 
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
+import org.keycloak.admin.client.CreatedResponseUtil
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
 import org.springframework.http.ResponseEntity
@@ -8,7 +9,6 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
 import org.keycloak.admin.client.Keycloak
-import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,11 +23,11 @@ class AuthController {
     @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     lateinit var keycloakUrlIssuer: String
 
-    @Value("\${http://localhost:8080/realms/SpringBootKeycloak")
+    @Value("\${http://localhost:8080/realms/SpringBootKeycloak/protocol/openid-connect/auth}")
     lateinit var keycloakUrl: String
 
     @Value("\${spring.security.oauth2.resourceserver.jwt.resource-id}")
-    final lateinit var clientId: String
+    final lateinit var resourceId: String
 
     @Value("\${keycloak.realm-name}")
     final lateinit var realmName: String
@@ -48,7 +48,7 @@ class AuthController {
 
         val requestBody: MultiValueMap<String, String> = LinkedMultiValueMap()
         requestBody.add("grant_type", "password")
-        requestBody.add("client_id", clientId)
+        requestBody.add("client_id", resourceId)
         requestBody.add("username", loginRequest.username)
         requestBody.add("password", loginRequest.password)
 
@@ -72,76 +72,48 @@ class AuthController {
 
     @PostMapping("/signup")
     fun signup(@RequestBody signupRequest: SignupRequest): ResponseEntity<String> {
-        /*var keycloak: Keycloak = Keycloak.getInstance(
-            keycloakUrl,
-            realmName,
-            adminUsername,
-            adminPassword,
-            clientId
-        )
-
-        val realmResource: RealmResource = keycloak.realm(realmName)
 
         val userRepresentation = UserRepresentation().apply {
             firstName = signupRequest.name
             lastName = signupRequest.surname
+            username = signupRequest.email
+            isEnabled = true
             email = signupRequest.email
         }
 
-        val credentialRepresentation = CredentialRepresentation().apply {
+        val passwordCredentials = ArrayList<CredentialRepresentation>()
+        val passwordCredential = CredentialRepresentation().apply {
             type = CredentialRepresentation.PASSWORD
             value = signupRequest.password
             isTemporary = false
         }
-        userRepresentation.credentials = listOf(credentialRepresentation)
-
-        try {
-            realmResource.users().create(userRepresentation)
-        } catch (e : RuntimeException) {
-            return ResponseEntity("Problem during registration!", HttpStatus.BAD_REQUEST)
-        }
-
-        val customerDTO = CustomerDTO(
-            userRepresentation.email,
-            userRepresentation.firstName,
-            userRepresentation.lastName
-        )
-
-        customerService.createCustomer(customerDTO)
-
-        return ResponseEntity("User signed up successfully.", HttpStatus.CREATED)
-        */
-
-        val userRepresentation = UserRepresentation()
-        userRepresentation.firstName = signupRequest.name
-        userRepresentation.lastName = signupRequest.surname
-        userRepresentation.email = signupRequest.email
-        userRepresentation.isEnabled = true
-
-        val passwordCredentials = ArrayList<CredentialRepresentation>()
-        val passwordCredential = CredentialRepresentation()
-        passwordCredential.type = CredentialRepresentation.PASSWORD
-        passwordCredential.value = signupRequest.password
-        passwordCredential.isTemporary = false
-        passwordCredentials.add(passwordCredential)
-        userRepresentation.credentials = passwordCredentials
+            passwordCredentials.add(passwordCredential)
+            userRepresentation.credentials = passwordCredentials
 
         var keycloak: Keycloak = Keycloak.getInstance(
-            keycloakUrl,
-            realmName,
+            "http://localhost:8080",
+            "master",
             adminUsername,
             adminPassword,
-            clientId
+            "admin-cli"
         )
 
-        val realmResource: RealmResource = keycloak.realm(realmName)
-
+        val realmResource = keycloak.realm(realmName)
         try {
-            val userResource = realmResource.users().create(userRepresentation)
-            return ResponseEntity.ok("User created Successfully")
+            val userResource = realmResource.users()
+            val response = userResource.create(userRepresentation) // Effettua la creazione dell'utente
+            val userId = CreatedResponseUtil.getCreatedId(response) // Ottieni l'ID dell'utente creato
+            val user = userResource.get(userId)
+
+            val roleRepresentation = realmResource.roles().get("app_client").toRepresentation()
+            val rolesResource = user.roles()
+            rolesResource.realmLevel().add(listOf(roleRepresentation))
+
+            return ResponseEntity.ok("User created successfully!")
         } catch (e: RuntimeException) {
             println(e.message)
             return ResponseEntity("Problem during registration!", HttpStatus.BAD_REQUEST)
         }
+
     }
 }

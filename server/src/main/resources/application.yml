@@ -21,7 +21,6 @@ keycloak:
   realm-name: SpringBootKeycloak
 
 
-
 logging:
   level:
     org.springframework.security: DEBUG
