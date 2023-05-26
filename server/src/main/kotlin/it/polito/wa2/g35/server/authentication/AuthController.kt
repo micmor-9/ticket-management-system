@@ -1,5 +1,6 @@
 package it.polito.wa2.g35.server.authentication
 
+import it.polito.wa2.g35.server.profiles.customer.CustomerDTO
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
 import org.keycloak.admin.client.CreatedResponseUtil
 import org.springframework.beans.factory.annotation.Value
@@ -79,6 +80,7 @@ class AuthController {
             username = signupRequest.email
             isEnabled = true
             email = signupRequest.email
+            isEmailVerified = true
         }
 
         val passwordCredentials = ArrayList<CredentialRepresentation>()
@@ -99,6 +101,12 @@ class AuthController {
         )
 
         val realmResource = keycloak.realm(realmName)
+        val customerDTO = CustomerDTO (
+            signupRequest.email,
+            signupRequest.name,
+            signupRequest.surname
+        )
+
         try {
             val userResource = realmResource.users()
             val response = userResource.create(userRepresentation) // Effettua la creazione dell'utente
@@ -109,11 +117,13 @@ class AuthController {
             val rolesResource = user.roles()
             rolesResource.realmLevel().add(listOf(roleRepresentation))
 
+            customerService.createCustomer(customerDTO)
             return ResponseEntity.ok("User created successfully!")
         } catch (e: RuntimeException) {
             println(e.message)
             return ResponseEntity("Problem during registration!", HttpStatus.BAD_REQUEST)
         }
+
 
     }
 }
