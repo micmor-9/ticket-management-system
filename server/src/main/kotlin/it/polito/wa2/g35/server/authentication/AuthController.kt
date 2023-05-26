@@ -1,5 +1,6 @@
 package it.polito.wa2.g35.server.authentication
 
+import it.polito.wa2.g35.server.profiles.DuplicateProfileException
 import it.polito.wa2.g35.server.profiles.customer.CustomerDTO
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
 import org.keycloak.admin.client.CreatedResponseUtil
@@ -109,6 +110,10 @@ class AuthController {
 
         try {
             val userResource = realmResource.users()
+            val users = userResource.search(signupRequest.email)
+            if (users.isNotEmpty()) {
+                return ResponseEntity("User already exists!", HttpStatus.BAD_REQUEST)
+            }
             val response = userResource.create(userRepresentation) // Effettua la creazione dell'utente
             val userId = CreatedResponseUtil.getCreatedId(response) // Ottieni l'ID dell'utente creato
             val user = userResource.get(userId)
@@ -116,14 +121,11 @@ class AuthController {
             val roleRepresentation = realmResource.roles().get("app_client").toRepresentation()
             val rolesResource = user.roles()
             rolesResource.realmLevel().add(listOf(roleRepresentation))
-
-            customerService.createCustomer(customerDTO)
-            return ResponseEntity.ok("User created successfully!")
         } catch (e: RuntimeException) {
             println(e.message)
             return ResponseEntity("Problem during registration!", HttpStatus.BAD_REQUEST)
         }
-
-
+        customerService.createCustomer(customerDTO)
+        return ResponseEntity.ok("User created successfully!")
     }
 }
