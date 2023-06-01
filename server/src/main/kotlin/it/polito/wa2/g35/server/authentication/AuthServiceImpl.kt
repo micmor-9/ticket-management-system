@@ -1,5 +1,6 @@
 package it.polito.wa2.g35.server.authentication
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.profiles.DuplicateProfileException
 import it.polito.wa2.g35.server.profiles.customer.CustomerDTO
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
@@ -9,10 +10,11 @@ import org.keycloak.admin.client.CreatedResponseUtil
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
@@ -41,6 +43,8 @@ class AuthServiceImpl() : AuthService  {
 
     @Autowired
     lateinit var expertService: ExpertServiceImpl
+
+    private val log: Logger = LoggerFactory.getLogger(AuthServiceImpl::class.java)
 
     override fun signupCustomer(signupRequest: SignupCustomerRequest): CustomerDTO? {
         val keycloak: Keycloak = Keycloak.getInstance(
@@ -152,8 +156,12 @@ class AuthServiceImpl() : AuthService  {
         return expertDTO
     }
 
-
+    @Observed(
+        name = "login",
+        contextualName = "login-request"
+    )
     override fun login(loginRequest: AuthRequest): AuthResponse? {
+        log.info("Service: login request received from ${loginRequest.username}")
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 

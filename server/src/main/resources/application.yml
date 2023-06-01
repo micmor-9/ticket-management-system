@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: server
   datasource:
     url: jdbc:postgresql://localhost:5432/products
     username: postgres
@@ -22,10 +24,26 @@ keycloak:
 
 
 logging:
-  level:
-    org.springframework.security: DEBUG
+  pattern:
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
 
 server:
   port: '8081'
-  servlet:
-    context-path: /api
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://host.docker.internal:9411/api/v2/spans
+  tracing:
+    sampling:
+      probability: '1.0'
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, info
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true

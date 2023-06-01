@@ -1,12 +1,12 @@
 package it.polito.wa2.g35.server.authentication
 
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
-import org.springframework.http.*
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
+import org.springframework.http.*
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -36,9 +36,12 @@ class AuthController {
     @Autowired
     lateinit var authService: AuthServiceImpl
 
+    private val log: Logger = LoggerFactory.getLogger(AuthController::class.java)
+
 
     @PostMapping("/login")
     fun login(@RequestBody loginRequest: AuthRequest): ResponseEntity<AuthResponse> {
+        log.info("Login request: $loginRequest")
         val response = authService.login(loginRequest)
         if (response != null)
             return ResponseEntity.ok(response)
