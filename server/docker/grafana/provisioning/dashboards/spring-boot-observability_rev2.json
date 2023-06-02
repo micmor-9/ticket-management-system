@@ -80,11 +80,12 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "exemplar": true,
+          "exemplar": false,
           "expr": "sum(http_server_requests_seconds_count{application=\"$app_name\", uri!=\"/actuator/prometheus\"})",
-          "interval": "",
+          "instant": true,
+          "interval": "5s",
           "legendFormat": "",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -150,11 +151,12 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "exemplar": true,
+          "exemplar": false,
           "expr": "sum by(uri) (http_server_requests_seconds_count{application=\"$app_name\", uri!=\"/actuator/prometheus\"})",
-          "interval": "",
+          "instant": true,
+          "interval": "5s",
           "legendFormat": "{{method}} {{uri}}",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -222,7 +224,7 @@
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum by(uri)(http_server_requests_seconds_sum{application=\"$app_name\", uri!=\"/actuator/prometheus\"}) / sum by(uri)(http_server_requests_seconds_count{application=\"$app_name\"})",
-          "interval": "",
+          "interval": "5s",
           "legendFormat": "{{method}} {{uri}}",
           "range": true,
           "refId": "A"
@@ -288,11 +290,12 @@
             "uid": "prometheus"
           },
           "editorMode": "builder",
-          "exemplar": true,
+          "exemplar": false,
           "expr": "sum(http_server_requests_seconds_count{application=\"$app_name\", outcome=\"CLIENT_ERROR\"})",
-          "interval": "",
+          "instant": true,
+          "interval": "5s",
           "legendFormat": "",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -898,11 +901,52 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 18,
+        "w": 9,
         "x": 6,
         "y": 21
       },
       "id": 2,
+      "interval": "5s",
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "pluginVersion": "8.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "editorMode": "builder",
+          "expr": "{app=\"server\", level=\"INFO\"}",
+          "hide": false,
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": "1h",
+      "title": "Spring Boot Log",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 9,
+        "x": 15,
+        "y": 21
+      },
+      "id": 24,
       "interval": "5s",
       "options": {
         "dedupStrategy": "none",
@@ -929,7 +973,7 @@
         }
       ],
       "timeFrom": "1h",
-      "title": "Log of All Spring Boot Apps",
+      "title": "Spring Boot Error Log",
       "type": "logs"
     }
   ],
@@ -941,6 +985,7 @@
     "list": [
       {
         "current": {
+          "isNone": true,
           "selected": false,
           "text": "None",
           "value": ""
