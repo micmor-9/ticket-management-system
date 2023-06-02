@@ -97,43 +97,62 @@ class TicketController(private val ticketService: TicketService) {
     fun postTicket(
         @RequestBody ts: TicketInputDTO
     ) : TicketDTO? {
+        log.info("Create ticket successful")
         return ticketService.createTicket(ts)
     }
 
     @PutMapping("/tickets/{ticketId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager', 'Expert')")
+    @Observed(
+        name = "tickets/{ticketId}",
+        contextualName = "put-ticket-request"
+    )
     fun updateTicket(
         @PathVariable("ticketId") ticketId: Long,
         @RequestBody p: TicketInputDTO,
         br: BindingResult
     ) : TicketDTO? {
-        if (br.hasErrors())
+        if (br.hasErrors()) {
+            log.error("Update ticket failed by bad request format")
             throw BadRequestException("Bad request format!")
+        }
         else
             if (ticketId == p.id) {
+                log.info("Update ticket successful")
                 return ticketService.updateTicket(p)
             } else
+                log.error("Update ticket failed because id doesn't exists")
                 throw TicketConflictException("Ticket with given id doesn't exists!")
     }
 
     @PatchMapping("/tickets/{ticketId}/status/{status}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager','Expert')")
+    @Observed(
+        name = "tickets/{ticketId}/status/{status}",
+        contextualName = "put-ticket-status-request"
+    )
     fun updateTicketStatus(
         @PathVariable("ticketId") ticketId: Long,
         @PathVariable("status") status: String
     ) {
+        log.info("Update ticket status successful")
         ticketService.updateTicketStatus(ticketId, status)
     }
 
     @PatchMapping("/tickets/{ticketId}/priority/{priority}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager')")
+    @Observed(
+        name = "tickets/{ticketId}/priority/{priority}",
+        contextualName = "put-ticket-priority-request"
+    )
     fun updateTicketPriority(
         @PathVariable("ticketId") ticketId: Long,
         @PathVariable("priority") priority: String
     ) {
+        log.info("Update ticket priority successful")
         ticketService.updateTicketPriority(ticketId, priority)
     }
 }
