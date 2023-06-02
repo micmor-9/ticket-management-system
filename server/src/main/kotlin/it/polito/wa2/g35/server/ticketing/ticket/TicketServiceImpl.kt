@@ -215,7 +215,7 @@ class TicketServiceImpl(
                     expert = ticketToSave.expert
                 )
             )
-            log.info("Create ticket successful")
+            log.info("Create ticket successful (repository)")
             return ticketToSave.toDTO()
         }
     }
@@ -271,7 +271,7 @@ class TicketServiceImpl(
                 )
             )
         }
-        log.info("Update ticket successful")
+        log.info("Update ticket successful (repository)")
         return ticketToUpdate.toDTO()
     }
 
