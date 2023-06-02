@@ -103,9 +103,9 @@ class TicketServiceImpl(
         contextualName = "get-ticket-by-id-request-service"
     )
     override fun getTicketById(id: Long): TicketDTO? {
-        log.info("Get ticket by id request from repository successful")
         val authentication = SecurityContextHolder.getContext().authentication
         val ticket = ticketRepository.findByIdOrNull(id)?.toDTO() ?: throw TicketNotFoundException("Ticket not found!")
+        log.info("Get ticket by id request from repository successful")
         return filterResultByRole(authentication, ticket)
     }
     @Observed(
@@ -113,7 +113,6 @@ class TicketServiceImpl(
         contextualName = "get-tickets-by-status-request-service"
     )
     override fun getTicketsByStatus(status: String): List<TicketDTO> {
-
         try {
             val statusValue = TicketStatusValues.valueOf(status.uppercase())
             val authentication = SecurityContextHolder.getContext().authentication
@@ -160,7 +159,7 @@ class TicketServiceImpl(
     override fun getTicketsByCustomer(idCustomer: String): List<TicketDTO> {
         val customer = customerService.getCustomerByEmail(idCustomer)
         if(customer == null) {
-            log.error("No Expert found with this Id: $idCustomer")
+            log.error("No Customer found with this Id: $idCustomer")
             throw ProfileNotFoundException("Customer not found with this Id!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
@@ -182,7 +181,7 @@ class TicketServiceImpl(
         }
         val product = productService.getProductById(ticket.productId)
             if(product==null){
-                log.error("No Customer found with this Id: $ticket.productId")
+                log.error("No Product found with this Id: $ticket.productId")
                 throw ProductNotFoundException("Product not found with this id!")
             }
         val warranty = orderService.getOrderByCustomerAndProduct(customer.email, product.id)
@@ -234,11 +233,11 @@ class TicketServiceImpl(
         }
         val expert = expertService.getExpertById(ticket.expertId)?.toExpert()
         if(expert == null){
-            log.error("No Customer found with this Id: ${ticket.expertId}")
+            log.error("No Expert found with this Id: ${ticket.expertId}")
             throw ProfileNotFoundException("Expert not found with this id!")
             }
         if (!TicketStatusValues.checkStatusUpdateConsistency(currentTicket.status, ticket.status!!)) {
-            log.error("Update Ticket failed, ticket status conflict")
+            log.error("Update Ticket failed by ticket status conflict")
             throw TicketStatusUpdateConflictException("Ticket Status update conflict!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
@@ -307,36 +306,42 @@ class TicketServiceImpl(
     )
     @Transactional
     override fun updateTicketStatus(ticketId: Long, statusValue: String): TicketDTO? {
-        val ticket = getTicketById(ticketId)?.toTicket() ?: throw TicketNotFoundException("Ticket not found!")
+        val ticket = getTicketById(ticketId)?.toTicket()
+        if(ticket == null){
+            log.error("No Ticket found with this Id: $ticketId")
+            throw TicketNotFoundException("Ticket not found!")
+        }
         val status = try {
             TicketStatusValues.valueOf(statusValue.uppercase())
         } catch (e: IllegalArgumentException) {
+            log.error("Update ticket status failed by ticket status not valid")
             throw TicketStatusValueInvalidException("Ticket Status not valid!")
         }
-        if (!TicketStatusValues.checkStatusUpdateConsistency(ticket.status, statusValue))
+        if (!TicketStatusValues.checkStatusUpdateConsistency(ticket.status, statusValue)) {
+            log.error("Update ticket status failed by ticket status conflict")
             throw TicketStatusUpdateConflictException("Ticket Status update conflict!")
-
+        }
         val authentication = SecurityContextHolder.getContext().authentication
 
         when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
                 accessGrantedUpdateTicketStatus(ticket, status)
-                log.info("Create ticket successful (repository)")
+                log.info("Create ticket status successful (repository)")
                 return ticket.toDTO()
             }
             SecurityConfig.EXPERT_ROLE -> {
                 if(ticket.expert?.email == authentication.name){
                     accessGrantedUpdateTicketStatus(ticket, status)
-                    log.info("Create ticket successful (repository)")
+                    log.info("Create ticket status successful (repository)")
                     return ticket.toDTO()
                 }
-                else{
-                    log.error("Update ticket failed by unauthorized access")
-                }
+                else {
+                    log.error("Update ticket status failed by unauthorized access")
                     throw UnauthorizedTicketException("You can't access this ticket!")
+                }
             }
             else -> {
-                log.error("Update ticket failed by unauthorized access")
+                log.error("Update ticket status failed by unauthorized access")
                 throw UnauthorizedTicketException("You can't access this ticket!")
             }
         }
@@ -363,7 +368,7 @@ class TicketServiceImpl(
     override fun updateTicketPriority(ticketId: Long, priorityValue: String): TicketDTO? {
         val ticket = getTicketById(ticketId)?.toTicket()
         if (ticket == null) {
-            log.error("No Expert found with this Id: $ticketId")
+            log.error("No Ticket found with this Id: $ticketId")
             throw TicketNotFoundException("Ticket not found!")
         }
         val priority = try {

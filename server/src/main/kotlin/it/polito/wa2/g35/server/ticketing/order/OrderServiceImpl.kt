@@ -1,5 +1,6 @@
 package it.polito.wa2.g35.server.ticketing.order
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.products.ProductNotFoundException
 import it.polito.wa2.g35.server.products.ProductService
 import it.polito.wa2.g35.server.products.toProduct
@@ -7,6 +8,9 @@ import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
 import it.polito.wa2.g35.server.profiles.customer.CustomerService
 import it.polito.wa2.g35.server.profiles.customer.toCustomer
 import it.polito.wa2.g35.server.security.SecurityConfig
+import it.polito.wa2.g35.server.ticketing.ticket.TicketController
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -14,7 +18,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderService {
-
+    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
     @Autowired
     lateinit var customerService: CustomerService
 
@@ -26,12 +30,11 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
             SecurityConfig.MANAGER_ROLE -> {
                 return resultOrder
             }
-
-
             SecurityConfig.CLIENT_ROLE -> {
                 if (resultOrder?.customer?.email == auth.name)
                     return resultOrder
                 else
+                    log.error("Unauthorized access to Order")
                     throw UnauthorizedOrderException("You can't access this Order!")
             }
 
@@ -55,30 +58,53 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
             }
         }
     }
-
+    @Observed(
+        name = "/orders/",
+        contextualName = "get-orders-request-service"
+    )
     override fun getOrders(): List<OrderDTO> {
+        log.info("Get orders from repository request successful")
         return orderRepository.findAll().map { it.toDTO() }
     }
-
+    @Observed(
+        name = "/orders/{customerId}",
+        contextualName = "get-orders-by-customer-request"
+    )
     override fun getOrdersByCustomer(idCustomer: String): List<OrderDTO> {
         val authentication = SecurityContextHolder.getContext().authentication
-        customerService.getCustomerByEmail(idCustomer)
-            ?: throw ProfileNotFoundException("Profile not found with this id!")
-
+        val profile =customerService.getCustomerByEmail(idCustomer)
+        if(profile == null){
+            log.error("No Profile found with this Id: $idCustomer")
+            throw ProfileNotFoundException("Profile not found with this id!")
+        }
         val orders = orderRepository.getOrdersByCustomerEmail(idCustomer).map { it.toDTO() }
+        log.info("Get orders by Customer from repository successful")
         return filterListResultByRole(authentication,orders)
     }
 
     override fun getOrderByCustomerAndProduct(idCustomer: String, idProduct: String): OrderDTO? {
         val authentication = SecurityContextHolder.getContext().authentication
         val order = orderRepository.getOrdersByCustomerAndProduct(idCustomer, idProduct)?.toDTO()
+        log.info("Get order by Customer and Product request from repository successful")
         return filterResultByRole(authentication,order)
     }
 
+    @Observed(
+        name = "/orders/",
+        contextualName = "post-order-request-service"
+    )
     override fun createOrder(order: OrderInputDTO): OrderDTO? {
-        val customer = customerService.getCustomerByEmail(order.customerId) ?: throw ProfileNotFoundException("Profile not found with this id!")
-        val product = productService.getProductById(order.productId) ?: throw ProductNotFoundException("Product not found with this id!")
-
+        val customer = customerService.getCustomerByEmail(order.customerId)
+        if(customer == null){
+            log.error("No Customer found with this Id: $order.customerId")
+            throw ProfileNotFoundException("Profile not found with this id!")
+        }
+        val product = productService.getProductById(order.productId)
+        if(product == null){
+            log.error("No Product found with this Id: $order.productId")
+            throw ProductNotFoundException("Product not found with this id!")
+        }
+        log.info("Create order request successful (repository9")
         return orderRepository.save(
             Order(
                 null,
