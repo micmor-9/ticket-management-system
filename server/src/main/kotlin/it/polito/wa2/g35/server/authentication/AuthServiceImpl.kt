@@ -1,6 +1,5 @@
 package it.polito.wa2.g35.server.authentication
 
-import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.profiles.DuplicateProfileException
 import it.polito.wa2.g35.server.profiles.customer.CustomerDTO
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
@@ -43,8 +42,6 @@ class AuthServiceImpl() : AuthService  {
 
     @Autowired
     lateinit var expertService: ExpertServiceImpl
-
-    private val log: Logger = LoggerFactory.getLogger(AuthServiceImpl::class.java)
 
     override fun signupCustomer(signupRequest: SignupCustomerRequest): CustomerDTO? {
         val keycloak: Keycloak = Keycloak.getInstance(
@@ -156,12 +153,7 @@ class AuthServiceImpl() : AuthService  {
         return expertDTO
     }
 
-    @Observed(
-        name = "login",
-        contextualName = "login-request"
-    )
     override fun login(loginRequest: AuthRequest): AuthResponse? {
-        log.info("Service: login request received from ${loginRequest.username}")
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
 

@@ -26,7 +26,6 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 17175,
   "graphTooltip": 0,
-  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -58,6 +57,7 @@
         "y": 0
       },
       "id": 4,
+      "interval": "5s",
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -99,6 +99,9 @@
       },
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -106,10 +109,13 @@
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
@@ -120,11 +126,12 @@
         "y": 0
       },
       "id": 16,
+      "interval": "5s",
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
+        "displayMode": "lcd",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "vertical",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -132,7 +139,8 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "showUnfilled": true,
+        "valueMode": "color"
       },
       "pluginVersion": "9.5.2",
       "targets": [
@@ -152,7 +160,7 @@
       ],
       "timeFrom": "24h",
       "title": "Requests Count",
-      "type": "stat"
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -213,7 +221,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum by(uri)(http_server_requests_seconds_sum{application=\"$app_name\"}) / sum by(uri)(http_server_requests_seconds_count{application=\"$app_name\"})",
+          "expr": "sum by(uri)(http_server_requests_seconds_sum{application=\"$app_name\", uri!=\"/actuator/prometheus\"}) / sum by(uri)(http_server_requests_seconds_count{application=\"$app_name\"})",
           "interval": "",
           "legendFormat": "{{method}} {{uri}}",
           "range": true,
@@ -257,6 +265,7 @@
         "y": 6
       },
       "id": 22,
+      "interval": "5s",
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -278,9 +287,9 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "editorMode": "code",
+          "editorMode": "builder",
           "exemplar": true,
-          "expr": "sum(http_server_requests_seconds_count{application=\"$app_name\", outcome=\"SERVER_ERROR\"})",
+          "expr": "sum(http_server_requests_seconds_count{application=\"$app_name\", outcome=\"CLIENT_ERROR\"})",
           "interval": "",
           "legendFormat": "",
           "range": true,
@@ -758,7 +767,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum by(uri)(rate(http_server_requests_seconds_count{application=\"$app_name\"}[1m]))",
+          "expr": "sum by(uri)(rate(http_server_requests_seconds_count{application=\"$app_name\", uri!=\"/actuator/prometheus\"}[1m]))",
           "interval": "",
           "legendFormat": "{{uri}}",
           "range": true,
@@ -770,57 +779,31 @@
     },
     {
       "datasource": {
-        "type": "loki",
-        "uid": "loki"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "bars",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
         "overrides": [
           {
@@ -877,34 +860,36 @@
         "y": 21
       },
       "id": 14,
+      "interval": "1s",
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
       },
-      "pluginVersion": "8.4.3",
+      "pluginVersion": "9.5.2",
       "targets": [
         {
           "datasource": {
-            "type": "loki",
-            "uid": "loki"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(type) (rate({compose_service=~\"app-.*\"} | pattern `<date> <time> <_>=<trace_id> <_>=<span_id> <_>=<trace_flags> <type> <_> --- <msg>` | type != \"\" |= \"$log_keyword\" [1m]))",
-          "legendFormat": "{{type}}",
-          "queryType": "range",
+          "exemplar": false,
+          "expr": "system_load_average_1m * 100",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
-      "title": "Log Type Rate",
-      "type": "timeseries"
+      "title": "CPU Usage",
+      "type": "gauge"
     },
     {
       "datasource": {
@@ -918,6 +903,7 @@
         "y": 21
       },
       "id": 2,
+      "interval": "5s",
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
@@ -935,13 +921,14 @@
             "type": "loki",
             "uid": "loki"
           },
-          "editorMode": "code",
-          "expr": "{compose_service=~\"app-.*\"} | pattern `<date> <time> <_>=<trace_id> <_>=<span_id> <_>=<trace_flags> <type> <_> --- <msg>` | line_format \"{{.compose_service}}\\t{{.type}}\\ttrace_id={{.trace_id}}\\t{{.msg}}\" |= \"$log_keyword\"",
+          "editorMode": "builder",
+          "expr": "{app=\"server\", level!=\"INFO\"}",
           "hide": false,
           "queryType": "range",
           "refId": "A"
         }
       ],
+      "timeFrom": "1h",
       "title": "Log of All Spring Boot Apps",
       "type": "logs"
     }
@@ -954,7 +941,6 @@
     "list": [
       {
         "current": {
-          "isNone": true,
           "selected": false,
           "text": "None",
           "value": ""
@@ -982,7 +968,7 @@
       },
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "",
           "value": ""
         },
@@ -1004,13 +990,13 @@
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Spring Boot Observability v2",
   "uid": "dLsDQIUnzbv2",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
