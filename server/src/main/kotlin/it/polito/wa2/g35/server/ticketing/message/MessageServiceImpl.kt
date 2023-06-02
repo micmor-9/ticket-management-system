@@ -36,17 +36,17 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                 }
                 SecurityConfig.CLIENT_ROLE -> {
                     if(ticket.customer.email != authentication.name) {
-                        log.error("Get messages by Ticket failed by unauthorized access")
+                        log.error("Get messages by Ticket from repository request failed by unauthorized access")
                         throw UnauthorizedTicketException("You can't access this ticket's messages")
                     }
                     else {
-                        log.info("Get messages by Ticket request successful")
+                        log.info("Get messages by Ticket from repository request successful")
                         return messageRepository.getMessagesByTicketId(ticketid).map { it.toDTO() }
                     }
                 }
                 SecurityConfig.EXPERT_ROLE -> {
                     if(ticket.expert?.email != authentication.name) {
-                        log.error("Get messages by Ticket failed by unauthorized access")
+                        log.error("Get messages by Ticket from repository request failed by unauthorized access")
                         throw UnauthorizedTicketException("You can't access this ticket's messages")
                     }
                     else {
@@ -76,7 +76,7 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                 }
                 SecurityConfig.CLIENT_ROLE -> {
                     if(message.ticket?.customer?.email != authentication.name) {
-                        log.error("Get messages by Id failed by unauthorized access")
+                        log.error("Get messages by Id from repository request failed by unauthorized access")
                         throw UnauthorizedTicketException("You can't access this ticket's messages")
                     }
                     else {
@@ -119,7 +119,7 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
             }
             SecurityConfig.CLIENT_ROLE -> {
                 if(ticket.customer.email != authentication.name) {
-                    log.error("Get messages by Id failed by unauthorized access")
+                    log.error("Create request failed by unauthorized access")
                     throw UnauthorizedTicketException("You can't access this ticket's messages")
                 }
                 else {

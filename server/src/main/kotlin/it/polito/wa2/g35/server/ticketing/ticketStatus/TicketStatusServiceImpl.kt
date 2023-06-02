@@ -16,7 +16,7 @@ class TicketStatusServiceImpl(private val ticketStatusRepository: TicketStatusRe
         contextualName = "post-ticket-status-request-service"
     )
     override fun createTicketStatus(ticketStatus: TicketStatusDTO): TicketStatusDTO? {
-        log.info("Create tickets status successful")
+        log.info("Create tickets status request successful (repository)")
         return ticketStatusRepository.save(TicketStatus(ticketStatus.id, Date(), ticketStatus.status, ticketStatus.description, ticketStatus.ticket, ticketStatus.expert )).toDTO()
     }
     @Observed(
@@ -24,7 +24,7 @@ class TicketStatusServiceImpl(private val ticketStatusRepository: TicketStatusRe
         contextualName = "get-ticket-status-request-service"
     )
     override fun getTicketStatusesByTicketId(ticketId: Long): List<TicketStatusDTO> {
-        log.info("Get tickets status by Id from repository successful")
+        log.info("Get tickets status by Id from repository request successful")
         return ticketStatusRepository.getTicketStatusesByTicketId(ticketId).map { it.toDTO() }
     }
 }
