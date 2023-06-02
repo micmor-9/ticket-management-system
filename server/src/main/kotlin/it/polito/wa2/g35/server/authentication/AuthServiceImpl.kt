@@ -1,5 +1,6 @@
 package it.polito.wa2.g35.server.authentication
 
+import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.profiles.DuplicateProfileException
 import it.polito.wa2.g35.server.profiles.customer.CustomerDTO
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
@@ -43,9 +44,15 @@ class AuthServiceImpl() : AuthService  {
     @Autowired
     lateinit var expertService: ExpertServiceImpl
 
+    private val log: Logger = LoggerFactory.getLogger(AuthController::class.java)
+
+    @Observed(
+        name = "signup",
+        contextualName = "signup-request"
+    )
     override fun signupCustomer(signupRequest: SignupCustomerRequest): CustomerDTO? {
         val keycloak: Keycloak = Keycloak.getInstance(
-            "http://localhost:8080",
+            "http://host.docker.internal:8080",
             "master",
             adminUsername,
             adminPassword,
@@ -79,6 +86,7 @@ class AuthServiceImpl() : AuthService  {
             val userResource = realmResource.users()
             val users = userResource.search(signupRequest.email)
             if (users.isNotEmpty()) {
+                log.error("Customer already exists! $users")
                 throw DuplicateProfileException("Customer already exists!")
             }
             val response = userResource.create(userRepresentation) // Effettua la creazione dell'utente
@@ -89,9 +97,11 @@ class AuthServiceImpl() : AuthService  {
             val rolesResource = user.roles()
             rolesResource.realmLevel().add(listOf(roleRepresentation))
         } catch (e: RuntimeException) {
+            log.error("Error creating customer! ${e.message}")
             return null
         }
         customerService.createCustomer(customerDTO)
+        log.info("Customer created! $customerDTO")
         return customerDTO
     }
 
@@ -115,7 +125,7 @@ class AuthServiceImpl() : AuthService  {
         expertRepresentation.credentials = passwordCredentials
 
         val keycloak: Keycloak = Keycloak.getInstance(
-            "http://localhost:8080",
+            "http://host.docker.internal:8080",
             "master",
             adminUsername,
             adminPassword,
