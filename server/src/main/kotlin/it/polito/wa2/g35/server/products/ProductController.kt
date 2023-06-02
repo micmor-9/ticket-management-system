@@ -12,7 +12,7 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@CrossOrigin(origins = ["http://localhost:3000"])
+@RequestMapping("/api")
 class ProductController(private val productService: ProductService) {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
     @GetMapping("/products/")

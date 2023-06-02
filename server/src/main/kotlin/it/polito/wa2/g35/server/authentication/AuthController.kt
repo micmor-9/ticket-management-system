@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*
 
 
 @RestController
+@RequestMapping("/api")
 class AuthController {
 
     /*@Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")

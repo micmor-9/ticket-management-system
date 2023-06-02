@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@RequestMapping("/api")
 class ExpertController(private val expertService: ExpertService){
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
     @GetMapping("/experts/{expertId}")

@@ -12,7 +12,7 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@CrossOrigin(origins = ["http://localhost:3000"])
+@RequestMapping("/api")
 class AttachmentController(private val attachmentService: AttachmentService) {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
     @GetMapping("/attachments/message/{messageId}")

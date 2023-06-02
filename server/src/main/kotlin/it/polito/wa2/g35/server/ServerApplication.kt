@@ -23,36 +23,25 @@ fun main(args: Array<String>) {
         return ObservedAspect(observationRegistry)
     }
 
-    // end::service[]
     @Component
     class ObsHandler : ObservationHandler<Observation.Context> {
         private val log = LoggerFactory.getLogger(ObsHandler::class.java)
         override fun onStart(context: Observation.Context) {
             log.info(
                 "Before running the observation for context [{}], userType [{}]",
-                context.name,
-                getUserTypeFromContext(context)
+                context.name
             )
         }
 
         override fun onStop(context: Observation.Context) {
             log.info(
                 "After running the observation for context [{}], userType [{}]",
-                context.name,
-                getUserTypeFromContext(context)
+                context.name
             )
         }
 
         override fun supportsContext(context: Observation.Context): Boolean {
             return true
-        }
-
-        private fun getUserTypeFromContext(context: Observation.Context): String {
-            return StreamSupport.stream(context.lowCardinalityKeyValues.spliterator(), false)
-                .filter { keyValue: KeyValue -> "userType" == keyValue.key }
-                .map { obj: KeyValue -> obj.value }
-                .findFirst()
-                .orElse("UNKNOWN")
         }
     }
 
