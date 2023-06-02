@@ -80,11 +80,12 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "exemplar": true,
+          "exemplar": false,
           "expr": "sum(http_server_requests_seconds_count{application=\"$app_name\", uri!=\"/actuator/prometheus\"})",
-          "interval": "",
+          "instant": true,
+          "interval": "5s",
           "legendFormat": "",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -150,11 +151,12 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "exemplar": true,
+          "exemplar": false,
           "expr": "sum by(uri) (http_server_requests_seconds_count{application=\"$app_name\", uri!=\"/actuator/prometheus\"})",
-          "interval": "",
+          "instant": true,
+          "interval": "5s",
           "legendFormat": "{{method}} {{uri}}",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -222,7 +224,7 @@
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum by(uri)(http_server_requests_seconds_sum{application=\"$app_name\", uri!=\"/actuator/prometheus\"}) / sum by(uri)(http_server_requests_seconds_count{application=\"$app_name\"})",
-          "interval": "",
+          "interval": "5s",
           "legendFormat": "{{method}} {{uri}}",
           "range": true,
           "refId": "A"
@@ -288,11 +290,12 @@
             "uid": "prometheus"
           },
           "editorMode": "builder",
-          "exemplar": true,
+          "exemplar": false,
           "expr": "sum(http_server_requests_seconds_count{application=\"$app_name\", outcome=\"CLIENT_ERROR\"})",
-          "interval": "",
+          "instant": true,
+          "interval": "5s",
           "legendFormat": "",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -941,6 +944,7 @@
     "list": [
       {
         "current": {
+          "isNone": true,
           "selected": false,
           "text": "None",
           "value": ""
@@ -997,6 +1001,6 @@
   "timezone": "",
   "title": "Spring Boot Observability v2",
   "uid": "dLsDQIUnzbv2",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }
