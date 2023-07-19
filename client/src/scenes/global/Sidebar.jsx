@@ -6,9 +6,8 @@ import {
   sidebarClasses,
   menuClasses,
 } from "react-pro-sidebar";
-//import "react-pro-sidebar/dist/css/styles.css";
 import { Avatar, Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
@@ -17,19 +16,20 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, slug, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
-    <MenuItem
-      active={selected === title}
-      style={{ color: colors.grey[100] }}
-      onClick={() => setSelected(title)}
-      icon={icon}
-    >
-      <Typography>{title}</Typography>
-      <Link to={to} />
-    </MenuItem>
+    <Link to={to} style={{ textDecoration: "none" }}>
+      <MenuItem
+        active={selected === slug}
+        style={{ color: colors.grey[100] }}
+        onClick={() => setSelected(slug)}
+        icon={icon}
+      >
+        <Typography>{title}</Typography>
+      </MenuItem>
+    </Link>
   );
 };
 
@@ -37,7 +37,10 @@ const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Dashboard");
+  const location = useLocation();
+  const [selected, setSelected] = useState(
+    location == "" ? "dashboard" : location.pathname.split("/")[1]
+  );
 
   return (
     <Box
@@ -53,6 +56,9 @@ const Sidebar = () => {
         rootStyles={{
           [`.${sidebarClasses.container}`]: {
             backgroundColor: `${colors.primary[400]} !important`,
+          },
+          [`.${menuClasses.active}`]: {
+            color: "#6870fa !important",
           },
           [`.${menuClasses.button}`]: {
             padding: "5px 35px 5px 20px !important",
@@ -139,20 +145,23 @@ const Sidebar = () => {
           <Box>
             <Item
               title="Dashboard"
+              slug="dashboard"
               to="/"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Profiles"
-              to="/profiles"
+              title="Users"
+              slug="users"
+              to="users"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Products"
+              slug="products"
               to="/products"
               icon={<Inventory2OutlinedIcon />}
               selected={selected}
@@ -160,6 +169,7 @@ const Sidebar = () => {
             />
             <Item
               title="Orders"
+              slug="orders"
               to="/orders"
               icon={<ShoppingCartOutlinedIcon />}
               selected={selected}
@@ -167,6 +177,7 @@ const Sidebar = () => {
             />
             <Item
               title="Tickets"
+              slug="tickets"
               to="/tickets"
               icon={<SupportAgentOutlinedIcon />}
               selected={selected}
