@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { StyledTabs, StyledTab } from "../../components/StyledTabs";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockUsers } from "../../data/mockUsers";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
+/* import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined"; */
 import Header from "../../components/Header";
 
 const Users = () => {
@@ -44,10 +44,10 @@ const Users = () => {
     { field: "specialization", headerName: "Specialization", flex: 1 },
   ];
 
-  const [value, setValue] = useState(0);
+  const [roleFilter, setRoleFilter] = useState(0);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleRoleFilterChange = (event, newValue) => {
+    setRoleFilter(newValue);
   };
 
   return (
@@ -67,7 +67,7 @@ const Users = () => {
             color: colors.greenAccent[300],
           },
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[700],
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
@@ -75,7 +75,7 @@ const Users = () => {
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[700],
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
@@ -83,11 +83,7 @@ const Users = () => {
         }}
       >
         {/* TODO: change datagrid content according to the selected tab */}
-        <StyledTabs
-          value={value}
-          onChange={handleChange}
-          aria-label="styled tabs example"
-        >
+        <StyledTabs value={roleFilter} onChange={handleRoleFilterChange}>
           <StyledTab label="Managers" />
           <StyledTab label="Experts" />
           <StyledTab label="Customers" />

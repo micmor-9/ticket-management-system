@@ -39,7 +39,9 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const [selected, setSelected] = useState(
-    location == "" ? "dashboard" : location.pathname.split("/")[1]
+    location.pathname.split("/")[1] === ""
+      ? "dashboard"
+      : location.pathname.split("/")[1]
   );
 
   return (
@@ -58,13 +60,13 @@ const Sidebar = () => {
             backgroundColor: `${colors.primary[400]} !important`,
           },
           [`.${menuClasses.active}`]: {
-            color: "#6870fa !important",
+            color: `${colors.blueAccent[400]} !important`,
           },
           [`.${menuClasses.button}`]: {
             padding: "5px 35px 5px 20px !important",
           },
           [`.${menuClasses.button}:hover`]: {
-            backgroundColor: `${colors.primary[600]} !important`,
+            backgroundColor: `${colors.blueAccent[700]} !important`,
           },
         }}
       >

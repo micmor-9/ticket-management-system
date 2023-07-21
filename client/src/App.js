@@ -6,7 +6,7 @@ import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import Users from "./scenes/users";
 /* import Products from "./scenes/products"; */
-/* import Tickets from "./scenes/tickets"; */
+import Tickets from "./scenes/tickets";
 /* import Orders from "./scenes/orders"; */
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/users" element={<Users />} />
               {/* <Route path="/products" element={<Products />} /> */}
-              {/* <Route path="/tickets" element={<Tickets />} /> */}
+              <Route path="/tickets" element={<Tickets />} />
               {/* <Route path="/orders" element={<Orders />} /> */}
             </Routes>
           </main>

@@ -60,6 +60,18 @@ export const tokens = (mode) => ({
           800: "#2a2d64",
           900: "#151632",
         },
+        status: {
+          OPEN: "#90CAF9",
+          IN_PROGRESS: "#81C784",
+          CLOSED: "#C5E1A5",
+          RESOLVED: "#9575CD",
+          REOPENED: "#E57373",
+        },
+        priority: {
+          LOW: "#AED581",
+          MEDIUM: "#FFD54F",
+          HIGH: "#EF5350",
+        },
       }
     : {
         grey: {
@@ -116,6 +128,18 @@ export const tokens = (mode) => ({
           700: "#a4a9fc",
           800: "#c3c6fd",
           900: "#e1e2fe",
+        },
+        status: {
+          OPEN: "#1976D2",
+          IN_PROGRESS: "#4CAF50",
+          CLOSED: "#8BC34A",
+          RESOLVED: "#673AB7",
+          REOPENED: "#F44336",
+        },
+        priority: {
+          LOW: "#7CB342",
+          MEDIUM: "#FFB300",
+          HIGH: "#E57373",
         },
       }),
 });
