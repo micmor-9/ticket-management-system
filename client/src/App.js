@@ -1,12 +1,12 @@
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
-import Topbar from "./scenes/global/Topbar";
-import Sidebar from "./scenes/global/Sidebar";
-import Dashboard from "./scenes/dashboard";
-import Users from "./scenes/users";
+import Topbar from "./views/global/Topbar";
+import Sidebar from "./views/global/Sidebar";
+import Dashboard from "./views/dashboard";
+import Users from "./views/users";
 /* import Products from "./scenes/products"; */
-import Tickets from "./scenes/tickets";
+import Tickets from "./views/tickets";
 /* import Orders from "./scenes/orders"; */
 
 function App() {
