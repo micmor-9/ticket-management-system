@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   db:
     image: postgres:latest
@@ -11,7 +11,7 @@ services:
       POSTGRES_DB: products
     volumes:
       - db-data:/var/lib/postgresql/data
-    container_name: lab05-db
+    container_name: spring-boot-db
 
   keycloak:
     image: michelemorgigno/keycloak_g35:latest
@@ -22,7 +22,7 @@ services:
     environment:
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
-    container_name: lab05-keycloak
+    container_name: spring-boot-keycloak
 
   server:
     image: lab05-server:latest
@@ -36,25 +36,25 @@ services:
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/SpringBootKeycloak
-    container_name: lab05-server
+    container_name: spring-boot-server
 
   tempo:
     image: grafana/tempo
-    extra_hosts: [ 'host.docker.internal:host-gateway' ]
-    command: [ "-config.file=/etc/tempo.yaml" ]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    command: ["-config.file=/etc/tempo.yaml"]
     volumes:
       - ./docker/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
       - ./docker/tempo/tempo-data:/tmp/tempo
     ports:
-      - "14268"  # jaeger ingest
+      - "14268" # jaeger ingest
       - "9411:9411" # zipkin
 
   loki:
     image: grafana/loki
-    extra_hosts: [ 'host.docker.internal:host-gateway' ]
-    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    command: ["-config.file=/etc/loki/local-config.yaml"]
     ports:
-      - "3100:3100"                                   # loki needs to be exposed so it receives logs
+      - "3100:3100" # loki needs to be exposed so it receives logs
     environment:
       - JAEGER_AGENT_HOST=tempo
       - JAEGER_ENDPOINT=http://tempo:14268/api/traces # send traces to Tempo
@@ -63,7 +63,7 @@ services:
 
   prometheus:
     image: prom/prometheus
-    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    extra_hosts: ["host.docker.internal:host-gateway"]
     command:
       - --enable-feature=exemplar-storage
       - --config.file=/etc/prometheus/prometheus.yml
@@ -74,7 +74,7 @@ services:
 
   grafana:
     image: grafana/grafana
-    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    extra_hosts: ["host.docker.internal:host-gateway"]
     volumes:
       - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro

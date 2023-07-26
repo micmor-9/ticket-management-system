@@ -6,10 +6,29 @@ import NorthOutlinedIcon from "@mui/icons-material/NorthOutlined";
 import SouthOutlinedIcon from "@mui/icons-material/SouthOutlined";
 import EastOutlinedIcon from "@mui/icons-material/EastOutlined";
 import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
+import { getTickets } from "../../api/tickets/ticketsApi";
+import { useEffect, useState } from "react";
 
 const Tickets = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const navigate = useNavigate();
+  const [tickets, setTickets] = useState([]);
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const ticketsData = await getTickets();
+        setTickets(ticketsData);
+      } catch (error) {
+        // Gestisci gli errori, ad esempio mostrando un messaggio di errore
+      }
+    };
+
+    fetchTickets();
+  }, []);
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -157,7 +176,11 @@ const Tickets = () => {
             "& .MuiDataGrid-panelWrapper .MuiButton-root": {
               color: colors.greenAccent[400] + " !important",
             },
+            "& .MuiDataGrid-row": {
+              cursor: "pointer",
+            },
           }}
+          onRowClick={(row) => navigate(`/tickets/${row.id}`)}
         />
       </Box>
     </Box>

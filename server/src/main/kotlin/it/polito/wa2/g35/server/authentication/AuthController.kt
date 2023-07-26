@@ -12,26 +12,8 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = ["http://localhost:5000"])
 class AuthController {
-
-    /*@Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    lateinit var keycloakUrlIssuer: String
-
-    @Value("\${http://localhost:8080/realms/SpringBootKeycloak/protocol/openid-connect/auth}")
-    lateinit var keycloakUrl: String
-
-    @Value("\${spring.security.oauth2.resourceserver.jwt.resource-id}")
-    final lateinit var resourceId: String
-
-    @Value("\${keycloak.realm-name}")
-    final lateinit var realmName: String
-
-    @Value("\${keycloak.admin-username}")
-    final lateinit var adminUsername: String
-
-    @Value("\${keycloak.admin-password}")
-    final lateinit var adminPassword: String*/
-
     @Autowired
     lateinit var customerService: CustomerServiceImpl
 
@@ -39,7 +21,6 @@ class AuthController {
     lateinit var authService: AuthServiceImpl
 
     private val log: Logger = LoggerFactory.getLogger(AuthController::class.java)
-
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)

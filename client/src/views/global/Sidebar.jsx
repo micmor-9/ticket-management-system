@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Sidebar as ProSidebar,
   Menu,
@@ -15,6 +15,7 @@ import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import { AuthContext, useAuth } from "../../utils/AuthContext";
 
 const Item = ({ title, slug, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -36,6 +37,7 @@ const Item = ({ title, slug, to, icon, selected, setSelected }) => {
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [currentUser] = useContext(AuthContext);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const [selected, setSelected] = useState(
@@ -107,7 +109,8 @@ const Sidebar = () => {
                     bgcolor: colors.greenAccent[300],
                   }}
                 >
-                  MM
+                  {currentUser.name?.charAt(0).toUpperCase() || ""}
+                  {currentUser.surname?.charAt(0).toUpperCase() || ""}
                 </Avatar>
               </Box>
               <Box textAlign="center">
@@ -117,10 +120,10 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 10px 0" }}
                 >
-                  Michele <br /> Morgigno
+                  {currentUser?.name || ""} <br /> {currentUser?.surname || ""}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[400]}>
-                  Manager
+                  {currentUser?.role}
                 </Typography>
               </Box>
             </Box>
@@ -137,7 +140,8 @@ const Sidebar = () => {
                     bgcolor: colors.greenAccent[300],
                   }}
                 >
-                  MM
+                  {currentUser.name?.charAt(0).toUpperCase() || ""}
+                  {currentUser.surname?.charAt(0).toUpperCase() || ""}
                 </Avatar>
               </Box>
             </Box>
