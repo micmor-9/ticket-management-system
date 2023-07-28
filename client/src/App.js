@@ -2,6 +2,8 @@ import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
 import { AuthContext, useAuth } from "./utils/AuthContext";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import Topbar from "./views/global/Topbar";
 import Sidebar from "./views/global/Sidebar";
 import Dashboard from "./views/dashboard";
@@ -11,10 +13,19 @@ import Users from "./views/users";
 import Tickets from "./views/tickets";
 import Ticket from "./views/tickets/[id]";
 /* import Orders from "./scenes/orders"; */
+import axios from "axios";
 
 function App() {
   const [theme, colorMode] = useMode();
   const [currentUser, setCurrentUser] = useAuth();
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
 
   return (
     <AuthContext.Provider value={[currentUser, setCurrentUser]}>
@@ -28,7 +39,6 @@ function App() {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/users" element={<Users />} />
-                <Route path="/login" element={<Login />} />
                 {/* <Route path="/products" element={<Products />} /> */}
                 <Route path="/tickets" element={<Tickets />} />
                 <Route path="/tickets/:ticketId" element={<Ticket />} />

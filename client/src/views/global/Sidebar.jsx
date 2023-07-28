@@ -15,7 +15,7 @@ import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import { AuthContext, useAuth } from "../../utils/AuthContext";
+import { AuthContext } from "../../utils/AuthContext";
 
 const Item = ({ title, slug, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -27,6 +27,7 @@ const Item = ({ title, slug, to, icon, selected, setSelected }) => {
         style={{ color: colors.grey[100] }}
         onClick={() => setSelected(slug)}
         icon={icon}
+        component={"span"}
       >
         <Typography>{title}</Typography>
       </MenuItem>

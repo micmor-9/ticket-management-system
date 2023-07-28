@@ -3,6 +3,9 @@ import backendUrl from "../../config";
 
 const api = axios.create({
   baseURL: `${backendUrl}`,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 const handleApiError = (error) => {
@@ -12,7 +15,11 @@ const handleApiError = (error) => {
 
 export const getTickets = async () => {
   try {
-    const response = await api.get("/tickets");
+    const response = await api.get("/tickets", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response.data;
   } catch (error) {
     handleApiError(error);
@@ -21,7 +28,11 @@ export const getTickets = async () => {
 
 export const getTicketById = async (ticketId) => {
   try {
-    const response = await api.get(`/tickets/${ticketId}`);
+    const response = await api.get(`/tickets/${ticketId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response.data;
   } catch (error) {
     handleApiError(error);

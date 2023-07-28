@@ -160,25 +160,30 @@ const Tickets = () => {
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
           },
+          "& .MuiCircularProgress-root": {
+            color: colors.greenAccent[700],
+          },
+          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+            color: colors.grey[100],
+          },
+          "& .MuiDataGrid-panelWrapper .MuiButton-root": {
+            color: colors.greenAccent[400] + " !important",
+          },
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
         }}
       >
         <DataGrid
-          rows={mockTickets}
+          rows={tickets}
           columns={columns}
+          loading={!tickets.length}
           getRowId={(row) => row.id}
           slots={{
             toolbar: GridToolbar,
           }}
           sx={{
-            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-              color: colors.grey[100],
-            },
-            "& .MuiDataGrid-panelWrapper .MuiButton-root": {
-              color: colors.greenAccent[400] + " !important",
-            },
-            "& .MuiDataGrid-row": {
-              cursor: "pointer",
-            },
+            height: "70vh",
           }}
           onRowClick={(row) => navigate(`/tickets/${row.id}`)}
         />

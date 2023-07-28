@@ -13,7 +13,6 @@ export const login = async (loginRequest) => {
     const response = await api.post("/login", loginRequest);
     if (response.data.access_token) {
       localStorage.setItem("token", response.data.access_token);
-      localStorage.setItem("user", JSON.stringify(response.data));
     } else {
       console.log("No token found");
     }
