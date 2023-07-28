@@ -32,7 +32,7 @@ class CorsConfig {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
-                    .allowedOrigins(frontendAddress)
+                    .allowedOrigins("*")
                     .allowedMethods("*")
                     .allowedHeaders("*")
                     .allowCredentials(true)

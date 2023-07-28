@@ -1,6 +1,6 @@
 package it.polito.wa2.g35.server.ticketing.attachment
 
-import it.polito.wa2.g35.server.ticketing.message.Message
+import it.polito.wa2.g35.server.messages.Message
 import jakarta.persistence.*
 
 @Entity

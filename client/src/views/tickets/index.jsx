@@ -1,7 +1,6 @@
 import { Box, Typography, Tooltip, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockTickets } from "../../data/mockTickets";
 import NorthOutlinedIcon from "@mui/icons-material/NorthOutlined";
 import SouthOutlinedIcon from "@mui/icons-material/SouthOutlined";
 import EastOutlinedIcon from "@mui/icons-material/EastOutlined";

@@ -2,9 +2,9 @@ package it.polito.wa2.g35.server.ticketing.attachment
 
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.security.SecurityConfig
-import it.polito.wa2.g35.server.ticketing.message.MessageNotFoundException
-import it.polito.wa2.g35.server.ticketing.message.MessageService
-import it.polito.wa2.g35.server.ticketing.message.toMessage
+import it.polito.wa2.g35.server.messages.MessageNotFoundException
+import it.polito.wa2.g35.server.messages.MessageService
+import it.polito.wa2.g35.server.messages.toMessage
 import it.polito.wa2.g35.server.ticketing.ticket.TicketController
 import it.polito.wa2.g35.server.ticketing.ticket.UnauthorizedTicketException
 import org.slf4j.Logger

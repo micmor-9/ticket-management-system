@@ -1,16 +1,31 @@
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useState, useContext } from "react";
+import io from "socket.io-client";
 import {
   Box,
   Grid,
   IconButton,
+  Divider,
   Paper,
   InputBase,
   useTheme,
 } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
 import { tokens } from "../theme";
+import { getMessagesByTicket } from "../api/messages/messagesApi";
+import { AuthContext } from "../utils/AuthContext";
 
-const ChatInputBox = () => {
+const ChatInputBox = ({ onSendMessage }) => {
+  const [message, setMessage] = useState("");
+
+  const handleSendMessage = () => {
+    if (message.trim() !== "") {
+      onSendMessage(message);
+      setMessage("");
+    }
+  };
+
   return (
     <Paper
       component="form"
@@ -28,109 +43,28 @@ const ChatInputBox = () => {
         sx={{ ml: 1, flex: 1 }}
         placeholder="Type your message"
         inputProps={{ "aria-label": "type your message" }}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
       />
-      <IconButton type="button" sx={{ p: "10px" }} aria-label="send">
+      <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
+        <AttachFileRoundedIcon />
+      </IconButton>
+      <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+      <IconButton
+        type="button"
+        sx={{ p: "10px" }}
+        aria-label="send"
+        onClick={handleSendMessage}
+      >
         <SendRoundedIcon />
       </IconButton>
     </Paper>
   );
 };
 
-const ChatBubblesBox = () => {
+const ChatBubblesBox = ({ chatMessages }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
-  const chatMessages = useMemo(
-    () => [
-      {
-        id: 1,
-        text: "Ciao! Ho bisogno di assistenza con il mio prodotto.",
-        sender: "customer",
-      },
-      {
-        id: 2,
-        text: "Certo, sono qui per aiutarti! Di che cosa hai bisogno?",
-        sender: "expert",
-      },
-      {
-        id: 3,
-        text: "Ho un problema con la connessione Wi-Fi. Non riesco a connettermi.",
-        sender: "customer",
-      },
-      {
-        id: 4,
-        text: "Capisco la tua preoccupazione. Proveremo a risolverlo insieme.",
-        sender: "expert",
-      },
-      {
-        id: 5,
-        text: "Grazie mille! Non so cosa farei senza internet.",
-        sender: "customer",
-      },
-      {
-        id: 6,
-        text: "Nessun problema, siamo qui per assicurarci che tutto funzioni correttamente.",
-        sender: "expert",
-      },
-      {
-        id: 7,
-        text: "Sto verificando le impostazioni del router. Potresti provare a riavviare il dispositivo?",
-        sender: "expert",
-      },
-      {
-        id: 8,
-        text: "Ok, ho riavviato il router ma ancora non si connette.",
-        sender: "customer",
-      },
-      {
-        id: 9,
-        text: "Hai provato a verificare la password Wi-Fi? Potrebbe essere sbagliata.",
-        sender: "expert",
-      },
-      {
-        id: 10,
-        text: "Hai ragione, la password era errata. Ora funziona! Grazie mille!",
-        sender: "customer",
-      },
-      {
-        id: 11,
-        text: "Felice di aver risolto il problema! Se hai altre domande, non esitare a chiedere.",
-        sender: "expert",
-      },
-      {
-        id: 12,
-        text: "Certamente, ti contatterò se ho bisogno di ulteriore assistenza. Grazie ancora!",
-        sender: "customer",
-      },
-      {
-        id: 13,
-        text: "Di nulla! Siamo sempre qui per aiutarti. Buona giornata!",
-        sender: "expert",
-      },
-      { id: 14, text: "Grazie, altrettanto! Arrivederci!", sender: "customer" },
-      {
-        id: 15,
-        text: "Arrivederci! Non esitare a tornare se hai bisogno di aiuto.",
-        sender: "expert",
-      },
-      {
-        id: 16,
-        text: "Ciao! Ci sono altri problemi riguardanti il prodotto?",
-        sender: "expert",
-      },
-      {
-        id: 17,
-        text: "Al momento no, tutto sembra funzionare correttamente. Grazie!",
-        sender: "customer",
-      },
-      {
-        id: 18,
-        text: "Perfetto! Se hai bisogno in futuro, non esitare a contattarci. Buona giornata!",
-        sender: "expert",
-      },
-    ],
-    []
-  );
 
   const chatBoxRef = useRef(null);
 
@@ -194,7 +128,7 @@ const ChatBubblesBox = () => {
                 } !important`,
               }}
             >
-              {message.text}
+              {message.messageText}
             </Box>
           </Box>
         );
@@ -205,6 +139,60 @@ const ChatBubblesBox = () => {
 };
 
 const Chat = ({ ticket }) => {
+  const socketRef = useRef(null);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentUser] = useContext(AuthContext);
+
+  const handleSendMessage = (messageText) => {
+    // Invia il messaggio tramite WebSocket al server
+    socketRef.current.emit("/app/chat.sendMessage", {
+      id: null,
+      messageTimestamp: null,
+      messageText: messageText,
+      ticket: ticket.id,
+      sender: currentUser.name,
+    });
+  };
+
+  useEffect(() => {
+    const fetchTicketMessages = async () => {
+      if (ticket) {
+        try {
+          const ticketMessages = await getMessagesByTicket(ticket.id);
+          setChatMessages(ticketMessages);
+          setLoading(false);
+        } catch (error) {
+          console.log(error);
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchTicketMessages();
+  }, [ticket]);
+
+  useEffect(() => {
+    if (ticket) {
+      // Connessione al server WebSocket
+      socketRef.current = io("http://localhost:8081/ws", {
+        extraHeaders: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      // Gestisci la ricezione di nuovi messaggi dal server
+      socketRef.current.on(`/topic/${ticket.id}`, (newMessage) => {
+        setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+      });
+
+      // Pulizia delle connessioni WebSocket quando il componente viene smontato
+      return () => {
+        socketRef.current.disconnect();
+      };
+    }
+  }, [ticket]);
+
   return (
     <Box
       sx={{
@@ -217,10 +205,23 @@ const Chat = ({ ticket }) => {
     >
       <Grid container direction="column" sx={{ height: "100%" }}>
         <Grid item sx={{ flex: 1 }}>
-          <ChatBubblesBox />
+          {loading ? ( // Mostra un indicatore di caricamento se loading è true
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : (
+            <ChatBubblesBox chatMessages={chatMessages} />
+          )}
         </Grid>
       </Grid>
-      <ChatInputBox />
+      <ChatInputBox onSendMessage={handleSendMessage} />
     </Box>
   );
 };

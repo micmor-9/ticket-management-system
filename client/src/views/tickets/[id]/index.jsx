@@ -10,13 +10,13 @@ const Ticket = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const { id } = useParams();
+  const { ticketId } = useParams();
   const [ticket, setTicket] = useState(null);
 
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        const ticketData = await getTicketById(id);
+        const ticketData = await getTicketById(ticketId);
         setTicket(ticketData);
       } catch (error) {
         console.log(error);
@@ -24,7 +24,7 @@ const Ticket = () => {
     };
 
     fetchTicket();
-  }, [id]);
+  }, [ticketId]);
 
   return (
     <Box m="20px">

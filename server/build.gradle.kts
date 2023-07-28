@@ -35,6 +35,7 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     implementation("org.keycloak:keycloak-admin-client:15.0.2")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
 
     // using new @Observed on class and enaabled @ObservedAspect
     implementation("org.springframework.boot:spring-boot-starter-aop")

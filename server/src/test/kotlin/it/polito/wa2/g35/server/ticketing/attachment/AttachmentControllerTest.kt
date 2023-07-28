@@ -7,8 +7,8 @@ import it.polito.wa2.g35.server.profiles.employee.expert.Expert
 import it.polito.wa2.g35.server.profiles.employee.expert.ExpertRepository
 import it.polito.wa2.g35.server.profiles.employee.expert.ExpertService
 import it.polito.wa2.g35.server.profiles.employee.expert.toDTO
-import it.polito.wa2.g35.server.ticketing.message.MessageInputDTO
-import it.polito.wa2.g35.server.ticketing.message.MessageService
+import it.polito.wa2.g35.server.messages.MessageInputDTO
+import it.polito.wa2.g35.server.messages.MessageService
 import it.polito.wa2.g35.server.ticketing.order.OrderInputDTO
 import it.polito.wa2.g35.server.ticketing.order.OrderRepository
 import it.polito.wa2.g35.server.ticketing.order.OrderService

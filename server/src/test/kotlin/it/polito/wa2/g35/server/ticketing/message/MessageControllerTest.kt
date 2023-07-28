@@ -1,6 +1,9 @@
 package it.polito.wa2.g35.server.ticketing.message
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import it.polito.wa2.g35.server.messages.MessageInputDTO
+import it.polito.wa2.g35.server.messages.MessageRepository
+import it.polito.wa2.g35.server.messages.MessageService
 import it.polito.wa2.g35.server.products.*
 import it.polito.wa2.g35.server.profiles.customer.*
 import it.polito.wa2.g35.server.profiles.employee.expert.*

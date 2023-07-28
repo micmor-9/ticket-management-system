@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import it.polito.wa2.g35.server.products.*
 import it.polito.wa2.g35.server.profiles.customer.*
 import it.polito.wa2.g35.server.profiles.employee.expert.*
-import it.polito.wa2.g35.server.ticketing.attachment.AttachmentDTO
-import it.polito.wa2.g35.server.ticketing.attachment.AttachmentInputDTO
-import it.polito.wa2.g35.server.ticketing.message.MessageInputDTO
 import it.polito.wa2.g35.server.ticketing.order.OrderInputDTO
 import it.polito.wa2.g35.server.ticketing.order.OrderRepository
 import it.polito.wa2.g35.server.ticketing.order.OrderService

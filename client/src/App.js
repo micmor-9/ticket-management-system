@@ -7,13 +7,11 @@ import { useNavigate } from "react-router";
 import Topbar from "./views/global/Topbar";
 import Sidebar from "./views/global/Sidebar";
 import Dashboard from "./views/dashboard";
-import Login from "./views/login";
 import Users from "./views/users";
 /* import Products from "./scenes/products"; */
 import Tickets from "./views/tickets";
 import Ticket from "./views/tickets/[id]";
 /* import Orders from "./scenes/orders"; */
-import axios from "axios";
 
 function App() {
   const [theme, colorMode] = useMode();
