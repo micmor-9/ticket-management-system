@@ -47,6 +47,7 @@ class SecurityConfig() {
             .requestMatchers(HttpMethod.POST, "/api/profiles/").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/signup").permitAll()
             .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/ws/**").permitAll()
             .anyRequest().authenticated()
         http.oauth2ResourceServer()
             .jwt()

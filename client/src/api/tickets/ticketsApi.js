@@ -13,7 +13,7 @@ const handleApiError = (error) => {
   throw error;
 };
 
-export const getTickets = async () => {
+const getTickets = async () => {
   try {
     const response = await api.get("/tickets", {
       headers: {
@@ -26,7 +26,33 @@ export const getTickets = async () => {
   }
 };
 
-export const getTicketById = async (ticketId) => {
+const getTicketsByExpert = async (expertId) => {
+  try {
+    const response = await api.get(`/tickets/expert/${expertId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const getTicketsByCustomer = async (customerId) => {
+  try {
+    const response = await api.get(`/tickets/customer/${customerId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const getTicketById = async (ticketId) => {
   try {
     const response = await api.get(`/tickets/${ticketId}`, {
       headers: {
@@ -39,7 +65,7 @@ export const getTicketById = async (ticketId) => {
   }
 };
 
-export const createTicket = async (ticketData) => {
+const createTicket = async (ticketData) => {
   try {
     const response = await api.post("/tickets/", ticketData);
     return response.data;
@@ -48,7 +74,7 @@ export const createTicket = async (ticketData) => {
   }
 };
 
-export const updateTicket = async (ticketId, ticketData) => {
+const updateTicket = async (ticketId, ticketData) => {
   try {
     const response = await api.put(`/tickets/${ticketId}`, ticketData);
     return response.data;
@@ -57,7 +83,7 @@ export const updateTicket = async (ticketId, ticketData) => {
   }
 };
 
-export const updateTicketStatus = async (ticketId, status) => {
+const updateTicketStatus = async (ticketId, status) => {
   try {
     const response = await api.patch(`/tickets/${ticketId}/status/${status}`);
     return response.data;
@@ -66,7 +92,7 @@ export const updateTicketStatus = async (ticketId, status) => {
   }
 };
 
-export const updateTicketPriority = async (ticketId, priority) => {
+const updateTicketPriority = async (ticketId, priority) => {
   try {
     const response = await api.patch(
       `/tickets/${ticketId}/priority/${priority}`
@@ -76,3 +102,16 @@ export const updateTicketPriority = async (ticketId, priority) => {
     handleApiError(error);
   }
 };
+
+const TicketsAPI = {
+  getTickets,
+  getTicketsByExpert,
+  getTicketsByCustomer,
+  getTicketById,
+  createTicket,
+  updateTicket,
+  updateTicketStatus,
+  updateTicketPriority,
+};
+
+export default TicketsAPI;

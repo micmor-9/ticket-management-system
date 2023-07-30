@@ -7,6 +7,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.util.Date
@@ -110,6 +111,7 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
             log.error("No Ticket found with this Id: ${message.ticket}")
             throw TicketNotFoundException("Ticket not found with this ID!")
         }
+
         val authentication = SecurityContextHolder.getContext().authentication
         when(authentication.authorities.map { it.authority }[0]){
             SecurityConfig.MANAGER_ROLE -> {

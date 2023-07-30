@@ -21,9 +21,13 @@ export const getMessagesByTicket = async (ticketId) => {
   }
 };
 
-export const postMessage = async (message) => {
+export const sendMessage = async (message) => {
   try {
-    const response = await api.post("/messages", message);
+    const response = await api.post("/messages/send", message, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response.data;
   } catch (error) {
     throw new Error("Error sending message");

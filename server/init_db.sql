@@ -20,10 +20,31 @@ INSERT INTO public.ticket_status (id, description, status, status_timestamp, exp
 INSERT INTO public.ticket_status (id, description, status, status_timestamp, expert_id, ticket_id) VALUES (102, 'schermo rotto', 'IN_PROGRESS', '2023-05-16 18:17:26.554000', '123', 2);
 INSERT INTO public.ticket_status (id, description, status, status_timestamp, expert_id, ticket_id) VALUES (103, 'schermo rotto', 'RESOLVED', '2023-05-16 18:17:40.716000', '123', 2);
 
-INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (1, 'ciao come va', '2023-05-19 13:25:55.947000', 'Mario', 52);
-INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (2, 'io tutto bene, tu?', '2023-05-19 13:29:16.922000', 'Michele', 52);
-INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (55, 'io tutto bene, tu?', '2023-05-19 13:40:04.488000', 'Michele', 2);
-INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (102, 'io tutto bene, tu?', '2023-05-19 13:42:18.253000', 'user1', 2);
-INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (202, 'io tutto bene, tu?', '2023-05-19 13:47:32.767000', 'user1', 2);
-INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (252, 'io tutto bene, tu?', '2023-05-19 13:58:51.807000', 'Mario', 2);
-INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (302, 'io tutto bene, tu?', '2023-05-19 14:06:28.391000', 'claudio', 2);
+INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (null, 'ciao come va', '2023-05-19 13:25:55.947000', 'Mario', 52);
+INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (null, 'io tutto bene, tu?', '2023-05-19 13:29:16.922000', 'Michele', 52);
+INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (null, 'io tutto bene, tu?', '2023-05-19 13:40:04.488000', 'Michele', 2);
+INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (null, 'io tutto bene, tu?', '2023-05-19 13:42:18.253000', 'user1', 2);
+INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (null, 'io tutto bene, tu?', '2023-05-19 13:47:32.767000', 'user1', 2);
+INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (null, 'io tutto bene, tu?', '2023-05-19 13:58:51.807000', 'Mario', 2);
+INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id) VALUES (null, 'io tutto bene, tu?', '2023-05-19 14:06:28.391000', 'claudio', 2);
+
+INSERT INTO public.message (id, message_text, message_timestamp, sender, ticket_id)
+VALUES
+    (null, 'Ciao! Ho bisogno di assistenza con il mio prodotto.', '2023-07-22 08:00:00', 'customer', 1),
+    (null, 'Certo, sono qui per aiutarti! Di che cosa hai bisogno?', '2023-07-22 08:10:00', 'expert', 1),
+    (null, 'Ho un problema con la connessione Wi-Fi. Non riesco a connettermi.', '2023-07-22 08:20:00', 'customer', 1),
+    (null, 'Capisco la tua preoccupazione. Proveremo a risolverlo insieme.', '2023-07-22 08:30:00', 'expert', 1),
+    (null, 'Grazie mille! Non so cosa farei senza internet.', '2023-07-22 08:40:00', 'customer', 1),
+    (null, 'Nessun problema, siamo qui per assicurarci che tutto funzioni correttamente.', '2023-07-22 08:50:00', 'expert', 1),
+    (null, 'Sto verificando le impostazioni del router. Potresti provare a riavviare il dispositivo?', '2023-07-22 09:00:00', 'expert', 1),
+    (null, 'Ok, ho riavviato il router ma ancora non si connette.', '2023-07-22 09:10:00', 'customer', 1),
+    (null, 'Hai provato a verificare la password Wi-Fi? Potrebbe essere sbagliata.', '2023-07-22 09:20:00', 'expert', 1),
+    (null, 'Hai ragione, la password era errata. Ora funziona! Grazie mille!', '2023-07-22 09:30:00', 'customer', 1),
+    (null, 'Felice di aver risolto il problema! Se hai altre domande, non esitare a chiedere.', '2023-07-22 09:40:00', 'expert', 1),
+    (null, 'Certamente, ti contatterò se ho bisogno di ulteriore assistenza. Grazie ancora!', '2023-07-22 09:50:00', 'customer', 1),
+    (null, 'Di nulla! Siamo sempre qui per aiutarti. Buona giornata!', '2023-07-22 10:00:00', 'expert', 1),
+    (null, 'Grazie, altrettanto! Arrivederci!', '2023-07-22 10:10:00', 'customer', 1),
+    (null, 'Arrivederci! Non esitare a tornare se hai bisogno di aiuto.', '2023-07-22 10:20:00', 'expert', 1),
+    (null, 'Ciao! Ci sono altri problemi riguardanti il prodotto?', '2023-07-22 10:30:00', 'expert', 1),
+    (null, 'Al momento no, tutto sembra funzionare correttamente. Grazie!', '2023-07-22 10:40:00', 'customer', 1),
+    (null, 'Perfetto! Se hai bisogno in futuro, non esitare a contattarci. Buona giornata!', '2023-07-22 10:50:00', 'expert', 1);

@@ -6,20 +6,28 @@ import SouthOutlinedIcon from "@mui/icons-material/SouthOutlined";
 import EastOutlinedIcon from "@mui/icons-material/EastOutlined";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
-import { getTickets } from "../../api/tickets/ticketsApi";
-import { useEffect, useState } from "react";
+import TicketsAPI from "../../api/tickets/ticketsApi";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 
 const Tickets = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  const [currentUser] = useContext(AuthContext);
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
 
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const ticketsData = await getTickets();
+        let ticketsData;
+        if (currentUser.role === "Customer")
+          ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.id);
+        if (currentUser.role === "Expert")
+          ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
+        if (currentUser.role === "Manager")
+          ticketsData = await TicketsAPI.getTickets();
         setTickets(ticketsData);
       } catch (error) {
         // Gestisci gli errori, ad esempio mostrando un messaggio di errore
@@ -27,7 +35,7 @@ const Tickets = () => {
     };
 
     fetchTickets();
-  }, []);
+  }, [currentUser.id, currentUser.role]);
 
   const columns = [
     { field: "id", headerName: "ID" },

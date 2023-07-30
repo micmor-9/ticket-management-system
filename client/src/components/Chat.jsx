@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useContext } from "react";
-import io from "socket.io-client";
+import { Client } from "@stomp/stompjs";
 import {
   Box,
   Grid,
@@ -13,8 +13,10 @@ import { CircularProgress } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
 import { tokens } from "../theme";
-import { getMessagesByTicket } from "../api/messages/messagesApi";
+import { getMessagesByTicket, sendMessage } from "../api/messages/messagesApi";
 import { AuthContext } from "../utils/AuthContext";
+
+const SOCKET_URL = "ws://localhost:8081/ws";
 
 const ChatInputBox = ({ onSendMessage }) => {
   const [message, setMessage] = useState("");
@@ -66,7 +68,10 @@ const ChatBubblesBox = ({ chatMessages }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  const [currentUser] = useContext(AuthContext);
   const chatBoxRef = useRef(null);
+
+  const currentSender = (currentUser?.name + " " + currentUser?.surname).trim();
 
   useEffect(() => {
     chatBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -105,7 +110,7 @@ const ChatBubblesBox = ({ chatMessages }) => {
               width: "100%",
               display: "flex",
               justifyContent: `${
-                message.sender === "expert" ? "flex-start" : "flex-end"
+                message.sender !== currentSender ? "flex-start" : "flex-end"
               }`,
               mb: "10px",
             }}
@@ -115,7 +120,7 @@ const ChatBubblesBox = ({ chatMessages }) => {
                 p: "10px",
                 borderRadius: "10px",
                 backgroundColor: `${
-                  message.sender === "expert"
+                  message.sender !== currentSender
                     ? theme.palette.mode === "dark"
                       ? colors.grey[100]
                       : colors.primary[400]
@@ -124,7 +129,7 @@ const ChatBubblesBox = ({ chatMessages }) => {
                     : colors.greenAccent[300]
                 }`,
                 color: `${
-                  message.sender === "expert" ? "black" : "white"
+                  message.sender !== currentSender ? "black" : "white"
                 } !important`,
               }}
             >
@@ -139,20 +144,26 @@ const ChatBubblesBox = ({ chatMessages }) => {
 };
 
 const Chat = ({ ticket }) => {
-  const socketRef = useRef(null);
   const [chatMessages, setChatMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUser] = useContext(AuthContext);
+  const clientRef = useRef(null);
 
   const handleSendMessage = (messageText) => {
-    // Invia il messaggio tramite WebSocket al server
-    socketRef.current.emit("/app/chat.sendMessage", {
+    if (messageText.trim() === "") return;
+    const message = {
       id: null,
       messageTimestamp: null,
-      messageText: messageText,
+      messageText: messageText.trim(),
       ticket: ticket.id,
-      sender: currentUser.name,
-    });
+      sender: (currentUser?.name + " " + currentUser?.surname).trim(),
+    };
+
+    sendMessage(message)
+      .then((response) => {})
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   useEffect(() => {
@@ -174,21 +185,44 @@ const Chat = ({ ticket }) => {
 
   useEffect(() => {
     if (ticket) {
-      // Connessione al server WebSocket
-      socketRef.current = io("http://localhost:8081/ws", {
-        extraHeaders: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      const client = new Client({
+        brokerURL: SOCKET_URL,
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
       });
 
-      // Gestisci la ricezione di nuovi messaggi dal server
-      socketRef.current.on(`/topic/${ticket.id}`, (newMessage) => {
-        setChatMessages((prevMessages) => [...prevMessages, newMessage]);
-      });
+      client.onConnect = () => {
+        console.log("Connected!");
+        client.subscribe(`/topic/${ticket.id}`, (message) => {
+          const newMessage = JSON.parse(message.body);
+          setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+        });
+      };
 
-      // Pulizia delle connessioni WebSocket quando il componente viene smontato
+      client.onStompError = function (frame) {
+        console.log("Broker reported error: " + frame.headers["message"]);
+        console.log("Additional details: " + frame.body);
+      };
+
+      client.onWebSocketError = function (frame) {
+        console.log("WS reported error: " + frame.headers["message"]);
+        console.log("Additional details: " + frame.body);
+      };
+
+      client.onDisconnect = () => {
+        console.log("Disconnected!");
+      };
+
+      client.activate();
+
+      clientRef.current = client;
+
       return () => {
-        socketRef.current.disconnect();
+        if (clientRef.current) {
+          clientRef.current.unsubscribe(`/topic/${ticket.id}`);
+          clientRef.current.deactivate();
+        }
       };
     }
   }, [ticket]);
@@ -205,7 +239,7 @@ const Chat = ({ ticket }) => {
     >
       <Grid container direction="column" sx={{ height: "100%" }}>
         <Grid item sx={{ flex: 1 }}>
-          {loading ? ( // Mostra un indicatore di caricamento se loading è true
+          {loading ? (
             <Box
               sx={{
                 display: "flex",

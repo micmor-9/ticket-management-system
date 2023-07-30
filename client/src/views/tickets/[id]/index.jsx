@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, useTheme, Typography, Paper } from "@mui/material";
 import { tokens } from "../../../theme";
 import Header from "../../../components/Header";
-import { getTicketById } from "../../../api/tickets/ticketsApi";
+import TicketsAPI from "../../../api/tickets/ticketsApi";
 import { useParams } from "react-router-dom";
 import Chat from "../../../components/Chat";
 
@@ -16,7 +16,7 @@ const Ticket = () => {
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        const ticketData = await getTicketById(ticketId);
+        const ticketData = await TicketsAPI.getTicketById(ticketId);
         setTicket(ticketData);
       } catch (error) {
         console.log(error);
