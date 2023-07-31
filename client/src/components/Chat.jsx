@@ -3,28 +3,59 @@ import { Client } from "@stomp/stompjs";
 import {
   Box,
   Grid,
+  Input,
   IconButton,
   Divider,
   Paper,
   InputBase,
   useTheme,
+  Badge,
 } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { tokens } from "../theme";
-import { getMessagesByTicket, sendMessage } from "../api/messages/messagesApi";
+import MessagesAPI from "../api/messages/messagesApi";
 import { AuthContext } from "../utils/AuthContext";
 
 const SOCKET_URL = "ws://localhost:8081/ws";
 
 const ChatInputBox = ({ onSendMessage }) => {
   const [message, setMessage] = useState("");
+  const [fileSelected, setFileSelected] = useState();
+  const fileInputRef = useRef();
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
-      onSendMessage(message);
+      onSendMessage(message, fileSelected);
       setMessage("");
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleFileInputChange = (e) => {
+    fileInputRef.current = e.target;
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setFileSelected(reader.result);
+      setMessage(file.name);
+    };
+  };
+
+  const handleDeleteFileSelected = () => {
+    setFileSelected();
+    setMessage("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -46,11 +77,38 @@ const ChatInputBox = ({ onSendMessage }) => {
         placeholder="Type your message"
         inputProps={{ "aria-label": "type your message" }}
         value={message}
+        onKeyDown={handleKeyDown}
         onChange={(e) => setMessage(e.target.value)}
+        disabled={fileSelected ? true : false}
       />
-      <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
-        <AttachFileRoundedIcon />
-      </IconButton>
+      <Input
+        type="file"
+        id="fileInput"
+        sx={{ display: "none" }}
+        onInput={handleFileInputChange}
+        ref={fileInputRef}
+      />
+      {fileSelected && (
+        <IconButton
+          type="button"
+          sx={{ p: "10px" }}
+          aria-label="delete-file"
+          onClick={handleDeleteFileSelected}
+        >
+          <DeleteRoundedIcon />
+        </IconButton>
+      )}
+      <label htmlFor="fileInput">
+        <IconButton
+          component="span"
+          sx={{ p: "10px" }}
+          aria-label="attach file"
+        >
+          <Badge color="secondary" badgeContent={1} invisible={!fileSelected}>
+            <AttachFileRoundedIcon />
+          </Badge>
+        </IconButton>
+      </label>
       <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
       <IconButton
         type="button"
@@ -148,8 +206,9 @@ const Chat = ({ ticket }) => {
   const [loading, setLoading] = useState(true);
   const [currentUser] = useContext(AuthContext);
   const clientRef = useRef(null);
+  const subscriptionRef = useRef(null);
 
-  const handleSendMessage = (messageText) => {
+  const handleSendMessage = (messageText, attachedFile = null) => {
     if (messageText.trim() === "") return;
     const message = {
       id: null,
@@ -159,7 +218,11 @@ const Chat = ({ ticket }) => {
       sender: (currentUser?.name + " " + currentUser?.surname).trim(),
     };
 
-    sendMessage(message)
+    if (attachedFile) {
+      //Handle Attachment API
+    }
+
+    MessagesAPI.sendMessage(message)
       .then((response) => {})
       .catch((error) => {
         console.log(error);
@@ -170,7 +233,9 @@ const Chat = ({ ticket }) => {
     const fetchTicketMessages = async () => {
       if (ticket) {
         try {
-          const ticketMessages = await getMessagesByTicket(ticket.id);
+          const ticketMessages = await MessagesAPI.getMessagesByTicket(
+            ticket.id
+          );
           setChatMessages(ticketMessages);
           setLoading(false);
         } catch (error) {
@@ -185,6 +250,7 @@ const Chat = ({ ticket }) => {
 
   useEffect(() => {
     if (ticket) {
+      clientRef.current = null;
       const client = new Client({
         brokerURL: SOCKET_URL,
         reconnectDelay: 5000,
@@ -194,10 +260,13 @@ const Chat = ({ ticket }) => {
 
       client.onConnect = () => {
         console.log("Connected!");
-        client.subscribe(`/topic/${ticket.id}`, (message) => {
-          const newMessage = JSON.parse(message.body);
-          setChatMessages((prevMessages) => [...prevMessages, newMessage]);
-        });
+        subscriptionRef.current = client.subscribe(
+          `/topic/${ticket.id}`,
+          (message) => {
+            const newMessage = JSON.parse(message.body);
+            setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+          }
+        );
       };
 
       client.onStompError = function (frame) {
@@ -206,8 +275,8 @@ const Chat = ({ ticket }) => {
       };
 
       client.onWebSocketError = function (frame) {
-        console.log("WS reported error: " + frame.headers["message"]);
-        console.log("Additional details: " + frame.body);
+        console.log("WS reported error: ");
+        console.log(frame);
       };
 
       client.onDisconnect = () => {
@@ -220,8 +289,16 @@ const Chat = ({ ticket }) => {
 
       return () => {
         if (clientRef.current) {
-          clientRef.current.unsubscribe(`/topic/${ticket.id}`);
-          clientRef.current.deactivate();
+          if (clientRef.current.active) {
+            try {
+              console.log(clientRef.current);
+              if (subscriptionRef.current)
+                subscriptionRef.current.unsubscribe();
+              clientRef.current.deactivate();
+            } catch (error) {
+              console.log(error);
+            }
+          }
         }
       };
     }

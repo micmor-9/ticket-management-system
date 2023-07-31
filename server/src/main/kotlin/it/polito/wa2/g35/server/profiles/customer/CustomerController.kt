@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = ["http://localhost:5000"])
 class CustomerController(private val customerService: CustomerService) {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
-    @GetMapping("/profiles/{email}")
+    @GetMapping("/customers/{email}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
     @Observed(
-        name = "/profiles/{email}",
+        name = "/customers/{email}",
         contextualName = "get-profile-request"
     )
     fun getProfile(@PathVariable email: String): CustomerDTO? {
@@ -29,10 +30,10 @@ class CustomerController(private val customerService: CustomerService) {
         return customerService.getCustomerByEmail(email)
     }
 
-    @PostMapping("/profiles")
+    @PostMapping("/customers")
     @ResponseStatus(HttpStatus.CREATED)
     @Observed(
-        name = "/profiles/",
+        name = "/customers/",
         contextualName = "post-profile-request"
     )
     fun postProfile(
@@ -49,11 +50,11 @@ class CustomerController(private val customerService: CustomerService) {
         }
     }
 
-    @PutMapping("/profiles/{email}")
+    @PutMapping("/customers/{email}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager', 'Client')")
     @Observed(
-        name = "/profiles/{email}",
+        name = "/customers/{email}",
         contextualName = "put-profile-request"
     )
     fun updateProfile(

@@ -48,6 +48,41 @@ class ExpertServiceImpl(private val expertRepository: ExpertRepository) : Expert
             }
         }
     }
+
+    @Observed(
+        name = "/experts/id/{expertEmail}",
+        contextualName = "get-expert-id-by-email-request-service"
+    )
+    override fun getExpertId(expertEmail: String?): ExpertDTO? {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val expert = expertRepository.findByEmail(expertEmail)
+        if(expert == null) {
+            log.error("No Expert found with this Email: $expertEmail")
+            throw UnauthorizedProfileException("Expert with given id doesn't exist!")
+        }
+
+        return when (authentication.authorities.map { it.authority }[0]) {
+            SecurityConfig.MANAGER_ROLE -> {
+                log.info("Get expert id from repository request successful")
+                expert.toDTO()
+            }
+
+            SecurityConfig.EXPERT_ROLE -> {
+                if (authentication.name == expert.email) {
+                    log.info("Get expert id from repository request successful")
+                    expert.toDTO()
+                } else {
+                    log.error("Get expert Id request failed by unauthorized access")
+                    throw UnauthorizedTicketException("You can't access this expert!")
+                }
+            }
+            else -> {
+                log.error("Get expert by Id request failed by unauthorized access")
+                throw UnauthorizedTicketException("You can't access this expert!")
+            }
+        }
+    }
+
     @Observed(
         name = "/experts/specialization/{specialization}",
         contextualName = "get-expert-by-specialization-request-service"

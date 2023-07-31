@@ -25,7 +25,7 @@ services:
     container_name: spring-boot-keycloak
 
   server:
-    image: lab05-server:latest
+    image: springboot-server:latest
     ports:
       - "8081:8081"
     depends_on:
@@ -37,6 +37,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/SpringBootKeycloak
     container_name: spring-boot-server
+    restart: always
 
   tempo:
     image: grafana/tempo

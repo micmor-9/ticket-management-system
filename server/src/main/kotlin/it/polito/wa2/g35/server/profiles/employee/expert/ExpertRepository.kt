@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ExpertRepository: JpaRepository<Expert, String>{
     fun findBySpecialization(specialization: String?): List<Expert>
+
+    fun findByEmail(email: String?): Expert?
 }

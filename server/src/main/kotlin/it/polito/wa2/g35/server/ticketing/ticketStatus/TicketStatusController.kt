@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*
 @Validated
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = ["http://localhost:5000"])
 class TicketStatusController(private val ticketStatusService: TicketStatusService){
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
     /*@PostMapping("/status/")

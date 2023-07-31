@@ -71,6 +71,6 @@ dependencyManagement {
 
 jib {
     to {
-        image ="lab05-server:latest"
+        image ="springboot-server:latest"
     }
 }

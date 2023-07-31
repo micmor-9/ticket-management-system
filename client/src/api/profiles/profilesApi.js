@@ -8,35 +8,40 @@ const api = axios.create({
   },
 });
 
-const getMessagesByTicket = async (ticketId) => {
+const handleApiError = (error) => {
+  console.log("Error during API call:", error);
+  throw error;
+};
+
+const getExpertId = async (expertEmail) => {
   try {
-    const response = await api.get(`/messages/${ticketId}`, {
+    const response = await api.get(`/experts/id/${expertEmail}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
     return response.data;
   } catch (error) {
-    throw new Error("Error fetching messages");
+    handleApiError(error);
   }
 };
 
-const sendMessage = async (message) => {
+const getManagerId = async (managerEmail) => {
   try {
-    const response = await api.post("/messages/send", message, {
+    const response = await api.get(`/managers/${managerEmail}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
     return response.data;
   } catch (error) {
-    throw new Error("Error sending message");
+    handleApiError(error);
   }
 };
 
-const MessagesAPI = {
-  getMessagesByTicket,
-  sendMessage,
+const ProfilesAPI = {
+  getExpertId,
+  getManagerId,
 };
 
-export default MessagesAPI;
+export default ProfilesAPI;

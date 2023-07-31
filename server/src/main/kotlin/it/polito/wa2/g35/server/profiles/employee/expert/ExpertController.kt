@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = ["http://localhost:5000"])
 class ExpertController(private val expertService: ExpertService){
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
     @GetMapping("/experts/{expertId}")
@@ -24,6 +25,17 @@ class ExpertController(private val expertService: ExpertService){
     fun getExpertById(@PathVariable expertId: String?) : ExpertDTO? {
         log.info("Get expert by Id request successful")
         return expertService.getExpertById(expertId)
+    }
+
+    @GetMapping("/experts/id/{expertEmail}")
+    @PreAuthorize("hasAnyRole('Manager', 'Expert')")
+    @Observed(
+        name = "/experts/id/{expertEmail}",
+        contextualName = "get-expert-id-by-email-request"
+    )
+    fun getExpertId(@PathVariable expertEmail: String?) : ExpertDTO? {
+        log.info("Get expert Id request successful")
+        return expertService.getExpertId(expertEmail)
     }
 
     @GetMapping("/experts/specialization/{specialization}")
