@@ -7,5 +7,6 @@ data class MessageInputDTO (
     val messageTimestamp: Date?,
     val messageText: String,
     val ticket: Long,
-    val sender: String?
+    val sender: String?,
+    val attachmentId: Long?
 )

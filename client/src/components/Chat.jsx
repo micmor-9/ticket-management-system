@@ -10,6 +10,7 @@ import {
   InputBase,
   useTheme,
   Badge,
+  Typography,
 } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
@@ -17,19 +18,21 @@ import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { tokens } from "../theme";
 import MessagesAPI from "../api/messages/messagesApi";
+import AttachmentsAPI from "../api/messages/attachmentsApi";
 import { AuthContext } from "../utils/AuthContext";
 
 const SOCKET_URL = "ws://localhost:8081/ws";
 
 const ChatInputBox = ({ onSendMessage }) => {
   const [message, setMessage] = useState("");
-  const [fileSelected, setFileSelected] = useState();
+  const [fileSelected, setFileSelected] = useState(null);
   const fileInputRef = useRef();
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
       onSendMessage(message, fileSelected);
       setMessage("");
+      setFileSelected(null);
     }
   };
 
@@ -44,15 +47,25 @@ const ChatInputBox = ({ onSendMessage }) => {
     fileInputRef.current = e.target;
     const file = e.target.files[0];
     const reader = new FileReader();
+    reader.onload = (event) => {
+      const fileContent = event.target.result.split(",")[1];
+      const attachment = {
+        id: null,
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        fileContent: fileContent,
+      };
+      setFileSelected(attachment);
+    };
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      setFileSelected(reader.result);
       setMessage(file.name);
     };
   };
 
   const handleDeleteFileSelected = () => {
-    setFileSelected();
+    setFileSelected(null);
     setMessage("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -160,6 +173,26 @@ const ChatBubblesBox = ({ chatMessages }) => {
         },
       }}
     >
+      {chatMessages.length === 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <Typography
+            variant="h3"
+            sx={{
+              opacity: 0.5,
+              marginTop: "40%",
+            }}
+          >
+            No messages yet
+          </Typography>
+        </Box>
+      )}
       {chatMessages.map((message) => {
         return (
           <Box
@@ -219,11 +252,20 @@ const Chat = ({ ticket }) => {
     };
 
     if (attachedFile) {
-      //Handle Attachment API
+      AttachmentsAPI.uploadAttachment(attachedFile)
+        .then((response) => {
+          console.log(response);
+          message.attachment_id = response.id;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
 
     MessagesAPI.sendMessage(message)
-      .then((response) => {})
+      .then((response) => {
+        console.log(response);
+      })
       .catch((error) => {
         console.log(error);
       });

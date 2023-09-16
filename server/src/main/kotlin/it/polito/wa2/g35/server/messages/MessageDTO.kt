@@ -1,5 +1,6 @@
 package it.polito.wa2.g35.server.messages
 
+import it.polito.wa2.g35.server.ticketing.attachment.Attachment
 import it.polito.wa2.g35.server.ticketing.ticket.Ticket
 import java.util.Date
 
@@ -8,18 +9,19 @@ data class MessageDTO(
     val messageTimestamp: Date?,
     val messageText: String,
     val ticket: Ticket?,
-    val sender: String?
+    val sender: String?,
+    val attachment: Attachment?
 )
 {
-    constructor() : this(null,null,"", null,"")
+    constructor() : this(null,null,"", null,"", null)
 }
 
 fun Message.toDTO() : MessageDTO {
-    return MessageDTO(this.id, this.messageTimestamp, this.messageText, this.ticket, this.sender)
+    return MessageDTO(this.id, this.messageTimestamp, this.messageText, this.ticket, this.sender, this.attachment)
 }
 
 fun MessageDTO.toMessage() : Message {
-    return Message(this.id, this.messageTimestamp, this.messageText, this.ticket, this.sender)
+    return Message(this.id, this.messageTimestamp, this.messageText, this.ticket, this.sender, this.attachment)
 }
 
 

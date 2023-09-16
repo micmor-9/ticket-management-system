@@ -11,8 +11,19 @@ class Attachment(
     @Column(updatable = false, nullable = false)
     var id: Long? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    val message: Message,
+    /*@OneToOne(mappedBy = "attachment")
+    val message: Message,*/
 
-    val fileContent: String
+    @Column(nullable = false)
+    val fileName: String,
+
+    @Column(nullable = false)
+    val fileType: String,
+
+    @Column(nullable = false)
+    val fileSize: Double,
+
+    @Lob
+    @Column(nullable = false)
+    val fileContent: ByteArray,
 )

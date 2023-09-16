@@ -2,6 +2,7 @@ package it.polito.wa2.g35.server.messages
 
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.security.SecurityConfig
+import it.polito.wa2.g35.server.ticketing.attachment.*
 import it.polito.wa2.g35.server.ticketing.ticket.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -17,6 +18,8 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
     @Autowired
     lateinit var ticketService: TicketService
+    @Autowired
+    lateinit var attachmentService: AttachmentService
     @Observed(
         name = "/messages/{ticketId}",
         contextualName = "get-messages-by-id-request-service"
@@ -112,11 +115,17 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
             throw TicketNotFoundException("Ticket not found with this ID!")
         }
 
+        val attachment = if (message.attachmentId != null) attachmentService.getAttachmentById(message.attachmentId)?.toAttachment() else null
+        if(message.attachmentId != null && attachment == null){
+            log.error("No Attachment found with this Id: ${message.attachmentId}")
+            throw AttachmentNotFoundException("Attachment not found with this ID!")
+        }
+
         val authentication = SecurityContextHolder.getContext().authentication
         when(authentication.authorities.map { it.authority }[0]){
             SecurityConfig.MANAGER_ROLE -> {
                 log.info("Create message request successful (repository)")
-                return messageRepository.save(Message(null, Date(), message.messageText, ticket, message.sender)).toDTO()
+                return messageRepository.save(Message(null, Date(), message.messageText, ticket, message.sender, attachment)).toDTO()
             }
             SecurityConfig.CLIENT_ROLE -> {
                 if(ticket.customer.email != authentication.name) {
@@ -125,7 +134,7 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                 }
                 else {
                     log.info("Create message request successful (repository)")
-                    return messageRepository.save(Message(null, Date(), message.messageText, ticket, message.sender))
+                    return messageRepository.save(Message(null, Date(), message.messageText, ticket, message.sender, attachment))
                         .toDTO()
                 }
             }
@@ -136,7 +145,7 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                 }
                 else {
                     log.info("Create message request successful (repository)")
-                    return messageRepository.save(Message(null, Date(), message.messageText, ticket, message.sender))
+                    return messageRepository.save(Message(null, Date(), message.messageText, ticket, message.sender, attachment))
                         .toDTO()
                 }
             }

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface AttachmentRepository: JpaRepository<Attachment, Long>{
 
-    fun getAttachmentsByMessageId(messageId: Long) : List<Attachment>
+    //fun getAttachmentsByMessageId(messageId: Long) : List<Attachment>
 }
