@@ -104,8 +104,6 @@ class AttachmentServiceImpl(private val attachmentRepository: AttachmentReposito
     )
     override fun postAttachment(attachment: AttachmentInputDTO): AttachmentDTO? {
         val authentication = SecurityContextHolder.getContext().authentication
-        /*val message = messageService.getMessageById(attachment.messageId)?.toMessage()
-            ?: throw MessageNotFoundException("Message not found with this ID!")*/
 
         return when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
@@ -113,23 +111,12 @@ class AttachmentServiceImpl(private val attachmentRepository: AttachmentReposito
                 return attachmentRepository.save(Attachment(null, /*message,*/ attachment.fileName, attachment.fileType, attachment.fileSize, attachment.fileContent)).toDTO()
             }
             SecurityConfig.EXPERT_ROLE -> {
-                /*if (message.ticket?.expert?.email != authentication.name) {
-                    log.error("Create attachment request failed by unauthorized access")
-                    throw UnauthorizedTicketException("You can't access this ticket's messages")
-                } else {*/
                     log.info("Create attachment request successful (repository)")
                     return attachmentRepository.save(Attachment(null, /*message,*/ attachment.fileName, attachment.fileType, attachment.fileSize, attachment.fileContent)).toDTO()
-                //}
             }
             SecurityConfig.CLIENT_ROLE -> {
-                /*if(message.ticket?.customer?.email != authentication.name) {
-                    log.error("Create attachment request failed by unauthorized access")
-                    throw UnauthorizedTicketException("You can't access this ticket's messages")
-                }
-                else{*/
                     log.info("Create attachment request successful (repository)")
                     return attachmentRepository.save(Attachment(null, /*message,*/ attachment.fileName, attachment.fileType, attachment.fileSize, attachment.fileContent)).toDTO()
-            //}
             }
             else -> {
                 log.error("Create attachment request failed")

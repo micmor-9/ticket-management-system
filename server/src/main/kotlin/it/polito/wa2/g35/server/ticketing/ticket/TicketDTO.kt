@@ -17,7 +17,7 @@ data class TicketDTO constructor(
     var customer: Customer
 ){
 
-        constructor() : this(null, Date(), "", null, TicketStatusValues.OPEN, null, Product("", ""), Customer("", "", ""))
+        constructor() : this(null, Date(), "", null, TicketStatusValues.OPEN, null, Product("", ""), Customer(null, "", "", ""))
 
 }
 

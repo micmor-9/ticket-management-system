@@ -18,6 +18,19 @@ import org.springframework.web.bind.annotation.*
 @CrossOrigin(origins = ["http://localhost:5000"])
 class CustomerController(private val customerService: CustomerService) {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+
+    @GetMapping("/customers/id/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
+    @Observed(
+        name = "/customers/id/{id}",
+        contextualName = "get-profile-request"
+    )
+    fun getProfileById(@PathVariable id: Int): CustomerDTO? {
+        log.info("Get Profile request successful")
+        return customerService.getCustomerById(id)
+    }
+
     @GetMapping("/customers/{email}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")

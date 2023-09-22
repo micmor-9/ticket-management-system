@@ -4,11 +4,12 @@ import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.attachment.*
 import it.polito.wa2.g35.server.ticketing.ticket.*
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.util.Date
@@ -20,14 +21,17 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
     lateinit var ticketService: TicketService
     @Autowired
     lateinit var attachmentService: AttachmentService
+    @PersistenceContext
+    private lateinit var entityManager: EntityManager
+
     @Observed(
         name = "/messages/{ticketId}",
         contextualName = "get-messages-by-id-request-service"
     )
-    override fun getMessagesByTicket(ticketid : Long): List<MessageDTO> {
-        val ticket = ticketService.getTicketById(ticketid)
+    override fun getMessagesByTicket(ticketId : Long): List<MessageDTO> {
+        val ticket = ticketService.getTicketById(ticketId)
         if(ticket == null) {
-            log.error("No Ticket found with this Id: $ticketid")
+            log.error("No Ticket found with this Id: $ticketId")
             throw TicketNotFoundException("Ticket not found with this ID!")
         }
         else {
@@ -35,7 +39,7 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
             when(authentication.authorities.map { it.authority }[0]){
                 SecurityConfig.MANAGER_ROLE -> {
                     log.info("Get messages by Ticket from repository request successful")
-                    return messageRepository.getMessagesByTicketId(ticketid).map { it.toDTO() }
+                    return messageRepository.getMessagesByTicketIdOrderByMessageTimestamp(ticketId).map { it.toDTO() }
                 }
                 SecurityConfig.CLIENT_ROLE -> {
                     if(ticket.customer.email != authentication.name) {
@@ -44,7 +48,7 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                     }
                     else {
                         log.info("Get messages by Ticket from repository request successful")
-                        return messageRepository.getMessagesByTicketId(ticketid).map { it.toDTO() }
+                        return messageRepository.getMessagesByTicketIdOrderByMessageTimestamp(ticketId).map { it.toDTO() }
                     }
                 }
                 SecurityConfig.EXPERT_ROLE -> {
@@ -54,7 +58,7 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                     }
                     else {
                         log.info("Get messages by Ticket from repository request successful")
-                        return messageRepository.getMessagesByTicketId(ticketid).map { it.toDTO() }
+                        return messageRepository.getMessagesByTicketIdOrderByMessageTimestamp(ticketId).map { it.toDTO() }
                     }
                 }
                 else -> {
@@ -115,17 +119,19 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
             throw TicketNotFoundException("Ticket not found with this ID!")
         }
 
-        val attachment = if (message.attachmentId != null) attachmentService.getAttachmentById(message.attachmentId)?.toAttachment() else null
-        if(message.attachmentId != null && attachment == null){
-            log.error("No Attachment found with this Id: ${message.attachmentId}")
-            throw AttachmentNotFoundException("Attachment not found with this ID!")
-        }
+        val uploadedAttachment = if (message.attachment != null) attachmentService.postAttachment(message.attachment)?.toAttachment() else null
 
         val authentication = SecurityContextHolder.getContext().authentication
         when(authentication.authorities.map { it.authority }[0]){
             SecurityConfig.MANAGER_ROLE -> {
                 log.info("Create message request successful (repository)")
-                return messageRepository.save(Message(null, Date(), message.messageText, ticket, message.sender, attachment)).toDTO()
+                val message = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                if (uploadedAttachment != null) {
+                    val managedAttachment = entityManager.merge(uploadedAttachment)
+                    message.attachment = managedAttachment
+                }
+                return messageRepository.save(message).toDTO()
+
             }
             SecurityConfig.CLIENT_ROLE -> {
                 if(ticket.customer.email != authentication.name) {
@@ -134,8 +140,13 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                 }
                 else {
                     log.info("Create message request successful (repository)")
-                    return messageRepository.save(Message(null, Date(), message.messageText, ticket, message.sender, attachment))
-                        .toDTO()
+                    val message = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                    if (uploadedAttachment != null) {
+                        val managedAttachment = entityManager.merge(uploadedAttachment)
+                        message.attachment = managedAttachment
+                    }
+                    return messageRepository.save(message).toDTO()
+
                 }
             }
             SecurityConfig.EXPERT_ROLE -> {
@@ -145,8 +156,12 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                 }
                 else {
                     log.info("Create message request successful (repository)")
-                    return messageRepository.save(Message(null, Date(), message.messageText, ticket, message.sender, attachment))
-                        .toDTO()
+                    val message = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                    if (uploadedAttachment != null) {
+                        val managedAttachment = entityManager.merge(uploadedAttachment)
+                        message.attachment = managedAttachment
+                    }
+                    return messageRepository.save(message).toDTO()
                 }
             }
             else -> {

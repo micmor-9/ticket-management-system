@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size
 
 
 data class CustomerDTO(
+    val id: Int?,
     @field:Email(regexp = ".*"+"@"+".*"+"\\."+".*") @Size(min=4,max=40) @NotBlank
     val email: String,
     @field:Size(min=2,max=25) @NotBlank
@@ -14,15 +15,15 @@ data class CustomerDTO(
     var surname: String
 )
 {
-    constructor() : this("","","")
+    constructor() : this(0,"","", "")
 }
 
 
 fun Customer.toDTO() : CustomerDTO {
-    return CustomerDTO(this.email, this.name, this.surname)
+    return CustomerDTO(this.id, this.email, this.name, this.surname)
 }
 
 fun CustomerDTO.toCustomer() : Customer {
-    return Customer(this.email, this.name, this.surname)
+    return Customer(this.id, this.email, this.name, this.surname)
 }
 

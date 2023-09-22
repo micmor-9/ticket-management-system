@@ -9,10 +9,7 @@ export const useAuth = () => {
 
   const isTokenExpired = (token) => {
     const decodedToken = jwtDecode(token);
-    if (decodedToken.exp && decodedToken.exp * 1000 < Date.now()) {
-      return true;
-    }
-    return false;
+    return !!(decodedToken.exp && decodedToken.exp * 1000 < Date.now());
   };
 
   const logout = () => {

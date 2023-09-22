@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query
 
 @Repository
 interface MessageRepository: JpaRepository<Message, Long> {
-    @Query("SELECT m FROM Message m WHERE m.ticket.id = :ticketId ORDER BY m.messageTimestamp ASC")
-    fun getMessagesByTicketId(ticketId: Long): List<Message>
+
+    fun getMessagesByTicketIdOrderByMessageTimestamp(ticketId: Long): List<Message>
 
 }

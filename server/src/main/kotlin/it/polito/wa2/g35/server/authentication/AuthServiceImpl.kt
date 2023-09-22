@@ -77,6 +77,7 @@ class AuthServiceImpl() : AuthService  {
 
         val realmResource = keycloak.realm(realmName)
         val customerDTO = CustomerDTO(
+            null,
             signupRequest.email,
             signupRequest.name,
             signupRequest.surname

@@ -92,7 +92,7 @@ const ChatInputBox = ({ onSendMessage }) => {
         value={message}
         onKeyDown={handleKeyDown}
         onChange={(e) => setMessage(e.target.value)}
-        disabled={fileSelected ? true : false}
+        disabled={!!fileSelected}
       />
       <Input
         type="file"
@@ -142,7 +142,7 @@ const ChatBubblesBox = ({ chatMessages }) => {
   const [currentUser] = useContext(AuthContext);
   const chatBoxRef = useRef(null);
 
-  const currentSender = (currentUser?.name + " " + currentUser?.surname).trim();
+  const currentSender = (currentUser?.email).trim();
 
   useEffect(() => {
     chatBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -224,6 +224,7 @@ const ChatBubblesBox = ({ chatMessages }) => {
                 } !important`,
               }}
             >
+              {message.attachment && <Typography>F</Typography>}
               {message.messageText}
             </Box>
           </Box>
@@ -248,19 +249,9 @@ const Chat = ({ ticket }) => {
       messageTimestamp: null,
       messageText: messageText.trim(),
       ticket: ticket.id,
-      sender: (currentUser?.name + " " + currentUser?.surname).trim(),
+      sender: (currentUser?.email).trim(),
+      attachment: attachedFile,
     };
-
-    if (attachedFile) {
-      AttachmentsAPI.uploadAttachment(attachedFile)
-        .then((response) => {
-          console.log(response);
-          message.attachment_id = response.id;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
 
     MessagesAPI.sendMessage(message)
       .then((response) => {
