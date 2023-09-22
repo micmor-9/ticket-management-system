@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useContext } from "react";
 import { Client } from "@stomp/stompjs";
 import {
+  Avatar,
   Box,
   Grid,
   Input,
@@ -13,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { CircularProgress } from "@mui/material";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
@@ -224,7 +226,11 @@ const ChatBubblesBox = ({ chatMessages }) => {
                 } !important`,
               }}
             >
-              {message.attachment && <Typography>F</Typography>}
+              {message.attachment && (
+                <Avatar>
+                  <AttachFileIcon />
+                </Avatar>
+              )}
               {message.messageText}
             </Box>
           </Box>

@@ -11,9 +11,6 @@ class Attachment(
     @Column(updatable = false, nullable = false)
     var id: Long? = null,
 
-    /*@OneToOne(mappedBy = "attachment")
-    val message: Message,*/
-
     @Column(nullable = false)
     val fileName: String,
 

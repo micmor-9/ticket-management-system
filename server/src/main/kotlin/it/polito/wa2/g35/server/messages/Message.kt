@@ -23,7 +23,7 @@ class Message(
 
     var sender: String?,
 
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     @JoinColumn(name = "attachment_id", referencedColumnName = "id")
     var attachment: Attachment?
 )
