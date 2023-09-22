@@ -1,14 +1,6 @@
 {
-  "name": "My Codespace Configuration",
+  "name": "Final Project - Codespace",
   "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu",
-  "extensions": [
-    "ms-vscode-remote.vscode-remote-extensionpack",
-    "vscjava.vscode-java-pack"
-  ],
-  "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash",
-    "java.home": "/usr/lib/jvm/java-11-openjdk-amd64"
-  },
   "forwardPorts": [
     8080,
     8081,
@@ -19,25 +11,5 @@
     3100,
     9090,
     3000
-  ],
-  "postCreateCommand": "docker-compose up -d",
-  "runArgs": [
-    "-u",
-    "codespace"
-  ],
-  "containerUser": "codespace",
-  "workspaceMount": "source=.,target=/workspace,type=bind,consistency=cached",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      "VARIANT": "11"
-    }
-  },
-  "remoteUser": "codespace",
-  "remoteEnv": {
-    "GRADLE_HOME": "/usr/local/gradle",
-    "NODE_HOME": "/usr/local/node",
-    "NPM_CONFIG_PREFIX": "/usr/local/npm",
-    "PATH": "/usr/local/gradle/bin:/usr/local/node/bin:/usr/local/npm/bin:$PATH"
-  }
+  ]
 }
