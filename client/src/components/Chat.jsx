@@ -17,10 +17,10 @@ import { CircularProgress } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
+import DownloadIcon from "@mui/icons-material/Download";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { tokens } from "../theme";
 import MessagesAPI from "../api/messages/messagesApi";
-import AttachmentsAPI from "../api/messages/attachmentsApi";
 import { AuthContext } from "../utils/AuthContext";
 
 const SOCKET_URL = "ws://localhost:8081/ws";
@@ -197,46 +197,133 @@ const ChatBubblesBox = ({ chatMessages }) => {
       )}
       {chatMessages.map((message) => {
         return (
-          <Box
+          <ChatBubble
             key={message.id}
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: `${
-                message.sender !== currentSender ? "flex-start" : "flex-end"
-              }`,
-              mb: "10px",
-            }}
-          >
+            message={message}
+            currentSender={currentSender}
+            theme={theme}
+            colors={colors}
+          />
+        );
+      })}
+      <div ref={chatBoxRef} />
+    </Box>
+  );
+};
+
+const ChatBubble = ({ message, currentSender, theme, colors }) => {
+  const [hover, setHover] = useState(false);
+  let url = null;
+  if (message.attachment) {
+    const fileData = atob(message.attachment.fileContent);
+    const byteArray = new Uint8Array(fileData.length);
+    for (let i = 0; i < fileData.length; i++) {
+      byteArray[i] = fileData.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteArray], {
+      type: message.attachment.fileType,
+    });
+
+    url = window.URL.createObjectURL(blob);
+  }
+
+  return (
+    <Box
+      key={message.id}
+      sx={{
+        width: "100%",
+        display: "flex",
+        justifyContent: `${
+          message.sender !== currentSender ? "flex-start" : "flex-end"
+        }`,
+        mb: "10px",
+      }}
+    >
+      <Box
+        sx={{
+          p: "10px",
+          borderRadius: "10px",
+          backgroundColor: `${
+            message.sender !== currentSender
+              ? theme.palette.mode === "dark"
+                ? colors.grey[100]
+                : colors.primary[400]
+              : theme.palette.mode === "dark"
+              ? colors.greenAccent[900]
+              : colors.greenAccent[300]
+          }`,
+          color: `${
+            message.sender !== currentSender ? "black" : "white"
+          } !important`,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            {message.attachment &&
+              (message.attachment.fileType === "image/png" ||
+                message.attachment.fileType === "image/jpeg" ||
+                message.attachment.fileType === "image/jpg") && (
+                <Box>
+                  <img
+                    src={url}
+                    alt={message.attachment.fileName}
+                    style={{
+                      maxWidth: "250px",
+                      maxHeight: "250px",
+                      marginBottom: "5px",
+                      borderRadius: "10px",
+                    }}
+                  />
+                </Box>
+              )}
             <Box
               sx={{
-                p: "10px",
-                borderRadius: "10px",
-                backgroundColor: `${
-                  message.sender !== currentSender
-                    ? theme.palette.mode === "dark"
-                      ? colors.grey[100]
-                      : colors.primary[400]
-                    : theme.palette.mode === "dark"
-                    ? colors.greenAccent[900]
-                    : colors.greenAccent[300]
-                }`,
-                color: `${
-                  message.sender !== currentSender ? "black" : "white"
-                } !important`,
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
               }}
             >
               {message.attachment && (
-                <Avatar>
-                  <AttachFileIcon />
+                <Avatar
+                  sx={{
+                    mr: 1,
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? colors.greenAccent[300]
+                        : colors.greenAccent[200],
+                    opacity: hover ? 0.8 : 1,
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={() => setHover(true)}
+                  onMouseLeave={() => setHover(false)}
+                >
+                  {hover ? (
+                    <DownloadIcon
+                      onClick={() => {
+                        if (message.attachment != null) {
+                          const link = document.createElement("a");
+                          link.href = url;
+                          link.setAttribute(
+                            "download",
+                            message.attachment.fileName
+                          );
+                          document.body.appendChild(link);
+                          link.click();
+                          window.URL.revokeObjectURL(url);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <AttachFileIcon />
+                  )}
                 </Avatar>
               )}
               {message.messageText}
             </Box>
           </Box>
-        );
-      })}
-      <div ref={chatBoxRef} />
+        </div>
+      </Box>
     </Box>
   );
 };

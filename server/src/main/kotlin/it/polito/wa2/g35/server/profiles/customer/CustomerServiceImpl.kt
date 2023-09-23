@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service
 class CustomerServiceImpl(private val profileRepository: CustomerRepository) : CustomerService {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
 
-    override fun getCustomerById(id: Int): CustomerDTO? {
-        val profile = profileRepository.findByIdOrNull(id)?.toDTO()
+    override fun getCustomerId(customerEmail: String): CustomerDTO? {
+        val profile = profileRepository.findByEmail(customerEmail)?.toDTO()
         if(profile != null) {
             val authentication = SecurityContextHolder.getContext().authentication
             if(authentication.authorities.map { it.authority }[0] == SecurityConfig.CLIENT_ROLE){

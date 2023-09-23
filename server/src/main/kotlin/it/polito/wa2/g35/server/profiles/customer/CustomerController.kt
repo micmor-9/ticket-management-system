@@ -19,16 +19,16 @@ import org.springframework.web.bind.annotation.*
 class CustomerController(private val customerService: CustomerService) {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
 
-    @GetMapping("/customers/id/{id}")
+    @GetMapping("/customers/id/{customerEmail}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
     @Observed(
-        name = "/customers/id/{id}",
+        name = "/customers/id/{customerEmail}",
         contextualName = "get-profile-request"
     )
-    fun getProfileById(@PathVariable id: Int): CustomerDTO? {
-        log.info("Get Profile request successful")
-        return customerService.getCustomerById(id)
+    fun getProfileId(@PathVariable customerEmail: String): CustomerDTO? {
+        log.info("Get Profile Id request successful")
+        return customerService.getCustomerId(customerEmail)
     }
 
     @GetMapping("/customers/{email}")

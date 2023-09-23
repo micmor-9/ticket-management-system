@@ -7,7 +7,7 @@ import jakarta.persistence.*
 @Table(name = "customer")
 class Customer(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Specifica la strategia di generazione
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int? = null,
     var email: String,
     var name: String,

@@ -26,6 +26,19 @@ const getExpertId = async (expertEmail) => {
   }
 };
 
+const getCustomerId = async (customerEmail) => {
+  try {
+    const response = await api.get(`/customers/id/${customerEmail}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 const getManagerId = async (managerEmail) => {
   try {
     const response = await api.get(`/managers/${managerEmail}`, {
@@ -42,6 +55,7 @@ const getManagerId = async (managerEmail) => {
 const ProfilesAPI = {
   getExpertId,
   getManagerId,
+  getCustomerId,
 };
 
 export default ProfilesAPI;

@@ -27,13 +27,15 @@ export const useAuth = () => {
           const role =
             decodedToken.resource_access["springboot-keycloak-client"].roles[0];
           let id = null;
-          if (role !== "Customer") {
-            if (role === "Manager") {
-              id = await ProfilesAPI.getManagerId(decodedToken.email);
-            }
-            if (role === "Expert") {
-              id = await ProfilesAPI.getExpertId(decodedToken.email);
-            }
+          if (role === "Manager") {
+            id = await ProfilesAPI.getManagerId(decodedToken.email);
+          }
+          if (role === "Expert") {
+            id = await ProfilesAPI.getExpertId(decodedToken.email);
+          }
+          if (role === "User") {
+            id = await ProfilesAPI.getUserId(decodedToken.email);
+            console.log(id);
           }
 
           setCurrentUser({
@@ -43,7 +45,7 @@ export const useAuth = () => {
             username: decodedToken.preferred_username,
             role: decodedToken.resource_access["springboot-keycloak-client"]
               .roles[0],
-            id: id.id,
+            id: id?.id,
           });
         } else {
           logout();
