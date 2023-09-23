@@ -1,5 +1,6 @@
 package it.polito.wa2.g35.server.messages
 
+import it.polito.wa2.g35.server.ticketing.attachment.Attachment
 import it.polito.wa2.g35.server.ticketing.ticket.Ticket
 import jakarta.persistence.*
 import java.util.*
@@ -20,5 +21,9 @@ class Message(
     @ManyToOne(fetch = FetchType.LAZY)
     var ticket: Ticket?,
 
-    var sender: String?
+    var sender: String?,
+
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @JoinColumn(name = "attachment_id", referencedColumnName = "id")
+    var attachment: Attachment?
 )

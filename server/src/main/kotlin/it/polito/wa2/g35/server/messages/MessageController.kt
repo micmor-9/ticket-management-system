@@ -3,13 +3,13 @@ package it.polito.wa2.g35.server.messages
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.exceptions.BadRequestException
 import it.polito.wa2.g35.server.ticketing.ticket.TicketController
+import jakarta.transaction.Transactional
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
-import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.BindingResult
@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.*
 class MessageController (private val messageService: MessageService) {
     @Autowired
     lateinit var simpMessagingTemplate: SimpMessagingTemplate
-
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+
     @GetMapping("/messages/{ticketId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Expert', 'Manager', 'Client')")
@@ -42,6 +42,7 @@ class MessageController (private val messageService: MessageService) {
         name = "/messages/send",
         contextualName = "send-message-request"
     )
+    @Transactional
     fun postMessage(@RequestBody message: MessageInputDTO,
                     br: BindingResult) : MessageDTO? {
         if(br.hasErrors()) {

@@ -14,8 +14,26 @@ import org.springframework.stereotype.Service
 @Service
 class CustomerServiceImpl(private val profileRepository: CustomerRepository) : CustomerService {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+
+    override fun getCustomerId(customerEmail: String): CustomerDTO? {
+        val profile = profileRepository.findByEmail(customerEmail)?.toDTO()
+        if(profile != null) {
+            val authentication = SecurityContextHolder.getContext().authentication
+            if(authentication.authorities.map { it.authority }[0] == SecurityConfig.CLIENT_ROLE){
+                if (profile.email != authentication.name) {
+                    log.error("Get Customer by Id from repository request failed by unauthorized access")
+                    throw UnauthorizedProfileException("You can't access this profile!")
+                }
+            }
+            log.info("Get Customer by Id from repository request successful")
+            return profile
+        } else {
+            log.error("Profile with given id doesn't exist!")
+            throw ProfileNotFoundException("Profile with given id doesn't exist!")
+        }
+    }
     override fun getCustomerByEmail(email: String): CustomerDTO? {
-        val profile = profileRepository.findByIdOrNull(email)?.toDTO()
+        val profile = profileRepository.findByEmail(email)?.toDTO()
         if(profile != null) {
             val authentication = SecurityContextHolder.getContext().authentication
             if(authentication.authorities.map { it.authority }[0] == SecurityConfig.CLIENT_ROLE){
@@ -34,10 +52,10 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
 
     override fun createCustomer(profile: CustomerDTO?): CustomerDTO? {
         return if (profile != null) {
-            val checkIfProfileExists = profileRepository.findByIdOrNull(profile.email)
+            val checkIfProfileExists = profileRepository.findByEmail(profile.email)
             if(checkIfProfileExists == null) {
                 log.info("Create Customer request successful (repository)")
-                profileRepository.save(Customer(profile.email, profile.name, profile.surname)).toDTO()
+                profileRepository.save(Customer(profile.id, profile.email, profile.name, profile.surname)).toDTO()
             } else {
                 log.error("Profile with given email already exists!")
                 throw DuplicateProfileException("Profile with given email already exists!")
@@ -50,7 +68,7 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
 
     override fun updateCustomer(profile: CustomerDTO?): CustomerDTO? {
         return if(profile != null) {
-            val checkIfProfileExists = profileRepository.findByIdOrNull(profile.email)
+            val checkIfProfileExists = profileRepository.findByEmail(profile.email)
             if (checkIfProfileExists != null) {
                 val authentication = SecurityContextHolder.getContext().authentication
                 if(authentication.authorities.map { it.authority }[0] == SecurityConfig.CLIENT_ROLE){
@@ -60,7 +78,7 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
                     }
                 }
                 log.info("Update Customer request successful (repository)")
-                profileRepository.save(Customer(profile.email, profile.name, profile.surname)).toDTO()
+                profileRepository.save(Customer(profile.id, profile.email, profile.name, profile.surname)).toDTO()
             } else {
                 log.error("Profile with given email doesn't exists!")
                 throw ProfileNotFoundException("Profile with given email doesn't exists!")

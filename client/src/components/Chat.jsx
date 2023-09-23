@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useContext } from "react";
 import { Client } from "@stomp/stompjs";
 import {
+  Avatar,
   Box,
   Grid,
   Input,
@@ -10,10 +11,13 @@ import {
   InputBase,
   useTheme,
   Badge,
+  Typography,
 } from "@mui/material";
 import { CircularProgress } from "@mui/material";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
+import DownloadIcon from "@mui/icons-material/Download";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { tokens } from "../theme";
 import MessagesAPI from "../api/messages/messagesApi";
@@ -23,13 +27,14 @@ const SOCKET_URL = "ws://localhost:8081/ws";
 
 const ChatInputBox = ({ onSendMessage }) => {
   const [message, setMessage] = useState("");
-  const [fileSelected, setFileSelected] = useState();
+  const [fileSelected, setFileSelected] = useState(null);
   const fileInputRef = useRef();
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
       onSendMessage(message, fileSelected);
       setMessage("");
+      setFileSelected(null);
     }
   };
 
@@ -44,15 +49,25 @@ const ChatInputBox = ({ onSendMessage }) => {
     fileInputRef.current = e.target;
     const file = e.target.files[0];
     const reader = new FileReader();
+    reader.onload = (event) => {
+      const fileContent = event.target.result.split(",")[1];
+      const attachment = {
+        id: null,
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        fileContent: fileContent,
+      };
+      setFileSelected(attachment);
+    };
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      setFileSelected(reader.result);
       setMessage(file.name);
     };
   };
 
   const handleDeleteFileSelected = () => {
-    setFileSelected();
+    setFileSelected(null);
     setMessage("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -79,7 +94,7 @@ const ChatInputBox = ({ onSendMessage }) => {
         value={message}
         onKeyDown={handleKeyDown}
         onChange={(e) => setMessage(e.target.value)}
-        disabled={fileSelected ? true : false}
+        disabled={!!fileSelected}
       />
       <Input
         type="file"
@@ -129,7 +144,7 @@ const ChatBubblesBox = ({ chatMessages }) => {
   const [currentUser] = useContext(AuthContext);
   const chatBoxRef = useRef(null);
 
-  const currentSender = (currentUser?.name + " " + currentUser?.surname).trim();
+  const currentSender = (currentUser?.email).trim();
 
   useEffect(() => {
     chatBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -160,43 +175,155 @@ const ChatBubblesBox = ({ chatMessages }) => {
         },
       }}
     >
-      {chatMessages.map((message) => {
-        return (
-          <Box
-            key={message.id}
+      {chatMessages.length === 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <Typography
+            variant="h3"
             sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: `${
-                message.sender !== currentSender ? "flex-start" : "flex-end"
-              }`,
-              mb: "10px",
+              opacity: 0.5,
+              marginTop: "40%",
             }}
           >
-            <Box
-              sx={{
-                p: "10px",
-                borderRadius: "10px",
-                backgroundColor: `${
-                  message.sender !== currentSender
-                    ? theme.palette.mode === "dark"
-                      ? colors.grey[100]
-                      : colors.primary[400]
-                    : theme.palette.mode === "dark"
-                    ? colors.greenAccent[900]
-                    : colors.greenAccent[300]
-                }`,
-                color: `${
-                  message.sender !== currentSender ? "black" : "white"
-                } !important`,
-              }}
-            >
-              {message.messageText}
-            </Box>
-          </Box>
+            No messages yet
+          </Typography>
+        </Box>
+      )}
+      {chatMessages.map((message) => {
+        return (
+          <ChatBubble
+            key={message.id}
+            message={message}
+            currentSender={currentSender}
+            theme={theme}
+            colors={colors}
+          />
         );
       })}
       <div ref={chatBoxRef} />
+    </Box>
+  );
+};
+
+const ChatBubble = ({ message, currentSender, theme, colors }) => {
+  const [hover, setHover] = useState(false);
+  let url = null;
+  if (message.attachment) {
+    const fileData = atob(message.attachment.fileContent);
+    const byteArray = new Uint8Array(fileData.length);
+    for (let i = 0; i < fileData.length; i++) {
+      byteArray[i] = fileData.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteArray], {
+      type: message.attachment.fileType,
+    });
+
+    url = window.URL.createObjectURL(blob);
+  }
+
+  return (
+    <Box
+      key={message.id}
+      sx={{
+        width: "100%",
+        display: "flex",
+        justifyContent: `${
+          message.sender !== currentSender ? "flex-start" : "flex-end"
+        }`,
+        mb: "10px",
+      }}
+    >
+      <Box
+        sx={{
+          p: "10px",
+          borderRadius: "10px",
+          backgroundColor: `${
+            message.sender !== currentSender
+              ? theme.palette.mode === "dark"
+                ? colors.grey[100]
+                : colors.primary[400]
+              : theme.palette.mode === "dark"
+              ? colors.greenAccent[900]
+              : colors.greenAccent[300]
+          }`,
+          color: `${
+            message.sender !== currentSender ? "black" : "white"
+          } !important`,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            {message.attachment &&
+              (message.attachment.fileType === "image/png" ||
+                message.attachment.fileType === "image/jpeg" ||
+                message.attachment.fileType === "image/jpg") && (
+                <Box>
+                  <img
+                    src={url}
+                    alt={message.attachment.fileName}
+                    style={{
+                      maxWidth: "250px",
+                      maxHeight: "250px",
+                      marginBottom: "5px",
+                      borderRadius: "10px",
+                    }}
+                  />
+                </Box>
+              )}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              {message.attachment && (
+                <Avatar
+                  sx={{
+                    mr: 1,
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? colors.greenAccent[300]
+                        : colors.greenAccent[200],
+                    opacity: hover ? 0.8 : 1,
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={() => setHover(true)}
+                  onMouseLeave={() => setHover(false)}
+                >
+                  {hover ? (
+                    <DownloadIcon
+                      onClick={() => {
+                        if (message.attachment != null) {
+                          const link = document.createElement("a");
+                          link.href = url;
+                          link.setAttribute(
+                            "download",
+                            message.attachment.fileName
+                          );
+                          document.body.appendChild(link);
+                          link.click();
+                          window.URL.revokeObjectURL(url);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <AttachFileIcon />
+                  )}
+                </Avatar>
+              )}
+              {message.messageText}
+            </Box>
+          </Box>
+        </div>
+      </Box>
     </Box>
   );
 };
@@ -215,15 +342,14 @@ const Chat = ({ ticket }) => {
       messageTimestamp: null,
       messageText: messageText.trim(),
       ticket: ticket.id,
-      sender: (currentUser?.name + " " + currentUser?.surname).trim(),
+      sender: (currentUser?.email).trim(),
+      attachment: attachedFile,
     };
 
-    if (attachedFile) {
-      //Handle Attachment API
-    }
-
     MessagesAPI.sendMessage(message)
-      .then((response) => {})
+      .then((response) => {
+        console.log(response);
+      })
       .catch((error) => {
         console.log(error);
       });

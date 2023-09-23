@@ -18,56 +18,56 @@ import org.springframework.stereotype.Service
 class AttachmentServiceImpl(private val attachmentRepository: AttachmentRepository) : AttachmentService {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
 
-    @Autowired
-    lateinit var messageService: MessageService
-    @Observed(
+    /*@Autowired
+    lateinit var messageService: MessageService*/
+    /*@Observed(
         name = "/attachments/message/{messageId}",
         contextualName = "get-attachments-by-messageId-request-service"
     )
     override fun getAttachmentsByMessageById(messageId: Long?): List<AttachmentDTO> {
         val authentication = SecurityContextHolder.getContext().authentication
-        val message = messageService.getMessageById(messageId!!)?.toMessage()
+        /*val message = messageService.getMessageById(messageId!!)?.toMessage()
         if(message == null){
             log.error("No Message found with this Id: $messageId!!")
             throw MessageNotFoundException("There isn't any message with this id!")
-        }
+        }*/
         when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
                 log.info("Get attachments by MessageId from repository request successful")
-                return attachmentRepository.getAttachmentsByMessageId(messageId).map { it.toDTO() }
+                return attachmentRepository.getAttachmentsByMessageId(messageId!!).map { it.toDTO() }
             }
             SecurityConfig.EXPERT_ROLE -> {
-                if(message.ticket?.expert?.email != authentication.name) {
+                /*if(message.ticket?.expert?.email != authentication.name) {
                     log.error("Get attachments by MessageId failed by unauthorized access")
                     throw UnauthorizedTicketException("You can't access this ticket's messages")
                 }
-                else {
+                else {*/
                     log.info("Get attachments by MessageId from repository request successful")
-                    return attachmentRepository.getAttachmentsByMessageId(messageId).map { it.toDTO() }
-                }
+                    return attachmentRepository.getAttachmentsByMessageId(messageId!!).map { it.toDTO() }
+                //}
             }
             SecurityConfig.CLIENT_ROLE -> {
-                if (message.ticket?.customer?.email != authentication.name) {
+                /*if (message.ticket?.customer?.email != authentication.name) {
                     log.error("Get attachments by MessageId failed by unauthorized access")
                     throw UnauthorizedTicketException("You can't access this ticket's messages")
                 }
-                else {
+                else {*/
                     log.info("Get attachments by MessageId from repository request successful")
-                    return attachmentRepository.getAttachmentsByMessageId(messageId).map { it.toDTO() }
-                }
+                    return attachmentRepository.getAttachmentsByMessageId(messageId!!).map { it.toDTO() }
+                //}
             }
             else -> {
                 log.info("Get attachments by MessageId from repository request successful")
                 return emptyList()
             }
         }
-    }
+    }*/
     @Observed(
         name = "/attachments/{attachmentId}",
         contextualName = "get-attachment-request-service"
     )
     override fun getAttachmentById(attachmentId: Long?): AttachmentDTO? {
-        val attachment = attachmentRepository.findByIdOrNull(attachmentId)?.toDTO()
+        val attachment = if (attachmentId != null) attachmentRepository.findByIdOrNull(attachmentId)?.toDTO() else null
         val authentication = SecurityContextHolder.getContext().authentication
         when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
@@ -75,22 +75,22 @@ class AttachmentServiceImpl(private val attachmentRepository: AttachmentReposito
                 return attachment
             }
             SecurityConfig.EXPERT_ROLE -> {
-                if(attachment?.message?.ticket?.expert?.email == authentication.name) {
+                //if(attachment?.message?.ticket?.expert?.email == authentication.name) {
                     log.info("Get attachment from repository request successful")
                     return attachment
-                } else {
+                /*} else {
                     log.error("Get attachment failed by unauthorized access")
                     throw UnauthorizedTicketException("You don't have access to this ticket's messages")
-                }
+                }*/
             }
             SecurityConfig.CLIENT_ROLE -> {
-                if(attachment?.message?.ticket?.customer?.email == authentication.name) {
+                //if(attachment?.message?.ticket?.customer?.email == authentication.name) {
                     log.info("Get attachment from repository request successful")
                     return attachment
-                } else {
+                /*} else {
                     log.error("Get attachment request failed by unauthorized access")
                     throw UnauthorizedTicketException("You don't have access to this ticket's messages")
-                }
+                }*/
             }
             else -> {
                     log.error("Get attachment request failed")
@@ -104,32 +104,19 @@ class AttachmentServiceImpl(private val attachmentRepository: AttachmentReposito
     )
     override fun postAttachment(attachment: AttachmentInputDTO): AttachmentDTO? {
         val authentication = SecurityContextHolder.getContext().authentication
-        val message = messageService.getMessageById(attachment.messageId)?.toMessage()
-            ?: throw MessageNotFoundException("Message not found with this ID!")
 
         return when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
                 log.info("Create attachment request successful (repository)")
-                return attachmentRepository.save(Attachment(null, message, attachment.fileContent)).toDTO()
+                return attachmentRepository.save(Attachment(null, /*message,*/ attachment.fileName, attachment.fileType, attachment.fileSize, attachment.fileContent)).toDTO()
             }
             SecurityConfig.EXPERT_ROLE -> {
-                if (message.ticket?.expert?.email != authentication.name) {
-                    log.error("Create attachment request failed by unauthorized access")
-                    throw UnauthorizedTicketException("You can't access this ticket's messages")
-                } else {
                     log.info("Create attachment request successful (repository)")
-                    return attachmentRepository.save(Attachment(null, message, attachment.fileContent)).toDTO()
-                }
+                    return attachmentRepository.save(Attachment(null, /*message,*/ attachment.fileName, attachment.fileType, attachment.fileSize, attachment.fileContent)).toDTO()
             }
             SecurityConfig.CLIENT_ROLE -> {
-                if(message.ticket?.customer?.email != authentication.name) {
-                    log.error("Create attachment request failed by unauthorized access")
-                    throw UnauthorizedTicketException("You can't access this ticket's messages")
-                }
-                else{
                     log.info("Create attachment request successful (repository)")
-                    return attachmentRepository.save(Attachment(null, message, attachment.fileContent)).toDTO()
-            }
+                    return attachmentRepository.save(Attachment(null, /*message,*/ attachment.fileName, attachment.fileType, attachment.fileSize, attachment.fileContent)).toDTO()
             }
             else -> {
                 log.error("Create attachment request failed")

@@ -11,7 +11,12 @@ class MessageExceptions : ResponseEntityExceptionHandler() {
     @ExceptionHandler(MessageNotFoundException::class)
     fun handleProductNotFound(e: MessageNotFoundException) = ProblemDetail
         .forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!!)
+
+    @ExceptionHandler(AttachmentNotFoundException::class)
+    fun handleProductNotFound(e: AttachmentNotFoundException) = ProblemDetail
+        .forStatusAndDetail( HttpStatus.NOT_FOUND, e.message!!)
 }
 
 class MessageNotFoundException(message : String) : RuntimeException(message)
+class AttachmentNotFoundException(message : String) : RuntimeException(message)
 

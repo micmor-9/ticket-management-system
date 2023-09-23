@@ -6,6 +6,10 @@ spring:
     username: postgres
     password: password
   jpa:
+    properties:
+      hibernate:
+        type:
+          preferred_instant_jdbc_type: TIMESTAMP
     show-sql: true
     hibernate:
       ddl-auto: update
@@ -22,13 +26,15 @@ keycloak:
   admin-password: admin
   realm-name: SpringBootKeycloak
 
-
 logging:
   pattern:
-    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
 
 server:
-  port: '8081'
+  port: "8081"
 
 management:
   zipkin:
@@ -36,7 +42,7 @@ management:
       endpoint: http://host.docker.internal:9411/api/v2/spans
   tracing:
     sampling:
-      probability: '1.0'
+      probability: "1.0"
   endpoints:
     web:
       exposure:
