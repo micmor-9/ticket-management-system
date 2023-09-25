@@ -24,7 +24,7 @@ class ManagerController(private val managerService: ManagerService){
     }
 
     @GetMapping("/managers/")
-    @PreAuthorize("hasRole('Manager')")
+    @PreAuthorize("hasAnyRole('Manager', 'Expert')")
     @Observed(
         name = "/managers/",
         contextualName = "get-managers-request"

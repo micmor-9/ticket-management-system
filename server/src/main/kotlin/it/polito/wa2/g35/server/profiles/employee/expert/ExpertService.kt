@@ -8,4 +8,6 @@ interface ExpertService {
     fun getExpertBySpecialization(specialization: String?) : List<ExpertDTO>
 
     fun createExpert(expert: ExpertDTO): ExpertDTO?
+
+    fun getAll(): List<ExpertDTO>?
 }

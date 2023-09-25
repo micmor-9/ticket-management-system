@@ -26,8 +26,22 @@ const getAllOrders = async () => {
     }
 };
 
+const getOrdersByCustomerId = async (customerId) => {
+  try { 
+    const response = await api.get(`/orders/${customerId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 const OrdersAPI = {
-    getAllOrders,
+  getAllOrders,
+  getOrdersByCustomerId,
 };
 
 export default OrdersAPI;

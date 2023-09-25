@@ -28,7 +28,7 @@ const getExpertId = async (expertEmail) => {
 
 const getAllExperts = async () => {
   try {
-    const response = await api.get(`/experts/`, {
+    const response = await api.get(`/experts`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

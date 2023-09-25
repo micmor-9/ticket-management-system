@@ -158,14 +158,16 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Users"
-              slug="users"
-              to="users"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            {(currentUser.role == "Manager" || currentUser.role == "Expert") && (
+              <Item
+                title="Users"
+                slug="users"
+                to="users"
+                icon={<ContactsOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            )}
             <Item
               title="Products"
               slug="products"
@@ -175,7 +177,9 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Orders"
+              title={
+                currentUser.role === "Client" ? "My Orders" : "Orders"
+              }
               slug="orders"
               to="/orders"
               icon={<ShoppingCartOutlinedIcon />}
@@ -183,7 +187,9 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Tickets"
+              title={
+                currentUser.role === "Client" ? "My Tickets" : "Tickets"
+              }
               slug="tickets"
               to="/tickets"
               icon={<SupportAgentOutlinedIcon />}

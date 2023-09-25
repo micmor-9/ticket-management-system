@@ -28,7 +28,7 @@ const Products = () => {
     }, [currentUser.role, currentUser.id]);
 
     const columns = [
-        { field: "id", headerName: "ID" },
+        { field: "id", headerName: "ID", flex: 1 },
         { field: "name", headerName: "Name", flex: 1},
     ];
 
@@ -85,7 +85,7 @@ const Products = () => {
             }}
             loading={!products.length}
             sx={{
-              height: "according to the number of rows",
+              height: "vh",
             }}
           />
         </Box>

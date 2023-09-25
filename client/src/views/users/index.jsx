@@ -10,7 +10,7 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined"; */
 import Header from "../../components/Header";
 import { AuthContext } from "../../utils/AuthContext";
 import ProfilesAPI from "../../api/profiles/profilesApi";
-import { useNavigate } from "react-router-dom";
+
 
 const Users = () => {
   const theme = useTheme();
@@ -26,13 +26,15 @@ const Users = () => {
         let usersData = [];
         let managersData = [];
         let expertsData = [];
-        //usersData = await ProfilesAPI.getAllCustomers();
-        
-        if(currentUser.role === "Manager"){
+        console.log(currentUser.role);
+        if (currentUser.role === "Manager" || currentUser.role === "Expert") {
           usersData = await ProfilesAPI.getAllCustomers();
           managersData = await ProfilesAPI.getAllManagers();
+          expertsData = await ProfilesAPI.getAllExperts();
         }
         setUsers(usersData);
+        setExperts(expertsData);
+        setManagers(managersData);
       } catch (error) {
         // Gestisci gli errori, ad esempio mostrando un messaggio di errore
       }
@@ -40,30 +42,9 @@ const Users = () => {
     fetchUsers();
   }, [currentUser.role, currentUser.id]);
 
-  const columns = [
-    { field: "id", headerName: "ID" },
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    {
-      field: "surname",
-      headerName: "Surname",
-      flex: 1,
-      cellClassName: "surname-column--cell",
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      flex: 1,
-      cellClassName: "email-column--cell",
-    },
-    
-  ];
-
   const [roleFilter, setRoleFilter] = useState(0);
+  
+  const columns = getUsersColumns(roleFilter);
 
   const handleRoleFilterChange = (event, newValue) => {
     setRoleFilter(newValue);
@@ -104,12 +85,18 @@ const Users = () => {
         
         {/* TODO: change datagrid content according to the selected tab */}
         <StyledTabs value={roleFilter} onChange={handleRoleFilterChange}>
-          <StyledTab label="Managers" />
-          <StyledTab label="Experts" />
           <StyledTab label="Customers" />
+          <StyledTab label="Experts" />
+          <StyledTab label="Managers" />
         </StyledTabs>
         <DataGrid
-          rows={users}
+          rows={
+            roleFilter === 0
+              ? users
+              : roleFilter === 1
+              ? experts
+              : managers
+          }
           columns={columns}
           loading={!users.length}
           getRowId={(row) => row.id}
@@ -117,12 +104,52 @@ const Users = () => {
             toolbar: GridToolbar,
           }}
           sx={{
-            height: "according to the number of rows",
+            height: "vh",
           }}
         />
       </Box>
     </Box>
   );
+};
+
+const getUsersColumns = (roleFilter) => {
+  let columns = [
+    { field: "id", headerName: "ID" },
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "surname",
+      headerName: "Surname",
+      flex: 1,
+      cellClassName: "surname-column--cell",
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1,
+      cellClassName: "email-column--cell",
+    },
+  ];
+  if (roleFilter === 2) {
+    columns.push({
+        field: "managedArea",
+        headerName: "Managed Area",
+        flex: 1,
+        cellClassName: "managed_area-column--cell",
+      })
+  } else if (roleFilter === 1) {
+    columns.push({
+      field: "specialization",
+      headerName: "Specialization",
+      flex: 1,
+      cellClassName: "specialization-column--cell",
+    });
+  }
+  return columns; 
 };
 
 export default Users;

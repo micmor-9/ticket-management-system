@@ -22,7 +22,10 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         let ordersData = [];
-        ordersData = await OrdersAPI.getAllOrders();
+        if(currentUser.role === "Manager" || currentUser.role === "Expert")
+            ordersData = await OrdersAPI.getAllOrders();
+        if(currentUser.role === "Client")
+            ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
         setOrders(ordersData);
       } catch (error) {
         // Gestisci gli errori, ad esempio mostrando un messaggio di errore
@@ -118,7 +121,7 @@ const Orders = () => {
             toolbar: GridToolbar,
           }}
           sx={{
-            height: "according to the number of rows",
+            height: "vh",
           }}
         />
       </Box>
