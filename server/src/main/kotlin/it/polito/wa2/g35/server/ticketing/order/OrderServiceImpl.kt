@@ -59,11 +59,12 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
         }
     }
     @Observed(
-        name = "/orders/",
+        name = "/orders",
         contextualName = "get-orders-request-service"
     )
     override fun getOrders(): List<OrderDTO> {
         log.info("Get orders from repository request successful")
+        println("MANNAGGIA LA MADONNA")
         return orderRepository.findAll().map { it.toDTO() }
     }
     @Observed(

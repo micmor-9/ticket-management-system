@@ -21,7 +21,7 @@ const Tickets = () => {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        let ticketsData;
+        let ticketsData = [];
         if (currentUser.role === "Customer")
           ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.id);
         if (currentUser.role === "Expert")
@@ -33,6 +33,7 @@ const Tickets = () => {
         // Gestisci gli errori, ad esempio mostrando un messaggio di errore
       }
     };
+
     fetchTickets();
   }, [currentUser.id, currentUser.role]);
 

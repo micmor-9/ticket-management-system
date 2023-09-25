@@ -12,7 +12,7 @@ import Users from "./views/users";
 import Tickets from "./views/tickets";
 import Ticket from "./views/tickets/[id]";
 import Products from "./views/products";
-/* import Orders from "./scenes/orders"; */
+import Orders from "./views/orders";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -41,8 +41,7 @@ function App() {
                 <Route path="/products" element={<Products />} />
                 <Route path="/tickets" element={<Tickets />} />
                 <Route path="/tickets/:ticketId" element={<Ticket />} />
-                {/* <Route path="/orders" element={<Orders />} /> */}
-
+                <Route path="/orders" element={<Orders />} />
               </Routes>
             </main>
           </div>

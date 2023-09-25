@@ -23,4 +23,15 @@ class ManagerController(private val managerService: ManagerService){
         return managerService.getManagerId(managerEmail)
     }
 
+    @GetMapping("/managers/")
+    @PreAuthorize("hasRole('Manager')")
+    @Observed(
+        name = "/managers/",
+        contextualName = "get-managers-request"
+    )
+    fun getAllManagers(): List<ManagerDTO>? {
+        log.info("Get managers request successful")
+        return managerService.getAllManagers()
+    }
+
 }

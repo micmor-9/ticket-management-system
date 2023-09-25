@@ -1,6 +1,5 @@
 import axios from "axios";
 import backendUrl from "../../config";
-import Products from "../../views/products";
 
 const api = axios.create({
   baseURL: `${backendUrl}`,
@@ -14,12 +13,12 @@ const handleApiError = (error) => {
   throw error;
 };
 
-const getAllProducts = async () => {
+const getAllOrders = async () => {
     try {
-        const response = await api.get(`/products/`, {
-           headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+        const response = await api.get(`/orders`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
         return response.data;
     } catch (error) {
@@ -27,8 +26,8 @@ const getAllProducts = async () => {
     }
 };
 
-const ProductsAPI = {
-    getAllProducts,
+const OrdersAPI = {
+    getAllOrders,
 };
 
-export default ProductsAPI;
+export default OrdersAPI;

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import { StyledTabs, StyledTab } from "../../components/StyledTabs";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockUsers } from "../../data/mockUsers";
 /* import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
@@ -10,28 +10,35 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined"; */
 import Header from "../../components/Header";
 import { AuthContext } from "../../utils/AuthContext";
 import ProfilesAPI from "../../api/profiles/profilesApi";
+import { useNavigate } from "react-router-dom";
 
 const Users = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [currentUser] = useContext(AuthContext);
   const [users, setUsers] = useState([]);
+  const [managers, setManagers] = useState([]);
+  const [experts, setExperts] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        let usersData;
-        if (currentUser.role === "Expert")
-          usersData = await ProfilesAPI.getAllUsers();
-        if (currentUser.role === "Manager")
-          usersData = await ProfilesAPI.getAllUsers();
+        let usersData = [];
+        let managersData = [];
+        let expertsData = [];
+        //usersData = await ProfilesAPI.getAllCustomers();
+        
+        if(currentUser.role === "Manager"){
+          usersData = await ProfilesAPI.getAllCustomers();
+          managersData = await ProfilesAPI.getAllManagers();
+        }
         setUsers(usersData);
       } catch (error) {
         // Gestisci gli errori, ad esempio mostrando un messaggio di errore
       }
     };
     fetchUsers();
-  }, [currentUser.id, currentUser.role]);
+  }, [currentUser.role, currentUser.id]);
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -94,6 +101,7 @@ const Users = () => {
           },
         }}
       >
+        
         {/* TODO: change datagrid content according to the selected tab */}
         <StyledTabs value={roleFilter} onChange={handleRoleFilterChange}>
           <StyledTab label="Managers" />
@@ -103,7 +111,14 @@ const Users = () => {
         <DataGrid
           rows={users}
           columns={columns}
+          loading={!users.length}
           getRowId={(row) => row.id}
+          slots={{
+            toolbar: GridToolbar,
+          }}
+          sx={{
+            height: "according to the number of rows",
+          }}
         />
       </Box>
     </Box>
