@@ -21,7 +21,7 @@ const Tickets = () => {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        let ticketsData;
+        let ticketsData = [];
         if (currentUser.role === "Customer")
           ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.id);
         if (currentUser.role === "Expert")
