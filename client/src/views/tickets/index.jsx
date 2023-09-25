@@ -33,7 +33,6 @@ const Tickets = () => {
         // Gestisci gli errori, ad esempio mostrando un messaggio di errore
       }
     };
-
     fetchTickets();
   }, [currentUser.id, currentUser.role]);
 

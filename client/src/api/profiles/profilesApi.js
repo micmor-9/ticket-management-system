@@ -52,10 +52,24 @@ const getManagerId = async (managerEmail) => {
   }
 };
 
+const getAllUsers = async () => {
+  try {
+    const response = await api.get(`/customers`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 const ProfilesAPI = {
   getExpertId,
   getManagerId,
   getCustomerId,
+  getAllUsers,
 };
 
 export default ProfilesAPI;

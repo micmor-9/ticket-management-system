@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import { StyledTabs, StyledTab } from "../../components/StyledTabs";
 import { DataGrid } from "@mui/x-data-grid";
@@ -8,10 +8,30 @@ import { mockUsers } from "../../data/mockUsers";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined"; */
 import Header from "../../components/Header";
+import { AuthContext } from "../../utils/AuthContext";
+import ProfilesAPI from "../../api/profiles/profilesApi";
 
 const Users = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [currentUser] = useContext(AuthContext);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        let usersData;
+        if (currentUser.role === "Expert")
+          usersData = await ProfilesAPI.getAllUsers();
+        if (currentUser.role === "Manager")
+          usersData = await ProfilesAPI.getAllUsers();
+        setUsers(usersData);
+      } catch (error) {
+        // Gestisci gli errori, ad esempio mostrando un messaggio di errore
+      }
+    };
+    fetchUsers();
+  }, [currentUser.id, currentUser.role]);
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -33,15 +53,7 @@ const Users = () => {
       flex: 1,
       cellClassName: "email-column--cell",
     },
-    {
-      field: "phone",
-      headerName: "Phone",
-      flex: 1,
-      type: "number",
-      headerAlign: "left",
-      align: "left",
-    },
-    { field: "specialization", headerName: "Specialization", flex: 1 },
+    
   ];
 
   const [roleFilter, setRoleFilter] = useState(0);
@@ -89,7 +101,7 @@ const Users = () => {
           <StyledTab label="Customers" />
         </StyledTabs>
         <DataGrid
-          rows={mockUsers}
+          rows={users}
           columns={columns}
           getRowId={(row) => row.id}
         />
