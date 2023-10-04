@@ -22,8 +22,10 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         let ordersData = [];
-        if(currentUser.role === "Manager" || currentUser.role === "Expert")
-            ordersData = await OrdersAPI.getAllOrders();
+        if(currentUser.role === "Manager" || currentUser.role === "Expert"){
+          console.log(currentUser.role);
+          ordersData = await OrdersAPI.getAllOrders();
+        }
         if(currentUser.role === "Client")
             ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
         setOrders(ordersData);
@@ -121,7 +123,7 @@ const Orders = () => {
             toolbar: GridToolbar,
           }}
           sx={{
-            height: "vh",
+            height: "50vh",
           }}
         />
       </Box>

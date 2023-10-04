@@ -176,6 +176,7 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
+            {(currentUser.role === "Manager" || currentUser.role === "Client") && (
             <Item
               title={
                 currentUser.role === "Client" ? "My Orders" : "Orders"
@@ -185,7 +186,7 @@ const Sidebar = () => {
               icon={<ShoppingCartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            />)}
             <Item
               title={
                 currentUser.role === "Client" ? "My Tickets" : "Tickets"

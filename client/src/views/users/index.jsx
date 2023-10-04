@@ -26,8 +26,8 @@ const Users = () => {
         let usersData = [];
         let managersData = [];
         let expertsData = [];
-        console.log(currentUser.role);
         if (currentUser.role === "Manager" || currentUser.role === "Expert") {
+          console.log(currentUser.role);
           usersData = await ProfilesAPI.getAllCustomers();
           managersData = await ProfilesAPI.getAllManagers();
           expertsData = await ProfilesAPI.getAllExperts();
@@ -80,9 +80,23 @@ const Users = () => {
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
           },
+          "& .MuiCheckbox-root": {
+            color: `${colors.greenAccent[200]} !important`,
+          },
+          "& .MuiCircularProgress-root": {
+            color: colors.greenAccent[700],
+          },
+          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+            color: colors.grey[100],
+          },
+          "& .MuiDataGrid-panelWrapper .MuiButton-root": {
+            color: colors.greenAccent[400] + " !important",
+          },
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
         }}
       >
-        
         {/* TODO: change datagrid content according to the selected tab */}
         <StyledTabs value={roleFilter} onChange={handleRoleFilterChange}>
           <StyledTab label="Customers" />
@@ -91,11 +105,7 @@ const Users = () => {
         </StyledTabs>
         <DataGrid
           rows={
-            roleFilter === 0
-              ? users
-              : roleFilter === 1
-              ? experts
-              : managers
+            roleFilter === 0 ? users : roleFilter === 1 ? experts : managers
           }
           columns={columns}
           loading={!users.length}
@@ -104,7 +114,7 @@ const Users = () => {
             toolbar: GridToolbar,
           }}
           sx={{
-            height: "vh",
+            height: "50vh",
           }}
         />
       </Box>

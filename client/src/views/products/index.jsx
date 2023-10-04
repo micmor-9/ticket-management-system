@@ -85,7 +85,7 @@ const Products = () => {
             }}
             loading={!products.length}
             sx={{
-              height: "vh",
+              height: "50vh",
             }}
           />
         </Box>

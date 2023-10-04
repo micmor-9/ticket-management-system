@@ -56,12 +56,10 @@ class ManagerServiceImpl(private val managerRepository: ManagerRepository) : Man
                 log.info("Get manager by id from repository request successful")
                 managers.map { it.toDTO() }
             }
-
             SecurityConfig.EXPERT_ROLE -> {
-                log.error("Get managers request failed by unauthorized access")
-                throw UnauthorizedTicketException("You can't access mangers!")
+                log.info("Get manager by id from repository request successful")
+                managers.map { it.toDTO() }
             }
-
             else -> {
                 log.error("Get managers request failed by unauthorized access")
                 throw UnauthorizedTicketException("You can't access managers!")
