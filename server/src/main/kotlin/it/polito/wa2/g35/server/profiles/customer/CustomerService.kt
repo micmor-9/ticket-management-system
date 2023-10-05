@@ -8,4 +8,6 @@ interface CustomerService {
     fun createCustomer(profile: CustomerDTO?) : CustomerDTO?
 
     fun updateCustomer(profile: CustomerDTO?) : CustomerDTO?
+
+    fun getAllCustomers(): List<CustomerDTO>?
 }

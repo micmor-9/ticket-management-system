@@ -59,7 +59,7 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
         }
     }
     @Observed(
-        name = "/orders/",
+        name = "/orders",
         contextualName = "get-orders-request-service"
     )
     override fun getOrders(): List<OrderDTO> {
@@ -72,7 +72,7 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
     )
     override fun getOrdersByCustomer(idCustomer: String): List<OrderDTO> {
         val authentication = SecurityContextHolder.getContext().authentication
-        val profile =customerService.getCustomerByEmail(idCustomer)
+        val profile = customerService.getCustomerByEmail(idCustomer)
         if(profile == null){
             log.error("No Profile found with this Id: $idCustomer")
             throw ProfileNotFoundException("Profile not found with this id!")

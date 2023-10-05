@@ -50,6 +50,15 @@ class ExpertServiceImpl(private val expertRepository: ExpertRepository) : Expert
     }
 
     @Observed(
+        name = "/experts",
+        contextualName = "get-experts-request-service"
+    )
+    override fun getAll(): List<ExpertDTO>? {
+        log.info("Get all experts from repository request successful")
+        return expertRepository.findAll().map { it.toDTO() }
+    }
+
+    @Observed(
         name = "/experts/id/{expertEmail}",
         contextualName = "get-expert-id-by-email-request-service"
     )

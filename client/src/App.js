@@ -11,7 +11,8 @@ import Users from "./views/users";
 /* import Products from "./scenes/products"; */
 import Tickets from "./views/tickets";
 import Ticket from "./views/tickets/[id]";
-/* import Orders from "./scenes/orders"; */
+import Products from "./views/products";
+import Orders from "./views/orders";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -37,10 +38,10 @@ function App() {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/users" element={<Users />} />
-                {/* <Route path="/products" element={<Products />} /> */}
+                <Route path="/products" element={<Products />} />
                 <Route path="/tickets" element={<Tickets />} />
                 <Route path="/tickets/:ticketId" element={<Ticket />} />
-                {/* <Route path="/orders" element={<Orders />} /> */}
+                <Route path="/orders" element={<Orders />} />
               </Routes>
             </main>
           </div>
