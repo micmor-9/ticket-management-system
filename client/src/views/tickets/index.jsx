@@ -22,8 +22,8 @@ const Tickets = () => {
     const fetchTickets = async () => {
       try {
         let ticketsData = [];
-        if (currentUser.role === "Client")
-          ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.email);
+        if (currentUser.role === "Customer")
+          ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.id);
         if (currentUser.role === "Expert")
           ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
         if (currentUser.role === "Manager")

@@ -28,3 +28,7 @@ hs_err_pid*
 .vscode
 
 .DS_Store
+
+docker/
+
+server/docker/tempo/tempo-data/blocks/single-tenant
