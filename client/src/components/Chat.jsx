@@ -23,6 +23,7 @@ import { tokens } from "../theme";
 import MessagesAPI from "../api/messages/messagesApi";
 import { AuthContext } from "../utils/AuthContext";
 import Lightbox from "./Lightbox";
+import ProfilesAPI from "../api/profiles/profilesApi";
 
 const SOCKET_URL = "ws://localhost:8081/ws";
 
@@ -146,6 +147,7 @@ const ChatBubblesBox = ({ chatMessages }) => {
   const chatBoxRef = useRef(null);
 
   const currentSender = (currentUser?.email).trim();
+  const [chatUsers, setChatUsers] = useState(new Map());
 
   useEffect(() => {
     chatBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -197,11 +199,25 @@ const ChatBubblesBox = ({ chatMessages }) => {
         </Box>
       )}
       {chatMessages.map((message) => {
+        if (chatUsers.has(message.sender) === false) {
+          ProfilesAPI.getUsernameByEmail(message.sender)
+            .then((response) => {
+              setChatUsers((prevChatUsers) => {
+                const newChatUsers = new Map(prevChatUsers);
+                newChatUsers.set(message.sender, response);
+                return newChatUsers;
+              });
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
         return (
           <ChatBubble
             key={message.id}
             message={message}
             currentSender={currentSender}
+            chatUsers={chatUsers}
             theme={theme}
             colors={colors}
           />
@@ -212,7 +228,7 @@ const ChatBubblesBox = ({ chatMessages }) => {
   );
 };
 
-const ChatBubble = ({ message, currentSender, theme, colors }) => {
+const ChatBubble = ({ message, currentSender, chatUsers, theme, colors }) => {
   const [hover, setHover] = useState(false);
   let url = null;
   if (message.attachment) {
@@ -312,6 +328,38 @@ const ChatBubble = ({ message, currentSender, theme, colors }) => {
                 </Avatar>
               )}
               {message.messageText}
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: "5px",
+              }}
+            >
+              <Typography
+                style={{
+                  color: "#ababab",
+                  fontSize: "0.7rem",
+                  marginRight: "10px",
+                }}
+              >
+                {chatUsers.get(message.sender)}
+              </Typography>
+              <Typography
+                style={{
+                  color: "#ababab",
+                  fontSize: "0.7rem",
+                }}
+              >
+                {new Date(message.messageTimestamp).toLocaleString("it-IT", {
+                  day: "numeric",
+                  month: "numeric",
+                  year: "2-digit",
+                  hour: "numeric",
+                  minute: "numeric",
+                })}
+              </Typography>
             </Box>
           </Box>
         </div>

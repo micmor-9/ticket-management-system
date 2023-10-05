@@ -33,9 +33,9 @@ class ExpertController(private val expertService: ExpertService){
         name = "/experts/id/{expertEmail}",
         contextualName = "get-expert-id-by-email-request"
     )
-    fun getExpertId(@PathVariable expertEmail: String?) : ExpertDTO? {
+    fun getExpert(@PathVariable expertEmail: String?) : ExpertDTO? {
         log.info("Get expert Id request successful")
-        return expertService.getExpertId(expertEmail)
+        return expertService.getExpert(expertEmail)
     }
 
     @GetMapping("/experts")
