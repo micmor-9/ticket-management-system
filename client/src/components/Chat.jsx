@@ -22,6 +22,7 @@ import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { tokens } from "../theme";
 import MessagesAPI from "../api/messages/messagesApi";
 import { AuthContext } from "../utils/AuthContext";
+import Lightbox from "./Lightbox";
 
 const SOCKET_URL = "ws://localhost:8081/ws";
 
@@ -265,16 +266,7 @@ const ChatBubble = ({ message, currentSender, theme, colors }) => {
                 message.attachment.fileType === "image/jpeg" ||
                 message.attachment.fileType === "image/jpg") && (
                 <Box>
-                  <img
-                    src={url}
-                    alt={message.attachment.fileName}
-                    style={{
-                      maxWidth: "250px",
-                      maxHeight: "250px",
-                      marginBottom: "5px",
-                      borderRadius: "10px",
-                    }}
-                  />
+                  <Lightbox src={url} alt={message.attachment.fileName} />
                 </Box>
               )}
             <Box
