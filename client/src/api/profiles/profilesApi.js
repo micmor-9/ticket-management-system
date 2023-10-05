@@ -26,7 +26,24 @@ const getExpert = async (expertEmail) => {
   }
 };
 
+<<<<<<< HEAD
 const getCustomer = async (customerEmail) => {
+=======
+const getAllExperts = async () => {
+  try {
+    const response = await api.get(`/experts`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const getCustomerId = async (customerEmail) => {
+>>>>>>> dev
   try {
     const response = await api.get(`/customers/id/${customerEmail}`, {
       headers: {
@@ -39,7 +56,24 @@ const getCustomer = async (customerEmail) => {
   }
 };
 
+<<<<<<< HEAD
 const getManager = async (managerEmail) => {
+=======
+const getAllCustomers = async () => {
+  try {
+    const response = await api.get(`/customers`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+const getManagerId = async (managerEmail) => {
+>>>>>>> dev
   try {
     const response = await api.get(`/managers/${managerEmail}`, {
       headers: {
@@ -52,9 +86,15 @@ const getManager = async (managerEmail) => {
   }
 };
 
+<<<<<<< HEAD
 const getUsernameByEmail = async (email) => {
   try {
     const response = await api.get(`/users/${email}`, {
+=======
+const getAllManagers = async () => {
+  try {
+    const response = await api.get(`/managers/`, {
+>>>>>>> dev
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -65,11 +105,24 @@ const getUsernameByEmail = async (email) => {
   }
 };
 
+<<<<<<< HEAD
 const ProfilesAPI = {
   getExpert,
   getManager,
   getCustomer,
   getUsernameByEmail,
+=======
+
+
+
+const ProfilesAPI = {
+  getExpertId,
+  getManagerId,
+  getCustomerId,
+  getAllCustomers,
+  getAllManagers,
+  getAllExperts,
+>>>>>>> dev
 };
 
 export default ProfilesAPI;

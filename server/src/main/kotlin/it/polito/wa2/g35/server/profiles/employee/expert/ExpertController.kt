@@ -38,6 +38,17 @@ class ExpertController(private val expertService: ExpertService){
         return expertService.getExpert(expertEmail)
     }
 
+    @GetMapping("/experts")
+    @PreAuthorize("hasAnyRole('Manager', 'Expert')")
+    @Observed(
+        name = "/experts",
+        contextualName = "get-all-expert-request"
+    )
+    fun getAllExperts() : List<ExpertDTO>? {
+        log.info("Get expert Id request successful")
+        return expertService.getAll()
+    }
+
     @GetMapping("/experts/specialization/{specialization}")
     @PreAuthorize("hasRole('Manager')")
     @Observed(

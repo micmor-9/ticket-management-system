@@ -25,9 +25,10 @@ class OrderController(private val orderService: OrderService) {
     }
 
     @GetMapping("/orders")
+    @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('Manager')")
     @Observed(
-        name = "/orders/",
+        name = "/orders",
         contextualName = "get-orders-request"
     )
     fun getOrders(): List<OrderDTO>? {

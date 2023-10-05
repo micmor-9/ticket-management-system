@@ -31,6 +31,20 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
             throw ProfileNotFoundException("Profile with given id doesn't exist!")
         }
     }
+
+    override fun getAllCustomers(): List<CustomerDTO>? {
+        val profile = profileRepository.findAll().map { it.toDTO() }
+        val authentication = SecurityContextHolder.getContext().authentication
+        if(authentication.authorities.map { it.authority }[0] == SecurityConfig.CLIENT_ROLE){
+            if (profile[0].email != authentication.name) {
+                log.error("Get All Customers from repository request failed by unauthorized access")
+                throw UnauthorizedProfileException("You can't access this profile!")
+            }
+        }
+        log.info("Get All Customers from repository request successful")
+        return profile
+    }
+
     override fun getCustomerByEmail(email: String): CustomerDTO? {
         val profile = profileRepository.findByEmail(email)?.toDTO()
         if(profile != null) {
@@ -87,4 +101,6 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
             null
         }
     }
+
+
 }

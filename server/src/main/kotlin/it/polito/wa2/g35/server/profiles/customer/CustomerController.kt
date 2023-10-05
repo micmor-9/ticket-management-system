@@ -43,6 +43,18 @@ class CustomerController(private val customerService: CustomerService) {
         return customerService.getCustomerByEmail(email)
     }
 
+    @GetMapping("/customers")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('Manager', 'Expert')")
+    @Observed(
+        name = "/customers",
+        contextualName = "get-profiles-request"
+    )
+    fun getProfiles(): List<CustomerDTO>? {
+        log.info("Get Profiles request successful")
+        return customerService.getAllCustomers()
+    }
+
     @PostMapping("/customers")
     @ResponseStatus(HttpStatus.CREATED)
     @Observed(

@@ -80,4 +80,27 @@ class ManagerServiceImpl(
         log.error("No user found with this email: $email")
         throw ProfileNotFoundException("User with given email doesn't exist!")
     }
+    
+    @Observed(
+        name = "/managers/",
+        contextualName = "get-managers-request-service"
+    )
+    override fun getAllManagers(): List<ManagerDTO>? {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val managers = managerRepository.findAll()
+        return when (authentication.authorities.map { it.authority }[0]) {
+            SecurityConfig.MANAGER_ROLE -> {
+                log.info("Get manager by id from repository request successful")
+                managers.map { it.toDTO() }
+            }
+            SecurityConfig.EXPERT_ROLE -> {
+                log.info("Get manager by id from repository request successful")
+                managers.map { it.toDTO() }
+            }
+            else -> {
+                log.error("Get managers request failed by unauthorized access")
+                throw UnauthorizedTicketException("You can't access managers!")
+            }
+        }
+    }
 }
