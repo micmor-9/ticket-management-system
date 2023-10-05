@@ -28,7 +28,7 @@ class CustomerController(private val customerService: CustomerService) {
     )
     fun getProfileId(@PathVariable customerEmail: String): CustomerDTO? {
         log.info("Get Profile Id request successful")
-        return customerService.getCustomerId(customerEmail)
+        return customerService.getCustomer(customerEmail)
     }
 
     @GetMapping("/customers/{email}")

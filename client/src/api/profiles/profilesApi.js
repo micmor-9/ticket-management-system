@@ -13,7 +13,7 @@ const handleApiError = (error) => {
   throw error;
 };
 
-const getExpertId = async (expertEmail) => {
+const getExpert = async (expertEmail) => {
   try {
     const response = await api.get(`/experts/id/${expertEmail}`, {
       headers: {
@@ -26,7 +26,7 @@ const getExpertId = async (expertEmail) => {
   }
 };
 
-const getCustomerId = async (customerEmail) => {
+const getCustomer = async (customerEmail) => {
   try {
     const response = await api.get(`/customers/id/${customerEmail}`, {
       headers: {
@@ -39,7 +39,7 @@ const getCustomerId = async (customerEmail) => {
   }
 };
 
-const getManagerId = async (managerEmail) => {
+const getManager = async (managerEmail) => {
   try {
     const response = await api.get(`/managers/${managerEmail}`, {
       headers: {
@@ -52,10 +52,24 @@ const getManagerId = async (managerEmail) => {
   }
 };
 
+const getUsernameByEmail = async (email) => {
+  try {
+    const response = await api.get(`/users/${email}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 const ProfilesAPI = {
-  getExpertId,
-  getManagerId,
-  getCustomerId,
+  getExpert,
+  getManager,
+  getCustomer,
+  getUsernameByEmail,
 };
 
 export default ProfilesAPI;
