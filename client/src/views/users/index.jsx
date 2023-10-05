@@ -20,6 +20,12 @@ const Users = () => {
   const [managers, setManagers] = useState([]);
   const [experts, setExperts] = useState([]);
 
+  const userRole = {
+    Customer: 0,
+    Expert: 1,
+    Manager: 2,
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -42,9 +48,9 @@ const Users = () => {
     fetchUsers();
   }, [currentUser.role, currentUser.id]);
 
-  const [roleFilter, setRoleFilter] = useState(0);
+  const [roleFilter, setRoleFilter] = useState(userRole.Customer);
   
-  const columns = getUsersColumns(roleFilter);
+  const columns = getUsersColumns(roleFilter, userRole);
 
   const handleRoleFilterChange = (event, newValue) => {
     setRoleFilter(newValue);
@@ -105,7 +111,7 @@ const Users = () => {
         </StyledTabs>
         <DataGrid
           rows={
-            roleFilter === 0 ? users : roleFilter === 1 ? experts : managers
+            roleFilter === userRole.Customer ? users : roleFilter === userRole.Expert ? experts : managers
           }
           columns={columns}
           loading={!users.length}
@@ -122,7 +128,7 @@ const Users = () => {
   );
 };
 
-const getUsersColumns = (roleFilter) => {
+const getUsersColumns = (roleFilter, userRole) => {
   let columns = [
     { field: "id", headerName: "ID" },
     {
@@ -144,14 +150,14 @@ const getUsersColumns = (roleFilter) => {
       cellClassName: "email-column--cell",
     },
   ];
-  if (roleFilter === 2) {
+  if (roleFilter === userRole.Manager) {
     columns.push({
         field: "managedArea",
         headerName: "Managed Area",
         flex: 1,
         cellClassName: "managed_area-column--cell",
       })
-  } else if (roleFilter === 1) {
+  } else if (roleFilter === userRole.Expert) {
     columns.push({
       field: "specialization",
       headerName: "Specialization",
