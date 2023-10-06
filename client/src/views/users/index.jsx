@@ -3,7 +3,6 @@ import { Box, useTheme } from "@mui/material";
 import { StyledTabs, StyledTab } from "../../components/StyledTabs";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockUsers } from "../../data/mockUsers";
 /* import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined"; */
@@ -82,9 +81,6 @@ const Users = () => {
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
             backgroundColor: colors.greenAccent[700],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,

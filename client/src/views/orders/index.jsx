@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box } from "@mui/system";
-import { mockOrders } from "../../data/mockOrders";
 import { useNavigate } from "react-router-dom";
 
 const Orders = () => {
@@ -22,19 +21,17 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         let ordersData = [];
-        if(currentUser.role === "Manager" || currentUser.role === "Expert"){
-          console.log(currentUser.role);
+        if(currentUser.role === "Manager" || currentUser.role === "Expert")
           ordersData = await OrdersAPI.getAllOrders();
-        }
         if(currentUser.role === "Client")
             ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
         setOrders(ordersData);
       } catch (error) {
-        // Gestisci gli errori, ad esempio mostrando un messaggio di errore
+          console.log(error);
       }
     };
     fetchOrders();
-  }, [currentUser.id, currentUser.role]);
+  }, [currentUser.id, currentUser.role, currentUser.email]);
 
   const columns = [
     { field: "id", headerName: "ID" },
