@@ -21,13 +21,13 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         let ordersData = [];
-        if(currentUser.role === "Manager" || currentUser.role === "Expert")
+        if (currentUser.role === "Manager" || currentUser.role === "Expert")
           ordersData = await OrdersAPI.getAllOrders();
-        if(currentUser.role === "Client")
-            ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
+        if (currentUser.role === "Client")
+          ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
         setOrders(ordersData);
       } catch (error) {
-          console.log(error);
+        console.log(error);
       }
     };
     fetchOrders();
@@ -35,35 +35,35 @@ const Orders = () => {
 
   const columns = [
     { field: "id", headerName: "ID" },
-    { 
-        field: "date", 
-        headerName: "Date", 
-        flex: 1,
-        type: "dateTime",
-        valueGetter: ({ value }) => value && new Date(value),
-        cellClassName: "date-column--cell", 
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      type: "date",
+      valueGetter: ({ value }) => value && new Date(value),
+      cellClassName: "date-column--cell",
     },
-    { 
-        field: "warrantyDuration", 
-        headerName: "Warranty Duration",
-        flex: 1, 
-        type: "dateTime",
-        valueGetter: ({ value }) => value && new Date(value),
-        cellClassName: "warrantyDuration-column--cell",
+    {
+      field: "warrantyDuration",
+      headerName: "Warranty Duration",
+      flex: 1,
+      type: "date",
+      valueGetter: ({ value }) => value && new Date(value),
+      cellClassName: "warrantyDuration-column--cell",
     },
-    { 
-        field: "customer", 
-        headerName: "Customer", 
-        flex: 1,
-        cellClassName: "customerID-column--cell",
-        valueGetter: ({ value }) => value && value.name + " " + value.surname,
+    {
+      field: "customer",
+      headerName: "Customer",
+      flex: 1,
+      cellClassName: "customerID-column--cell",
+      valueGetter: ({ value }) => value && value.name + " " + value.surname,
     },
-    { 
-        field: "product", 
-        headerName: "Product", 
-        flex: 1,
-        cellClassName: "productID-column--cell",
-        valueGetter: ({ value }) => value && value.name,
+    {
+      field: "product",
+      headerName: "Product",
+      flex: 1,
+      cellClassName: "productID-column--cell",
+      valueGetter: ({ value }) => value && value.name,
     },
   ];
 

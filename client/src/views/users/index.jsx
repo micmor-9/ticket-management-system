@@ -10,7 +10,6 @@ import Header from "../../components/Header";
 import { AuthContext } from "../../utils/AuthContext";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 
-
 const Users = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -32,7 +31,6 @@ const Users = () => {
         let managersData = [];
         let expertsData = [];
         if (currentUser.role === "Manager" || currentUser.role === "Expert") {
-          console.log(currentUser.role);
           usersData = await ProfilesAPI.getAllCustomers();
           managersData = await ProfilesAPI.getAllManagers();
           expertsData = await ProfilesAPI.getAllExperts();
@@ -48,7 +46,7 @@ const Users = () => {
   }, [currentUser.role, currentUser.id]);
 
   const [roleFilter, setRoleFilter] = useState(userRole.Customer);
-  
+
   const columns = getUsersColumns(roleFilter, userRole);
 
   const handleRoleFilterChange = (event, newValue) => {
@@ -107,7 +105,11 @@ const Users = () => {
         </StyledTabs>
         <DataGrid
           rows={
-            roleFilter === userRole.Customer ? users : roleFilter === userRole.Expert ? experts : managers
+            roleFilter === userRole.Customer
+              ? users
+              : roleFilter === userRole.Expert
+              ? experts
+              : managers
           }
           columns={columns}
           loading={!users.length}
@@ -148,11 +150,11 @@ const getUsersColumns = (roleFilter, userRole) => {
   ];
   if (roleFilter === userRole.Manager) {
     columns.push({
-        field: "managedArea",
-        headerName: "Managed Area",
-        flex: 1,
-        cellClassName: "managed_area-column--cell",
-      })
+      field: "managedArea",
+      headerName: "Managed Area",
+      flex: 1,
+      cellClassName: "managed_area-column--cell",
+    });
   } else if (roleFilter === userRole.Expert) {
     columns.push({
       field: "specialization",
@@ -161,7 +163,7 @@ const getUsersColumns = (roleFilter, userRole) => {
       cellClassName: "specialization-column--cell",
     });
   }
-  return columns; 
+  return columns;
 };
 
 export default Users;

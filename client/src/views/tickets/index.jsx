@@ -28,7 +28,6 @@ const Tickets = () => {
           ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
         if (currentUser.role === "Manager")
           ticketsData = await TicketsAPI.getTickets();
-        console.log(currentUser.role);
         setTickets(ticketsData);
       } catch (error) {
         // Gestisci gli errori, ad esempio mostrando un messaggio di errore
