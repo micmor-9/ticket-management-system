@@ -65,6 +65,12 @@ const Orders = () => {
       cellClassName: "productID-column--cell",
       valueGetter: ({ value }) => value && value.name,
     },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      flex: 1,
+      cellClassName: "productQuantity-column--cell",
+    },
   ];
 
   return (
