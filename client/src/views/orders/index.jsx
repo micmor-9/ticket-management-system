@@ -1,5 +1,4 @@
 import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
 import { useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import OrdersAPI from "../../api/orders/ordersApi";
@@ -8,10 +7,10 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box } from "@mui/system";
 import { useNavigate } from "react-router-dom";
+import { dataGridStyles } from "../../styles/dataGridStyles";
 
 const Orders = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
   const [currentUser] = useContext(AuthContext);
   const navigate = useNavigate();
@@ -76,47 +75,7 @@ const Orders = () => {
   return (
     <Box m="20px">
       <Header title="ORDERS" subtitle="Orders history" />
-      <Box
-        m="40px 0 0 0"
-        height="70h"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.greenAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.greenAccent[700],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
-          "& .MuiCircularProgress-root": {
-            color: colors.greenAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: colors.grey[100],
-          },
-          "& .MuiDataGrid-panelWrapper .MuiButton-root": {
-            color: colors.greenAccent[400] + " !important",
-          },
-          "& .MuiDataGrid-row": {
-            cursor: "pointer",
-          },
-        }}
-      >
+      <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
         <DataGrid
           rows={orders}
           columns={columns}
@@ -126,7 +85,7 @@ const Orders = () => {
             toolbar: GridToolbar,
           }}
           sx={{
-            height: "50vh",
+            height: "70vh",
           }}
         />
       </Box>

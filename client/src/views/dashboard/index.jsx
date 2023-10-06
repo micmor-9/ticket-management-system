@@ -22,6 +22,7 @@ const Dashboard = () => {
                     : colors.primary[500],
                 padding: "20px",
                 borderRadius: "10px",
+                height: "35vh",
               }}
             >
               <Typography variant="h3">1st Square</Typography>
@@ -37,6 +38,7 @@ const Dashboard = () => {
                     : colors.primary[500],
                 padding: "20px",
                 borderRadius: "10px",
+                height: "35vh",
               }}
             >
               <Typography variant="h3">2nd Square</Typography>
@@ -45,31 +47,33 @@ const Dashboard = () => {
           <Grid item xs={4}>
             <Paper
               sx={{
-                backgroundColor: colors.greenAccent[800],
+                backgroundColor: colors.blueAccent[600],
                 color:
                   theme.palette.mode === "dark"
                     ? colors.primary[100]
                     : colors.primary[500],
                 padding: "20px",
                 borderRadius: "10px",
+                height: "35vh",
               }}
             >
-              <Typography variant="h3">2nd Square</Typography>
+              <Typography variant="h3">3rd Square</Typography>
             </Paper>
           </Grid>
           <Grid item xs={8}>
             <Paper
               sx={{
-                backgroundColor: colors.greenAccent[800],
+                backgroundColor: colors.redAccent[800],
                 color:
                   theme.palette.mode === "dark"
                     ? colors.primary[100]
                     : colors.primary[500],
                 padding: "20px",
                 borderRadius: "10px",
+                height: "35vh",
               }}
             >
-              <Typography variant="h3">2nd Square</Typography>
+              <Typography variant="h3">4th Square</Typography>
             </Paper>
           </Grid>
         </Grid>
