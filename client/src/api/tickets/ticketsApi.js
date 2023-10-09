@@ -7,7 +7,13 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
+const ticketStatusApi = axios.create({
+  baseURL: `${backendUrl}`,
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+});
 const handleApiError = (error) => {
   console.log("Error during API call:", error);
   throw error;
@@ -103,6 +109,16 @@ const updateTicketPriority = async (ticketId, priority) => {
   }
 };
 
+const getTicketStatusByTicketId = async (ticketId) => {
+  try {
+    const response = await ticketStatusApi.get(`/status/${ticketId}`);
+    console.log(response.data)
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 const TicketsAPI = {
   getTickets,
   getTicketsByExpert,
@@ -112,6 +128,7 @@ const TicketsAPI = {
   updateTicket,
   updateTicketStatus,
   updateTicketPriority,
+  getTicketStatusByTicketId,
 };
 
 export default TicketsAPI;

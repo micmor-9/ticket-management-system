@@ -27,7 +27,7 @@ class Ticket(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "expert_id")
-    val expert: Expert?,
+    var expert: Expert?,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
