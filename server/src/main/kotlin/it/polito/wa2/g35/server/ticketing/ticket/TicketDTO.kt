@@ -6,7 +6,7 @@ import it.polito.wa2.g35.server.profiles.employee.expert.Expert
 import java.util.*
 
 
-data class TicketDTO constructor(
+data class TicketDTO (
     val id: Long?,
     val creationTimestamp: Date,
     val issueDescription: String,
@@ -15,13 +15,7 @@ data class TicketDTO constructor(
     val expert: Expert?,
     val product: Product,
     var customer: Customer
-){
-
-        constructor() : this(null, Date(), "", null, TicketStatusValues.OPEN, null, Product("", ""), Customer(null, "", "", ""))
-
-}
-
-
+)
 
 fun Ticket.toDTO(): TicketDTO {
     return TicketDTO(this.id, this.creationTimestamp, this.issueDescription, this.priority, this.status, this.expert, this.product, this.customer)

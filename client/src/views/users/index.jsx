@@ -33,7 +33,6 @@ const Users = () => {
         let managersData = [];
         let expertsData = [];
         if (currentUser.role === "Manager" || currentUser.role === "Expert") {
-          console.log(currentUser.role);
           usersData = await ProfilesAPI.getAllCustomers();
           managersData = await ProfilesAPI.getAllManagers();
           expertsData = await ProfilesAPI.getAllExperts();
@@ -72,6 +71,9 @@ const Users = () => {
           "& .name-column--cell": {
             color: colors.greenAccent[300],
           },
+          "& .surname-column--cell": {
+            color: colors.greenAccent[300],
+          },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.greenAccent[700],
             borderBottom: "none",
@@ -82,9 +84,6 @@ const Users = () => {
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
             backgroundColor: colors.greenAccent[700],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
@@ -111,7 +110,11 @@ const Users = () => {
         </StyledTabs>
         <DataGrid
           rows={
-            roleFilter === userRole.Customer ? users : roleFilter === userRole.Expert ? experts : managers
+            roleFilter === userRole.Customer
+              ? users
+              : roleFilter === userRole.Expert
+              ? experts
+              : managers
           }
           columns={columns}
           loading={!users.length}

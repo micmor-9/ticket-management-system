@@ -24,6 +24,17 @@ class OrderController(private val orderService: OrderService) {
         return orderService.getOrderByCustomerAndProduct(customerId, productId)
     }
 
+    @GetMapping("/order/{orderId}")
+    @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
+    @Observed(
+        name = "/order/{orderId}",
+        contextualName = "get-order-by-id-request"
+    )
+    fun getOrderByOrderId(@PathVariable orderId: String): OrderDTO? {
+        log.info("Get order by id request successful")
+        return orderService.getOrderByOrderId(orderId)
+    }
+
     @GetMapping("/orders")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('Manager')")

@@ -13,6 +13,7 @@ import Tickets from "./views/tickets";
 import Ticket from "./views/tickets/[id]";
 import Products from "./views/products";
 import Orders from "./views/orders";
+import CreateTicket from "./views/tickets/create";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/tickets" element={<Tickets />} />
                 <Route path="/tickets/:ticketId" element={<Ticket />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="tickets/new/:orderId" element={<CreateTicket />} />
               </Routes>
             </main>
           </div>

@@ -28,7 +28,6 @@ const Tickets = () => {
           ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
         if (currentUser.role === "Manager")
           ticketsData = await TicketsAPI.getTickets();
-        console.log(currentUser.role);
         setTickets(ticketsData);
       } catch (error) {
         // Gestisci gli errori, ad esempio mostrando un messaggio di errore
@@ -65,9 +64,8 @@ const Tickets = () => {
             m="0 auto 0 0"
             p="5px"
             display="flex"
-            justifyContent="flex-start"
             backgroundColor={"transparent"}
-            borderRadius="4px"
+            
           >
             <Tooltip
               title={
@@ -104,9 +102,7 @@ const Tickets = () => {
             m="0 auto 0 0"
             p="5px"
             display="flex"
-            justifyContent="center"
             backgroundColor={colors.status[status]}
-            borderRadius="4px"
           >
             <Typography color={colors.primary[400]}>
               {status.replace("_", " ")}

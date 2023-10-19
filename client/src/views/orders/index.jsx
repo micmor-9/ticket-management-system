@@ -9,6 +9,8 @@ import Header from "../../components/Header";
 import { Box } from "@mui/system";
 import { mockOrders } from "../../data/mockOrders";
 import { useNavigate } from "react-router-dom";
+import { Button, TableCell, TableRow, Typography } from "@mui/material";
+import CreateTicketForm from "../tickets/create";
 
 const Orders = () => {
   const theme = useTheme();
@@ -23,7 +25,6 @@ const Orders = () => {
       try {
         let ordersData = [];
         if(currentUser.role === "Manager" || currentUser.role === "Expert"){
-          console.log(currentUser.role);
           ordersData = await OrdersAPI.getAllOrders();
         }
         if(currentUser.role === "Client")
@@ -38,96 +39,128 @@ const Orders = () => {
 
   const columns = [
     { field: "id", headerName: "ID" },
-    { 
-        field: "date", 
-        headerName: "Date", 
-        flex: 1,
-        type: "dateTime",
-        valueGetter: ({ value }) => value && new Date(value),
-        cellClassName: "date-column--cell", 
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      type: "dateTime",
+      valueGetter: ({ value }) => value && new Date(value),
+      cellClassName: "date-column--cell",
     },
-    { 
-        field: "warrantyDuration", 
-        headerName: "Warranty Duration",
-        flex: 1, 
-        type: "dateTime",
-        valueGetter: ({ value }) => value && new Date(value),
-        cellClassName: "warrantyDuration-column--cell",
+    {
+      field: "warrantyDuration",
+      headerName: "Warranty Duration",
+      flex: 1,
+      type: "dateTime",
+      valueGetter: ({ value }) => value && new Date(value),
+      cellClassName: "warrantyDuration-column--cell",
     },
-    { 
-        field: "customer", 
-        headerName: "Customer", 
-        flex: 1,
-        cellClassName: "customerID-column--cell",
-        valueGetter: ({ value }) => value && value.name + " " + value.surname,
+    {
+      field: "customer",
+      headerName: "Customer",
+      flex: 1,
+      cellClassName: "customerID-column--cell",
+      valueGetter: ({ value }) => value && value.name + " " + value.surname,
     },
-    { 
-        field: "product", 
-        headerName: "Product", 
-        flex: 1,
-        cellClassName: "productID-column--cell",
-        valueGetter: ({ value }) => value && value.name,
+    {
+      field: "product",
+      headerName: "Product",
+      flex: 1,
+      cellClassName: "productID-column--cell",
+      valueGetter: ({ value }) => value && value.name,
+    },
+    {
+      field: "button",
+      headerName: "Ticket",
+      flex: 1,
+      cellClassName: "ticketID-column--cell",
+      renderCell: ({ row: { ticket } }) => {
+        return (
+          <Button
+            width="60%"
+            m="0 auto 0 0"
+            p="5px"
+            display="flex"
+            sx={{ backgroundColor: colors.redAccent[400]}}
+          >
+            <Typography color="white">Create Ticket</Typography>
+          </Button>
+        );
+      },
     },
   ];
 
+
   return (
-    <Box m="20px">
-      <Header title="ORDERS" subtitle="Orders history" />
-      <Box
-        m="40px 0 0 0"
-        height="70h"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.greenAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.greenAccent[700],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
-          "& .MuiCircularProgress-root": {
-            color: colors.greenAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: colors.grey[100],
-          },
-          "& .MuiDataGrid-panelWrapper .MuiButton-root": {
-            color: colors.greenAccent[400] + " !important",
-          },
-          "& .MuiDataGrid-row": {
-            cursor: "pointer",
-          },
-        }}
-      >
-        <DataGrid
-          rows={orders}
-          columns={columns}
-          loading={!orders.length}
-          getRowId={(row) => row.id}
-          slots={{
-            toolbar: GridToolbar,
-          }}
+    <>
+      <Box m="20px">
+        <Header title="ORDERS" subtitle="Orders history" />
+        <Box
+          m="40px 0 0 0"
+          height="70h"
           sx={{
-            height: "50vh",
+            "& .MuiDataGrid-root": {
+              border: "none",
+            },
+            "& .MuiDataGrid-cell": {
+              borderBottom: "none",
+            },
+            "& .name-column--cell": {
+              color: colors.greenAccent[300],
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: colors.greenAccent[700],
+              borderBottom: "none",
+            },
+            "& .MuiDataGrid-virtualScroller": {
+              backgroundColor: colors.primary[400],
+            },
+            "& .MuiDataGrid-footerContainer": {
+              borderTop: "none",
+              backgroundColor: colors.greenAccent[700],
+            },
+            "& .MuiCheckbox-root": {
+              color: `${colors.greenAccent[200]} !important`,
+            },
+            "& .MuiCircularProgress-root": {
+              color: colors.greenAccent[700],
+            },
+            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+              color: colors.grey[100],
+            },
+            "& .MuiDataGrid-panelWrapper .MuiButton-root": {
+              color: colors.greenAccent[400] + " !important",
+            },
+            "& .MuiDataGrid-row": {
+              cursor: "pointer",
+            },
           }}
-        />
+        >
+          <Box
+            sx={{
+              justifyContent: "center",
+
+            }}
+          >
+            <DataGrid
+              rows={orders}
+              columns={columns}
+              loading={!orders.length}
+              getRowId={(row) => row.id}
+              slots={{
+                toolbar: GridToolbar,
+              }}
+              sx={{
+                height: "50vh",
+              }}
+              onCellClick={(row) => {
+                navigate(`/tickets/new/${row.row.id}`)
+              }}
+            />
+          </Box>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 
