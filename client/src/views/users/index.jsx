@@ -10,6 +10,8 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined"; */
 import Header from "../../components/Header";
 import { AuthContext } from "../../utils/AuthContext";
 import ProfilesAPI from "../../api/profiles/profilesApi";
+import Button from "@mui/material/Button";
+import Form from "../form";
 
 
 const Users = () => {
@@ -19,6 +21,11 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [managers, setManagers] = useState([]);
   const [experts, setExperts] = useState([]);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
+  const handleCreateUserClick = () => {
+        setIsFormVisible(true);
+    };
 
   const userRole = {
     Customer: 0,
@@ -86,9 +93,6 @@ const Users = () => {
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
           },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
           "& .MuiCircularProgress-root": {
             color: colors.greenAccent[700],
           },
@@ -104,6 +108,14 @@ const Users = () => {
         }}
       >
         {/* TODO: change datagrid content according to the selected tab */}
+          {isFormVisible===false && (<> <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleCreateUserClick}
+              sx={{ marginTop: "20px" }}
+          > New User
+          </Button></>)}
+          {isFormVisible===false && (<>
         <StyledTabs value={roleFilter} onChange={handleRoleFilterChange}>
           <StyledTab label="Customers" />
           <StyledTab label="Experts" />
@@ -122,7 +134,8 @@ const Users = () => {
           sx={{
             height: "50vh",
           }}
-        />
+        /></>)}
+          {isFormVisible && <Form setIsFormVisible={setIsFormVisible}> </Form>}
       </Box>
     </Box>
   );

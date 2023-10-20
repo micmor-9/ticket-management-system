@@ -4,11 +4,15 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 
-const Form = () => {
+const Form = (props) => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
   const handleFormSubmit = (values) => {
     console.log(values);
+  };
+
+  const handleCancelClick = () => {
+    props.setIsFormVisible(false);
   };
 
   return (
@@ -117,6 +121,10 @@ const Form = () => {
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
+              <Button type="button" color="secondary" variant="outlined" style={{ marginRight: '20px' }}
+              onClick={handleCancelClick}>
+                Cancel
+              </Button>
               <Button type="submit" color="secondary" variant="contained">
                 Create New User
               </Button>
