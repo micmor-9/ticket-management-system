@@ -65,7 +65,7 @@ const Users = () => {
 
   return (
     <Box m="20px">
-      <Header title="USERS" subtitle="Manage users" />
+        { isFormVisible ? <Header title="CREATE USER" subtitle="Create a New User Profile"/> : <Header title= "USERS" subtitle="Manage users" />}
       <Box
         m="40px 0 0 0"
         height="70h"
@@ -112,7 +112,10 @@ const Users = () => {
               variant="contained"
               color="secondary"
               onClick={handleCreateUserClick}
-              sx={{ marginTop: "20px" }}
+              sx={{
+                  display: 'flex',
+                  justifyContent: 'end',
+              }}
           > New User
           </Button></>)}
           {isFormVisible===false && (<>

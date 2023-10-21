@@ -3,12 +3,29 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-
+import profilesApi from "../../api/profiles/profilesApi";
+import MessagesAPI from "../../api/messages/messagesApi";
 const Form = (props) => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
   const handleFormSubmit = (values) => {
-    console.log(values);
+
+      const profile = {
+          id: 0,
+          email: values.email,
+          name: values.firstName,
+          surname: values.lastName,
+      };
+      console.log('Dati inviati al server:', profile);
+    profilesApi.createUser(profile)
+        .then((response) => {
+          console.log(response);
+            props.setIsFormVisible(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
   };
 
   const handleCancelClick = () => {
@@ -16,9 +33,6 @@ const Form = (props) => {
   };
 
   return (
-    <Box m="20px">
-      <Header title="CREATE USER" subtitle="Create a New User Profile" />
-
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -132,7 +146,6 @@ const Form = (props) => {
           </form>
         )}
       </Formik>
-    </Box>
   );
 };
 

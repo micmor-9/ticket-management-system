@@ -91,6 +91,18 @@ const getAllManagers = async () => {
   }
 };
 
+const createUser = async (userData) => {
+  try {
+    const response = await api.post("/customers", userData,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
 
 
 
@@ -101,6 +113,7 @@ const ProfilesAPI = {
   getAllCustomers,
   getAllManagers,
   getAllExperts,
+  createUser,
 };
 
 export default ProfilesAPI;
