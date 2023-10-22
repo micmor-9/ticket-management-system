@@ -101,7 +101,21 @@ const getUsernameByEmail = async (email) => {
     } catch (error) {
         handleApiError(error);
     }
-}
+};
+
+const createUser = async (userData) => {
+  try {
+    const response = await api.post("/customers", userData,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 
 
 const ProfilesAPI = {
@@ -111,7 +125,8 @@ const ProfilesAPI = {
     getAllCustomers,
     getAllManagers,
     getAllExperts,
-    getUsernameByEmail
+    getUsernameByEmail,
+    createUser
 };
 
 export default ProfilesAPI;

@@ -1,14 +1,18 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box, Button, useTheme } from "@mui/material";
 import { StyledTabs, StyledTab } from "../../components/StyledTabs";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { tokens } from "../../theme";
+import { mockUsers } from "../../data/mockUsers";
 /* import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined"; */
 import Header from "../../components/Header";
+import Form from "../form";
 import { AuthContext } from "../../utils/AuthContext";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import { dataGridStyles } from "../../styles/dataGridStyles";
+
 
 const Users = () => {
   const theme = useTheme();
@@ -16,6 +20,11 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [managers, setManagers] = useState([]);
   const [experts, setExperts] = useState([]);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
+  const handleCreateUserClick = () => {
+        setIsFormVisible(true);
+    };
 
   const userRole = {
     Customer: 0,
@@ -54,9 +63,20 @@ const Users = () => {
 
   return (
     <Box m="20px">
-      <Header title="USERS" subtitle="Manage users" />
+        { isFormVisible ? <Header title="CREATE USER" subtitle="Create a New User Profile"/> : <Header title= "USERS" subtitle="Manage users" />}
       <Box m="40px 0 0 0" height="70h" sx={dataGridStyles(theme)}>
         {/* TODO: change datagrid content according to the selected tab */}
+          {isFormVisible===false && (<> <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleCreateUserClick}
+              sx={{
+                  display: 'flex',
+                  justifyContent: 'end',
+              }}
+          > New User
+          </Button></>)}
+          {isFormVisible===false && (<>
         <StyledTabs value={roleFilter} onChange={handleRoleFilterChange}>
           <StyledTab label="Customers" />
           <StyledTab label="Experts" />
@@ -79,7 +99,8 @@ const Users = () => {
           sx={{
             height: "70vh",
           }}
-        />
+        /></>)}
+          {isFormVisible && <Form setIsFormVisible={setIsFormVisible}> </Form>}
       </Box>
     </Box>
   );
