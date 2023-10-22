@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box, Button, useTheme } from "@mui/material";
 import { StyledTabs, StyledTab } from "../../components/StyledTabs";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -8,15 +8,14 @@ import { mockUsers } from "../../data/mockUsers";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined"; */
 import Header from "../../components/Header";
+import Form from "../form";
 import { AuthContext } from "../../utils/AuthContext";
 import ProfilesAPI from "../../api/profiles/profilesApi";
-import Button from "@mui/material/Button";
-import Form from "../form";
+import { dataGridStyles } from "../../styles/dataGridStyles";
 
 
 const Users = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const [currentUser] = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [managers, setManagers] = useState([]);
@@ -40,7 +39,6 @@ const Users = () => {
         let managersData = [];
         let expertsData = [];
         if (currentUser.role === "Manager" || currentUser.role === "Expert") {
-          console.log(currentUser.role);
           usersData = await ProfilesAPI.getAllCustomers();
           managersData = await ProfilesAPI.getAllManagers();
           expertsData = await ProfilesAPI.getAllExperts();
@@ -56,7 +54,7 @@ const Users = () => {
   }, [currentUser.role, currentUser.id]);
 
   const [roleFilter, setRoleFilter] = useState(userRole.Customer);
-  
+
   const columns = getUsersColumns(roleFilter, userRole);
 
   const handleRoleFilterChange = (event, newValue) => {
@@ -66,47 +64,7 @@ const Users = () => {
   return (
     <Box m="20px">
         { isFormVisible ? <Header title="CREATE USER" subtitle="Create a New User Profile"/> : <Header title= "USERS" subtitle="Manage users" />}
-      <Box
-        m="40px 0 0 0"
-        height="70h"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.greenAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.greenAccent[700],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
-          "& .MuiCircularProgress-root": {
-            color: colors.greenAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: colors.grey[100],
-          },
-          "& .MuiDataGrid-panelWrapper .MuiButton-root": {
-            color: colors.greenAccent[400] + " !important",
-          },
-          "& .MuiDataGrid-row": {
-            cursor: "pointer",
-          },
-        }}
-      >
+      <Box m="40px 0 0 0" height="70h" sx={dataGridStyles(theme)}>
         {/* TODO: change datagrid content according to the selected tab */}
           {isFormVisible===false && (<> <Button
               variant="contained"
@@ -126,7 +84,11 @@ const Users = () => {
         </StyledTabs>
         <DataGrid
           rows={
-            roleFilter === userRole.Customer ? users : roleFilter === userRole.Expert ? experts : managers
+            roleFilter === userRole.Customer
+              ? users
+              : roleFilter === userRole.Expert
+              ? experts
+              : managers
           }
           columns={columns}
           loading={!users.length}
@@ -135,7 +97,7 @@ const Users = () => {
             toolbar: GridToolbar,
           }}
           sx={{
-            height: "50vh",
+            height: "70vh",
           }}
         /></>)}
           {isFormVisible && <Form setIsFormVisible={setIsFormVisible}> </Form>}
@@ -168,11 +130,11 @@ const getUsersColumns = (roleFilter, userRole) => {
   ];
   if (roleFilter === userRole.Manager) {
     columns.push({
-        field: "managedArea",
-        headerName: "Managed Area",
-        flex: 1,
-        cellClassName: "managed_area-column--cell",
-      })
+      field: "managedArea",
+      headerName: "Managed Area",
+      flex: 1,
+      cellClassName: "managed_area-column--cell",
+    });
   } else if (roleFilter === userRole.Expert) {
     columns.push({
       field: "specialization",
@@ -181,7 +143,7 @@ const getUsersColumns = (roleFilter, userRole) => {
       cellClassName: "specialization-column--cell",
     });
   }
-  return columns; 
+  return columns;
 };
 
 export default Users;

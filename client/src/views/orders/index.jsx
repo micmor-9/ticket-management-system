@@ -1,5 +1,4 @@
 import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
 import { useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import OrdersAPI from "../../api/orders/ordersApi";
@@ -7,12 +6,11 @@ import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box } from "@mui/system";
-import { mockOrders } from "../../data/mockOrders";
 import { useNavigate } from "react-router-dom";
+import { dataGridStyles } from "../../styles/dataGridStyles";
 
 const Orders = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
   const [currentUser] = useContext(AuthContext);
   const navigate = useNavigate();
@@ -22,98 +20,62 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         let ordersData = [];
-        if(currentUser.role === "Manager" || currentUser.role === "Expert"){
-          console.log(currentUser.role);
+        if (currentUser.role === "Manager" || currentUser.role === "Expert")
           ordersData = await OrdersAPI.getAllOrders();
-        }
-        if(currentUser.role === "Client")
-            ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
+        if (currentUser.role === "Client")
+          ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
         setOrders(ordersData);
       } catch (error) {
-        // Gestisci gli errori, ad esempio mostrando un messaggio di errore
+        console.log(error);
       }
     };
     fetchOrders();
-  }, [currentUser.id, currentUser.role]);
+  }, [currentUser.id, currentUser.role, currentUser.email]);
 
   const columns = [
     { field: "id", headerName: "ID" },
-    { 
-        field: "date", 
-        headerName: "Date", 
-        flex: 1,
-        type: "dateTime",
-        valueGetter: ({ value }) => value && new Date(value),
-        cellClassName: "date-column--cell", 
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      type: "date",
+      valueGetter: ({ value }) => value && new Date(value),
+      cellClassName: "date-column--cell",
     },
-    { 
-        field: "warrantyDuration", 
-        headerName: "Warranty Duration",
-        flex: 1, 
-        type: "dateTime",
-        valueGetter: ({ value }) => value && new Date(value),
-        cellClassName: "warrantyDuration-column--cell",
+    {
+      field: "warrantyDuration",
+      headerName: "Warranty Duration",
+      flex: 1,
+      type: "date",
+      valueGetter: ({ value }) => value && new Date(value),
+      cellClassName: "warrantyDuration-column--cell",
     },
-    { 
-        field: "customer", 
-        headerName: "Customer", 
-        flex: 1,
-        cellClassName: "customerID-column--cell",
-        valueGetter: ({ value }) => value && value.name + " " + value.surname,
+    {
+      field: "customer",
+      headerName: "Customer",
+      flex: 1,
+      cellClassName: "customerID-column--cell",
+      valueGetter: ({ value }) => value && value.name + " " + value.surname,
     },
-    { 
-        field: "product", 
-        headerName: "Product", 
-        flex: 1,
-        cellClassName: "productID-column--cell",
-        valueGetter: ({ value }) => value && value.name,
+    {
+      field: "product",
+      headerName: "Product",
+      flex: 1,
+      cellClassName: "productID-column--cell",
+      valueGetter: ({ value }) => value && value.name,
+    },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      flex: 1,
+      cellClassName: "productQuantity-column--cell",
     },
   ];
 
   return (
     <Box m="20px">
       <Header title="ORDERS" subtitle="Orders history" />
-      <Box
-        m="40px 0 0 0"
-        height="70h"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.greenAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.greenAccent[700],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
-          "& .MuiCircularProgress-root": {
-            color: colors.greenAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: colors.grey[100],
-          },
-          "& .MuiDataGrid-panelWrapper .MuiButton-root": {
-            color: colors.greenAccent[400] + " !important",
-          },
-          "& .MuiDataGrid-row": {
-            cursor: "pointer",
-          },
-        }}
-      >
+      <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
         <DataGrid
           rows={orders}
           columns={columns}
@@ -123,7 +85,7 @@ const Orders = () => {
             toolbar: GridToolbar,
           }}
           sx={{
-            height: "50vh",
+            height: "70vh",
           }}
         />
       </Box>

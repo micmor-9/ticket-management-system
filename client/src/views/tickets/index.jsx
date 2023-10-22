@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../utils/AuthContext";
+import { dataGridStyles } from "../../styles/dataGridStyles";
 
 const Tickets = () => {
   const theme = useTheme();
@@ -22,13 +23,12 @@ const Tickets = () => {
     const fetchTickets = async () => {
       try {
         let ticketsData = [];
-        if (currentUser.role === "Client")
-          ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.email);
+        if (currentUser.role === "Customer")
+          ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.id);
         if (currentUser.role === "Expert")
           ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
         if (currentUser.role === "Manager")
           ticketsData = await TicketsAPI.getTickets();
-        console.log(currentUser.role);
         setTickets(ticketsData);
       } catch (error) {
         // Gestisci gli errori, ad esempio mostrando un messaggio di errore
@@ -141,47 +141,7 @@ const Tickets = () => {
   return (
     <Box m="20px">
       <Header title="TICKETS" subtitle="Manage tickets" />
-      <Box
-        m="40px 0 0 0"
-        height="70h"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.greenAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.greenAccent[700],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
-          "& .MuiCircularProgress-root": {
-            color: colors.greenAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: colors.grey[100],
-          },
-          "& .MuiDataGrid-panelWrapper .MuiButton-root": {
-            color: colors.greenAccent[400] + " !important",
-          },
-          "& .MuiDataGrid-row": {
-            cursor: "pointer",
-          },
-        }}
-      >
+      <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
         <DataGrid
           rows={tickets}
           columns={columns}

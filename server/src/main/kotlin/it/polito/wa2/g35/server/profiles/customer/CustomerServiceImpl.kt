@@ -7,7 +7,6 @@ import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.ticket.TicketController
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Service
 class CustomerServiceImpl(private val profileRepository: CustomerRepository) : CustomerService {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
 
-    override fun getCustomerId(customerEmail: String): CustomerDTO? {
+    override fun getCustomer(customerEmail: String): CustomerDTO? {
         val profile = profileRepository.findByEmail(customerEmail)?.toDTO()
         if(profile != null) {
             val authentication = SecurityContextHolder.getContext().authentication

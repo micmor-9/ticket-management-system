@@ -62,7 +62,7 @@ class ExpertServiceImpl(private val expertRepository: ExpertRepository) : Expert
         name = "/experts/id/{expertEmail}",
         contextualName = "get-expert-id-by-email-request-service"
     )
-    override fun getExpertId(expertEmail: String?): ExpertDTO? {
+    override fun getExpert(expertEmail: String?): ExpertDTO? {
         val authentication = SecurityContextHolder.getContext().authentication
         val expert = expertRepository.findByEmail(expertEmail)
         if(expert == null) {
