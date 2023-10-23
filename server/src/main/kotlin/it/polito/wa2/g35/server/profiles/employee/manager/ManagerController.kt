@@ -18,9 +18,9 @@ class ManagerController(private val managerService: ManagerService){
         name = "/managers/{managerEmail}",
         contextualName = "get-manager-id-request"
     )
-    fun getManagerId(@PathVariable managerEmail: String?) : ManagerDTO? {
+    fun getManager(@PathVariable managerEmail: String?) : ManagerDTO? {
         log.info("Get manager Id request successful")
-        return managerService.getManagerId(managerEmail)
+        return managerService.getManager(managerEmail)
     }
 
     @GetMapping("/managers/")
@@ -34,4 +34,14 @@ class ManagerController(private val managerService: ManagerService){
         return managerService.getAllManagers()
     }
 
+    @GetMapping("/users/{email}")
+    @PreAuthorize("hasAnyRole('Client', 'Expert', 'Manager')")
+    @Observed(
+        name = "/users/{email}",
+        contextualName = "get-username-by-email-request"
+    )
+    fun getUsernameByEmail(@PathVariable email: String) : String? {
+        log.info("Get username by email request successful")
+        return managerService.getUsernameByEmail(email)
+    }
 }

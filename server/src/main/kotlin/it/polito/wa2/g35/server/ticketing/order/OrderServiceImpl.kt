@@ -122,7 +122,8 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
                 order.date,
                 order.warrantyDuration,
                 customer.toCustomer(),
-                product.toProduct()
+                product.toProduct(),
+                order.quantity
             )
         ).toDTO()
     }

@@ -158,7 +158,7 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            {(currentUser.role == "Manager" || currentUser.role == "Expert") && (
+            {(currentUser.role === "Manager" || currentUser.role === "Expert") && (
               <Item
                 title="Users"
                 slug="users"

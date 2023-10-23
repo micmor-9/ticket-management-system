@@ -1,5 +1,4 @@
 import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
 import { useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import OrdersAPI from "../../api/orders/ordersApi";
@@ -7,14 +6,13 @@ import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box } from "@mui/system";
-import { mockOrders } from "../../data/mockOrders";
 import { useNavigate } from "react-router-dom";
 import { Button, TableCell, TableRow, Typography } from "@mui/material";
 import CreateTicketForm from "../tickets/create";
+import { dataGridStyles } from "../../styles/dataGridStyles";
 
 const Orders = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
   const [currentUser] = useContext(AuthContext);
   const navigate = useNavigate();
@@ -24,18 +22,17 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         let ordersData = [];
-        if(currentUser.role === "Manager" || currentUser.role === "Expert"){
+        if (currentUser.role === "Manager" || currentUser.role === "Expert")
           ordersData = await OrdersAPI.getAllOrders();
-        }
-        if(currentUser.role === "Client")
-            ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
+        if (currentUser.role === "Client")
+          ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
         setOrders(ordersData);
       } catch (error) {
-        // Gestisci gli errori, ad esempio mostrando un messaggio di errore
+        console.log(error);
       }
     };
     fetchOrders();
-  }, [currentUser.id, currentUser.role]);
+  }, [currentUser.id, currentUser.role, currentUser.email]);
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -43,7 +40,7 @@ const Orders = () => {
       field: "date",
       headerName: "Date",
       flex: 1,
-      type: "dateTime",
+      type: "date",
       valueGetter: ({ value }) => value && new Date(value),
       cellClassName: "date-column--cell",
     },
@@ -51,7 +48,7 @@ const Orders = () => {
       field: "warrantyDuration",
       headerName: "Warranty Duration",
       flex: 1,
-      type: "dateTime",
+      type: "date",
       valueGetter: ({ value }) => value && new Date(value),
       cellClassName: "warrantyDuration-column--cell",
     },
@@ -87,6 +84,10 @@ const Orders = () => {
           </Button>
         );
       },
+      field: "quantity",
+      headerName: "Quantity",
+      flex: 1,
+      cellClassName: "productQuantity-column--cell",
     },
   ];
 

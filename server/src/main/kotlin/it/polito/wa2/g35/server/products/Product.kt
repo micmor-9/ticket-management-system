@@ -10,5 +10,8 @@ import jakarta.persistence.Table
 class Product (
     @Id
     var id: String = "",
-    var name: String = ""
+    var name: String = "",
+    var description: String? = "",
+    var price: Double? = 0.0,
+    var quantity: Int? = 0,
 )

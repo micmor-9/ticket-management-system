@@ -6,6 +6,7 @@ data class OrderInputDTO (
     val id: Long?,
     val customerId: String,
     val productId: String,
+    val quantity: Int?,
     val date: Date,
     val warrantyDuration: Date
 )
