@@ -65,9 +65,8 @@ const Tickets = () => {
             m="0 auto 0 0"
             p="5px"
             display="flex"
-            justifyContent="flex-start"
             backgroundColor={"transparent"}
-            borderRadius="4px"
+            
           >
             <Tooltip
               title={
@@ -104,9 +103,8 @@ const Tickets = () => {
             m="0 auto 0 0"
             p="5px"
             display="flex"
-            justifyContent="center"
             backgroundColor={colors.status[status]}
-            borderRadius="4px"
+            borderRadius={"5px"}
           >
             <Typography color={colors.primary[400]}>
               {status.replace("_", " ")}

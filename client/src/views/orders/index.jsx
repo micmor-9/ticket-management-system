@@ -7,11 +7,13 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import { Box } from "@mui/system";
 import { useNavigate } from "react-router-dom";
+import { Button, Typography } from "@mui/material";
+import { tokens } from "../../theme";
 import { dataGridStyles } from "../../styles/dataGridStyles";
 
 const Orders = () => {
   const theme = useTheme();
-
+  const colors = tokens(theme.palette.mode);
   const [currentUser] = useContext(AuthContext);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
@@ -32,6 +34,10 @@ const Orders = () => {
     fetchOrders();
   }, [currentUser.id, currentUser.role, currentUser.email]);
 
+  const handleButtonClick = (params) => {
+    navigate(`/tickets/new/${params}`);
+  };
+
   const columns = [
     { field: "id", headerName: "ID" },
     {
@@ -40,7 +46,6 @@ const Orders = () => {
       flex: 1,
       type: "date",
       valueGetter: ({ value }) => value && new Date(value),
-      cellClassName: "date-column--cell",
     },
     {
       field: "warrantyDuration",
@@ -48,34 +53,69 @@ const Orders = () => {
       flex: 1,
       type: "date",
       valueGetter: ({ value }) => value && new Date(value),
-      cellClassName: "warrantyDuration-column--cell",
     },
     {
       field: "customer",
       headerName: "Customer",
       flex: 1,
-      cellClassName: "customerID-column--cell",
+      type: "string",
       valueGetter: ({ value }) => value && value.name + " " + value.surname,
     },
     {
       field: "product",
       headerName: "Product",
       flex: 1,
-      cellClassName: "productID-column--cell",
       valueGetter: ({ value }) => value && value.name,
     },
     {
-      field: "quantity",
-      headerName: "Quantity",
+      field: "button",
+      headerName: "Ticket",
       flex: 1,
-      cellClassName: "productQuantity-column--cell",
+      type: "button",
+      renderCell: ({ row }) => {
+        return (
+          <Button
+            id="create-ticket"
+            sx={{
+              backgroundColor: colors.redAccent[600],
+              "&:hover": {
+                backgroundColor: colors.redAccent[500],
+              },
+            }}
+            onClick={() => handleButtonClick(row.id)}
+          >
+            <Typography color="white">Create Ticket</Typography>
+          </Button>
+        );
+      },
     },
   ];
+
 
   return (
     <Box m="20px">
       <Header title="ORDERS" subtitle="Orders history" />
-      <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
+      <Box m="40px 0 0 0" height="70h" sx={dataGridStyles(theme)}>
+        {/* <Box
+          sx={{
+            justifyContent: "center",
+          }}
+        >
+          <DataGrid
+            rows={orders}
+            columns={columns}
+            loading={!orders.length}
+
+            getRowId={(row) => row.id}
+            slots={{
+              toolbar: GridToolbar,
+            }}
+            sx={{
+              height: "50vh",
+            }}
+            // onCellClick={handleCellClick}
+          />
+        </Box> */}
         <DataGrid
           rows={orders}
           columns={columns}
@@ -85,12 +125,14 @@ const Orders = () => {
             toolbar: GridToolbar,
           }}
           sx={{
-            height: "70vh",
+            height: "50vh",
           }}
+          // onCellClick={handleCellClick}
         />
       </Box>
     </Box>
   );
 };
+
 
 export default Orders;

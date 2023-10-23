@@ -6,9 +6,6 @@ export const dataGridStyles = (theme) => {
     "& .MuiDataGrid-root": {
       border: "none",
     },
-    "& .MuiDataGrid-cell": {
-      borderBottom: "none",
-    },
     "& .name-column--cell": {
       color: colors.greenAccent[300],
     },
@@ -32,9 +29,9 @@ export const dataGridStyles = (theme) => {
     "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
       color: colors.grey[100],
     },
-    "& .MuiDataGrid-panelWrapper .MuiButton-root": {
-      color: colors.greenAccent[400] + " !important",
-    },
+    // "& .MuiDataGrid-panelWrapper .MuiButton-root": {
+    //   color: colors.greenAccent[400] + " !important",
+    // },
     "& .MuiDataGrid-row": {
       cursor: "pointer",
     },
