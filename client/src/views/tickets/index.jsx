@@ -103,6 +103,7 @@ const Tickets = () => {
             p="5px"
             display="flex"
             backgroundColor={colors.status[status]}
+            borderRadius={"5px"}
           >
             <Typography color={colors.primary[400]}>
               {status.replace("_", " ")}

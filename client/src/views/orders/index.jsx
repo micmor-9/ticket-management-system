@@ -139,7 +139,6 @@ const Orders = () => {
           <Box
             sx={{
               justifyContent: "center",
-
             }}
           >
             <DataGrid
@@ -154,7 +153,7 @@ const Orders = () => {
                 height: "50vh",
               }}
               onCellClick={(row) => {
-                navigate(`/tickets/new/${row.row.id}`)
+                navigate(`/tickets/new/${row.row.id}`);
               }}
             />
           </Box>

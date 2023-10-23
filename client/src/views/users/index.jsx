@@ -71,9 +71,6 @@ const Users = () => {
           "& .name-column--cell": {
             color: colors.greenAccent[300],
           },
-          "& .surname-column--cell": {
-            color: colors.greenAccent[300],
-          },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.greenAccent[700],
             borderBottom: "none",
