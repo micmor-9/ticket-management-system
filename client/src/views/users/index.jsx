@@ -9,10 +9,12 @@ import {dataGridStyles} from "../../styles/dataGridStyles";
 import {useNavigate} from "react-router-dom";
 import HeaderActions from "../../components/HeaderActions";
 import AddIcon from "@mui/icons-material/Add";
+import { tokens } from "../../theme";
 
 
 const Users = () => {
     const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
     const [currentUser] = useContext(AuthContext);
     const [users, setUsers] = useState([]);
     const [managers, setManagers] = useState([]);
@@ -70,6 +72,7 @@ const Users = () => {
                     </Button>
                 </HeaderActions>
             </Header>
+            
             <Box height="70vh" sx={dataGridStyles(theme)}>
                 <StyledTabs value={roleFilter} onChange={handleRoleFilterChange}>
                     <StyledTab label="Customers"/>
@@ -97,77 +100,6 @@ const Users = () => {
             </Box>
         </Box>
     );
-  return (
-    <Box m="20px">
-      <Header title="USERS" subtitle="Manage users" />
-      <Box
-        m="40px 0 0 0"
-        height="70h"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.greenAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.greenAccent[700],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
-          "& .MuiCircularProgress-root": {
-            color: colors.greenAccent[700],
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            color: colors.grey[100],
-          },
-          "& .MuiDataGrid-panelWrapper .MuiButton-root": {
-            color: colors.greenAccent[400] + " !important",
-          },
-          "& .MuiDataGrid-row": {
-            cursor: "pointer",
-          },
-        }}
-      >
-        {/* TODO: change datagrid content according to the selected tab */}
-        <StyledTabs value={roleFilter} onChange={handleRoleFilterChange}>
-          <StyledTab label="Customers" />
-          <StyledTab label="Experts" />
-          <StyledTab label="Managers" />
-        </StyledTabs>
-        <DataGrid
-          rows={
-            roleFilter === userRole.Customer
-              ? users
-              : roleFilter === userRole.Expert
-              ? experts
-              : managers
-          }
-          columns={columns}
-          loading={!users.length}
-          getRowId={(row) => row.id}
-          slots={{
-            toolbar: GridToolbar,
-          }}
-          sx={{
-            height: "50vh",
-          }}
-        />
-      </Box>
-    </Box>
-  );
 };
 
 const getUsersColumns = (roleFilter, userRole) => {
