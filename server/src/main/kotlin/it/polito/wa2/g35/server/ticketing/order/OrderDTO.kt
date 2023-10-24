@@ -8,14 +8,15 @@ data class OrderDTO (
     val id: Long?,
     val customer: Customer,
     val product: Product,
+    val quantity: Int?,
     val date: Date,
     val warrantyDuration: Date
 )
 {
-    constructor() : this(null, Customer(null, "","",""),Product("",""),Date(),Date())
+    constructor() : this(null, Customer(null, "","",""),Product("",""), 0,Date(),Date())
 }
 
 
 fun Order.toDTO() : OrderDTO {
-    return OrderDTO(this.id, this.customer, this.product, this.date, this.warrantyDuration)
+    return OrderDTO(this.id, this.customer, this.product, this.quantity, this.date, this.warrantyDuration)
 }

@@ -35,6 +35,7 @@ class MessageController (private val messageService: MessageService) {
         log.info("Get messages by Ticket request successful")
         return messageService.getMessagesByTicket(ticketId)
     }
+
     @PostMapping("/messages/send")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('Expert', 'Manager', 'Client')")

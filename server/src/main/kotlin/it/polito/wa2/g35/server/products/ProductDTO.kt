@@ -2,16 +2,19 @@ package it.polito.wa2.g35.server.products
 
 data class ProductDTO(
     val id: String,
-    val name: String
+    val name: String,
+    var description: String?,
+    var price: Double?,
+    var quantity: Int?,
 )
 {
-    constructor() : this("","")
+    constructor() : this("","", "", 0.0, 0)
 }
 
 fun Product.toDTO(): ProductDTO {
-    return ProductDTO(this.id, this.name)
+    return ProductDTO(this.id, this.name, this.description, this.price, this.quantity)
 }
 
 fun ProductDTO.toProduct(): Product {
-    return Product(this.id, this.name)
+    return Product(this.id, this.name, this.description, this.price, this.quantity)
 }

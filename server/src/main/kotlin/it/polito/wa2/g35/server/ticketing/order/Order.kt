@@ -23,5 +23,7 @@ class Order (
     val customer: Customer,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    val product: Product
+    val product: Product,
+
+    val quantity: Int?
 )

@@ -125,12 +125,12 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
         when(authentication.authorities.map { it.authority }[0]){
             SecurityConfig.MANAGER_ROLE -> {
                 log.info("Create message request successful (repository)")
-                val message = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                val messageToSave = Message(null, Date(), message.messageText, ticket, message.sender, null)
                 if (uploadedAttachment != null) {
                     val managedAttachment = entityManager.merge(uploadedAttachment)
-                    message.attachment = managedAttachment
+                    messageToSave.attachment = managedAttachment
                 }
-                return messageRepository.save(message).toDTO()
+                return messageRepository.save(messageToSave).toDTO()
 
             }
             SecurityConfig.CLIENT_ROLE -> {
@@ -140,12 +140,12 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                 }
                 else {
                     log.info("Create message request successful (repository)")
-                    val message = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                    val messageToSave = Message(null, Date(), message.messageText, ticket, message.sender, null)
                     if (uploadedAttachment != null) {
                         val managedAttachment = entityManager.merge(uploadedAttachment)
-                        message.attachment = managedAttachment
+                        messageToSave.attachment = managedAttachment
                     }
-                    return messageRepository.save(message).toDTO()
+                    return messageRepository.save(messageToSave).toDTO()
 
                 }
             }
@@ -156,12 +156,12 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
                 }
                 else {
                     log.info("Create message request successful (repository)")
-                    val message = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                    val messageToSave = Message(null, Date(), message.messageText, ticket, message.sender, null)
                     if (uploadedAttachment != null) {
                         val managedAttachment = entityManager.merge(uploadedAttachment)
-                        message.attachment = managedAttachment
+                        messageToSave.attachment = managedAttachment
                     }
-                    return messageRepository.save(message).toDTO()
+                    return messageRepository.save(messageToSave).toDTO()
                 }
             }
             else -> {

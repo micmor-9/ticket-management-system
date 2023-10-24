@@ -28,13 +28,13 @@ export const useAuth = () => {
             decodedToken.resource_access["springboot-keycloak-client"].roles[0];
           let id = null;
           if (role === "Manager") {
-            id = await ProfilesAPI.getManagerId(decodedToken.email);
+            id = await ProfilesAPI.getManager(decodedToken.email);
           }
           if (role === "Expert") {
-            id = await ProfilesAPI.getExpertId(decodedToken.email);
+            id = await ProfilesAPI.getExpert(decodedToken.email);
           }
-          if (role === "User") {
-            id = await ProfilesAPI.getUserId(decodedToken.email);
+          if (role === "Client") {
+            id = await ProfilesAPI.getCustomer(decodedToken.email);
             console.log(id);
           }
 
