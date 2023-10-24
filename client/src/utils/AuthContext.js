@@ -33,7 +33,7 @@ export const useAuth = () => {
           if (role === "Expert") {
             id = await ProfilesAPI.getExpert(decodedToken.email);
           }
-          if (role === "User") {
+          if (role === "Client") {
             id = await ProfilesAPI.getCustomer(decodedToken.email);
             console.log(id);
           }
