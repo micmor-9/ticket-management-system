@@ -23,9 +23,10 @@ const Tickets = () => {
         const fetchTickets = async () => {
             try {
                 let ticketsData = [];
-                    console.log(currentUser.role + " " + currentUser.id + " " + currentUser.email);
-                if (currentUser.role === "Client"){
-                    ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.email);}
+                console.log(currentUser.role + " " + currentUser.id + " " + currentUser.email);
+                if (currentUser.role === "Client") {
+                    ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.email);
+                }
                 if (currentUser.role === "Expert")
                     ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
                 if (currentUser.role === "Manager")
@@ -37,7 +38,7 @@ const Tickets = () => {
         };
 
         fetchTickets();
-    }, [currentUser.id, currentUser.role]);
+    }, [currentUser.id, currentUser.role, currentUser.email]);
 
     const columns = [
         {field: "id", headerName: "ID"},

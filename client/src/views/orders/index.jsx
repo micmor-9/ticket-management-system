@@ -34,10 +34,6 @@ const Orders = () => {
         fetchOrders();
     }, [currentUser.id, currentUser.role, currentUser.email]);
 
-    const handleButtonClick = (params) => {
-        navigate(`/tickets/new/${params}`);
-    };
-
     const columns = [
         {field: "id", headerName: "ID"},
         {
@@ -82,7 +78,7 @@ const Orders = () => {
                                 backgroundColor: colors.redAccent[500],
                             },
                         }}
-                        onClick={() => handleButtonClick(row.id)}
+                        onClick={() => navigate(`/tickets/create/${row.id}`)}
                     >
                         <Typography color="white">Create Ticket</Typography>
                     </Button>
@@ -96,26 +92,6 @@ const Orders = () => {
         <Box m="20px">
             <Header title="ORDERS" subtitle="Orders history"/>
             <Box m="40px 0 0 0" height="70vh" sx={dataGridStyles(theme)}>
-                {/* <Box
-          sx={{
-            justifyContent: "center",
-          }}
-        >
-          <DataGrid
-            rows={orders}
-            columns={columns}
-            loading={!orders.length}
-
-            getRowId={(row) => row.id}
-            slots={{
-              toolbar: GridToolbar,
-            }}
-            sx={{
-              height: "50vh",
-            }}
-            // onCellClick={handleCellClick}
-          />
-        </Box> */}
                 <DataGrid
                     rows={orders}
                     columns={columns}
@@ -127,7 +103,6 @@ const Orders = () => {
                     sx={{
                         height: "70vh",
                     }}
-                    // onCellClick={handleCellClick}
                 />
             </Box>
         </Box>
