@@ -1,4 +1,4 @@
-import {Box, Typography, Tooltip, useTheme} from "@mui/material";
+import {Box, Typography, Tooltip, useTheme, Select, MenuItem} from "@mui/material";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
 import {tokens} from "../../theme";
 import NorthOutlinedIcon from "@mui/icons-material/NorthOutlined";
@@ -10,6 +10,7 @@ import TicketsAPI from "../../api/tickets/ticketsApi";
 import {useContext, useEffect, useState} from "react";
 import {AuthContext} from "../../utils/AuthContext";
 import {dataGridStyles} from "../../styles/dataGridStyles";
+import id from "./[id]";
 
 const Tickets = () => {
     const theme = useTheme();
@@ -33,12 +34,42 @@ const Tickets = () => {
                     ticketsData = await TicketsAPI.getTickets();
                 setTickets(ticketsData);
             } catch (error) {
-                // Gestisci gli errori, ad esempio mostrando un messaggio di errore
+
             }
         };
 
         fetchTickets();
     }, [currentUser.id, currentUser.role, currentUser.email]);
+    const handlePriorityChange = async (event, ticketId) => {
+        const newPriority = event.target.value;
+        try {
+            if (currentUser.role === "Manager" || currentUser.role === "Expert")
+                await TicketsAPI.updateTicketPriority(ticketId, newPriority);
+            const updatedTickets = tickets.map((ticket) =>
+                ticket.id === ticketId ? { ...ticket, priority: newPriority } : ticket
+            );
+            setTickets(updatedTickets);
+
+        } catch (error) {
+
+        }
+    };
+
+    const handleStatusChange = async (event, ticketId) => {
+        const newStatus = event.target.value;
+        try {
+            if (currentUser.role === "Manager" || currentUser.role === "Expert")
+                await TicketsAPI.updateTicketStatus(ticketId, newStatus);
+            const updatedTickets = tickets.map((ticket) =>
+                ticket.id === ticketId ? { ...ticket, status: newStatus } : ticket
+            );
+            setTickets(updatedTickets);
+
+        } catch (error) {
+
+        }
+    };
+
 
     const columns = [
         {field: "id", headerName: "ID"},
@@ -60,61 +91,139 @@ const Tickets = () => {
             field: "priority",
             headerName: "Priority",
             cellClassName: "priority-column--cell",
-            renderCell: ({row: {priority}}) => {
-                return (
-                    <Box
-                        width="60%"
-                        m="0 auto 0 0"
-                        p="5px"
-                        display="flex"
-                        backgroundColor={"transparent"}
-                    >
-                        <Tooltip
-                            title={
-                                priority === "LOW"
-                                    ? "Low"
-                                    : priority === "MEDIUM"
-                                        ? "Medium"
-                                        : "High"
-                            }
-                        >
-                            <Typography color={colors.priority[priority]}>
-                                {priority === "LOW" ? (
-                                    <SouthOutlinedIcon/>
-                                ) : priority === "MEDIUM" ? (
-                                    <EastOutlinedIcon/>
-                                ) : (
-                                    <NorthOutlinedIcon/>
-                                )}
-                            </Typography>
-                        </Tooltip>
-                    </Box>
-                );
+            renderCell: ({row: {priority,id}}) => {
+                if (currentUser.role == "Manager" || currentUser.role == "Expert") {
+                    return (
+                        <>
+                            <Box
+                                width="60%"
+                                m="0 auto 0 0"
+                                p="5px"
+                                display="flex"
+                                backgroundColor={"transparent"}
+                            >
+                                <Tooltip
+                                    title={
+                                        priority === "LOW"
+                                            ? "Low"
+                                            : priority === "MEDIUM"
+                                                ? "Medium"
+                                                : "High"
+                                    }
+                                >
+                                    <Typography color={colors.priority[priority]}>
+                                        {priority === "LOW" ? (
+                                            <SouthOutlinedIcon/>
+                                        ) : priority === "MEDIUM" ? (
+                                            <EastOutlinedIcon/>
+                                        ) : (
+                                            <NorthOutlinedIcon/>
+                                        )}
+                                    </Typography>
+                                </Tooltip>
+                            </Box>
+                            <Select
+                                sx={{ height: "40%", width: "40%" }}
+                                native
+                                onChange={(event) => handlePriorityChange(event,id)}
+                            >
+
+                                <option value={"LOW"}>Low</option>
+                                <option value={"MEDIUM"}>Medium</option>
+                                <option value={"HIGH"}>High</option>
+                            </Select>
+                        </>
+                    );
+                }else {
+                    return(
+                        <>
+                            <Box
+                                width="60%"
+                                m="0 auto 0 0"
+                                p="5px"
+                                display="flex"
+                                backgroundColor={"transparent"}
+                            >
+                                <Tooltip
+                                    title={
+                                        priority === "LOW"
+                                            ? "Low"
+                                            : priority === "MEDIUM"
+                                                ? "Medium"
+                                                : "High"
+                                    }
+                                >
+                                    <Typography color={colors.priority[priority]}>
+                                        {priority === "LOW" ? (
+                                            <SouthOutlinedIcon/>
+                                        ) : priority === "MEDIUM" ? (
+                                            <EastOutlinedIcon/>
+                                        ) : (
+                                            <NorthOutlinedIcon/>
+                                        )}
+                                    </Typography>
+                                </Tooltip>
+                            </Box>
+                        </>
+                    );
+                }
+                }
+            ,
             },
-        },
         {
             field: "status",
             headerName: "Status",
             flex: 1,
             cellClassName: "status-column--cell",
-            renderCell: ({row: {status}}) => {
-                return (
-                    <Box
-                        width="60%"
-                        m="0 auto 0 0"
-                        p="5px"
-                        display="flex"
-                        justifyContent={"center"}
-                        backgroundColor={colors.status[status]}
-                        borderRadius={"5px"}
-                    >
-                        <Typography color={colors.primary[400]}>
-                            {status.replace("_", " ")}
-                        </Typography>
-                    </Box>
+            renderCell: ({row: {status,id}}) => {
+                if (currentUser.role == "Manager" || currentUser.role =="Expert") {
+                    return (
+                        <>
+                            <Box
+                                width="60%"
+                                m="0 auto 0 0"
+                                p="5px"
+                                display="flex"
+                                justifyContent={"center"}
+                                backgroundColor={colors.status[status]}
+                                borderRadius={"5px"}
+                            >
+                                <Typography color={colors.primary[400]}>
+                                    {status.replace("_", " ")}
+                                </Typography>
+                            </Box>
+                            <Select sx={{height: "40%", width: "20%"}}
+                                    native
+                                    onChange={(event) => handleStatusChange(event,id)}
+                            >
+                                <option value={"OPEN"}>Open</option>
+                                <option value={"IN_PROGRESS"}>In Progress</option>
+                                <option value={"CLOSED"}>Closed</option>
+                                <option value={"RESOLVED"}>Resolved</option>
+                                <option value={"REOPENED"}>Reopened</option>
+                            </Select>
+                        </>
+                    );
+                } else {
+                    return(
+                        <Box
+                            width="60%"
+                            m="0 auto 0 0"
+                            p="5px"
+                            display="flex"
+                            justifyContent={"center"}
+                            backgroundColor={colors.status[status]}
+                            borderRadius={"5px"}
+                        >
+                            <Typography color={colors.primary[400]}>
+                                {status.replace("_", " ")}
+                            </Typography>
+                        </Box>
                 );
+                }
+                }
+            ,
             },
-        },
         {
             field: "expert",
             headerName: "Expert",
@@ -153,7 +262,11 @@ const Tickets = () => {
                     sx={{
                         height: "70vh",
                     }}
-                    onRowClick={(row) => navigate(`/tickets/${row.id}`)}
+                    onCellClick={(params) => {
+                        if (params.field === "id") {
+                            navigate(`/tickets/${params.id}`);
+                        }
+                    }}
                 />
             </Box>
         </Box>

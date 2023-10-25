@@ -96,7 +96,14 @@ const updateTicket = async (ticketId, ticketData) => {
 
 const updateTicketStatus = async (ticketId, status) => {
   try {
-    const response = await api.patch(`/tickets/${ticketId}/status/${status}`);
+    const response = await api.patch(`/tickets/${ticketId}/status/${status}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+    );
     return response.data;
   } catch (error) {
     handleApiError(error);
@@ -106,18 +113,26 @@ const updateTicketStatus = async (ticketId, status) => {
 const updateTicketPriority = async (ticketId, priority) => {
   try {
     const response = await api.patch(
-      `/tickets/${ticketId}/priority/${priority}`
+        `/tickets/${ticketId}/priority/${priority}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
     );
     return response.data;
   } catch (error) {
     handleApiError(error);
   }
 };
-
 const getTicketStatusByTicketId = async (ticketId) => {
   try {
-    const response = await ticketStatusApi.get(`/status/${ticketId}`);
-    console.log(response.data)
+    const response = await ticketStatusApi.get(`/status/${ticketId}`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response.data;
   } catch (error) {
     handleApiError(error);
