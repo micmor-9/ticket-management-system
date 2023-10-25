@@ -261,7 +261,7 @@ class TicketServiceImpl(
                 throw UnauthorizedTicketException("You can't access this ticket!")
             }
         }
-        if (currentTicket.status != ticketToUpdate.status) {
+        if (currentTicket.status != ticketToUpdate.status || currentTicket.expert != ticketToUpdate.expert) {
             ticketStatusService.createTicketStatus(
                 TicketStatusDTO(
                     id = null,
