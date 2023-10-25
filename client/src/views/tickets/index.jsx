@@ -245,6 +245,9 @@ const Tickets = () => {
           }}
           sx={{
             height: "70vh",
+            "& .MuiSelect-select": {
+                whiteSpace: "break-spaces !important",
+            }
           }}
           onRowClick={(row) => navigate(`/tickets/${row.id}`)}
         />
