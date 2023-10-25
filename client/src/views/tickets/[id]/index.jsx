@@ -1,12 +1,14 @@
 import {useState, useEffect} from "react";
-import {Box, Grid, useTheme, Typography, Paper} from "@mui/material";
+import {Box, Grid, useTheme, Typography, Paper, Step, Stepper, StepLabel, StepContent} from "@mui/material";
 import {tokens} from "../../../theme";
 import Header from "../../../components/Header";
 import TicketsAPI from "../../../api/tickets/ticketsApi";
 import {useParams} from "react-router-dom";
 import Chat from "../../../components/Chat";
-import "../../../components/statusStyle.css";// Importa il tuo file CSS
-
+import StatusBadge from "../../../components/StatusBadge";
+import PriorityBadge from "../../../components/PriorityBadge";
+import Button from "@mui/material/Button";
+import TicketStatusHistory from "../../../components/TicketStatusHistory";
 
 const Ticket = () => {
     const theme = useTheme();
@@ -20,10 +22,11 @@ const Ticket = () => {
         const fetchTicket = async () => {
             try {
                 const ticketData = await TicketsAPI.getTicketById(ticketId);
-                const ticketStatusData = await TicketsAPI.getTicketStatusByTicketId(ticketId);
+                const ticketStatusData = await TicketsAPI.getTicketStatusByTicketId(
+                    ticketId
+                );
                 setTicket(ticketData);
-                setTicketStatus(ticketStatusData)
-                console.log("ciao", ticketStatusData)
+                setTicketStatus(ticketStatusData);
             } catch (error) {
                 console.log(error);
             }
@@ -31,6 +34,29 @@ const Ticket = () => {
 
         fetchTicket();
     }, [ticketId]);
+
+    const ticketPropertyNameStyles = {
+        fontWeight: "bold",
+        color: colors.primary[200],
+        textTransform: "uppercase",
+    };
+
+    const ticketPropertyValueStyles = {
+        color: colors.primary[100],
+    };
+
+    const ticketPropertyOrder = [
+        "creationTimestamp",
+        "customer",
+        "expert",
+        "product",
+        "status",
+        "priority",
+        "issueDescription",
+        "id"
+    ]
+    console.log(ticket);
+    console.log(ticketStatus);
 
     return (
         <Box m="20px">
@@ -40,7 +66,7 @@ const Ticket = () => {
                     <Grid item xs={12} md={7}>
                         <Paper
                             sx={{
-                                height: "70vh",
+                                height: "75vh",
                                 backgroundColor: colors.primary[400],
                                 color:
                                     theme.palette.mode === "dark"
@@ -50,46 +76,76 @@ const Ticket = () => {
                                 borderRadius: "10px",
                             }}
                         >
-
-                            {ticketStatus && (
-                                <table className="status-table">
-                                    <thead>
-                                    <tr>
-                                        <th>Status ID</th>
-                                        <th>Status Timestamp</th>
-                                        <th>Status</th>
-                                        <th>Description</th>
-                                        <th>Product Info</th>
-                                        <th>Expert Info</th>
-                                        {/* Aggiungi altre intestazioni delle colonne, se necessario */}
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {ticketStatus.map((status, index) => (
-                                        <tr key={index}>
-                                            <td>{status.id}</td>
-                                            <td>{status.statusTimestamp}</td>
-                                            <td>{status.status}</td>
-                                            <td>{status.description}</td>
-                                            <td>{"Id: " + status.ticket.product.id + " , "}
-                                                {"Name: " + status.ticket.product.name}</td>
-                                            {status.ticket.expert == null ? (
-                                                <td>{"N/A"}</td>) : (
-                                                <td>{status.expert.name + "  "}
-                                                    {status.expert.surname + " , "}
-                                                    {status.expert.email + "  "}</td>
-                                            )}
-                                        </tr>
+                            {ticket && typeof ticket === "object" && (
+                                <Grid container>
+                                    {Object.entries(ticket).sort((a, b) => {
+                                        return ticketPropertyOrder.indexOf(a[0]) - ticketPropertyOrder.indexOf(b[0]);
+                                    }).map(([key, value]) => (
+                                        key !== "id" ? (
+                                            <>
+                                                <Grid item xs={3} mb={4}
+                                                      style={{
+                                                          display: "flex",
+                                                          alignItems: key === "issueDescription" ? "flex-start" : "center"
+                                                      }}>
+                                                    <Typography
+                                                        variant="h5"
+                                                        sx={ticketPropertyNameStyles}
+                                                    >
+                                                        {key.replace(/([A-Z]+)/g, " $1").replace(/([A-Z][a-z])/g, " $1")}
+                                                    </Typography>
+                                                </Grid>
+                                                {key === "issueDescription" ? (
+                                                    <Grid item xs={9} mb={4}
+                                                          style={{display: "flex", alignItems: "center"}}>
+                                                        <Typography
+                                                            variant="h5"
+                                                            sx={ticketPropertyValueStyles}
+                                                            style={{
+                                                                height: "10vh",
+                                                                overflowY: "auto",
+                                                            }}
+                                                        >
+                                                            {value}
+                                                        </Typography>
+                                                    </Grid>
+                                                ) : (
+                                                    <Grid item xs={3} mb={4}
+                                                          style={{display: "flex", alignItems: "center"}}>
+                                                        {key === "status" ? (
+                                                            <StatusBadge statusValue={value}/>
+                                                        ) : key === "priority" ? (
+                                                            <PriorityBadge priority={value}/>
+                                                        ) : (
+                                                            <Typography
+                                                                variant="h5"
+                                                                sx={ticketPropertyValueStyles}
+                                                            >
+                                                                {key === "creationTimestamp" ? (
+                                                                    new Date(value).toLocaleString().replace(",", "")
+                                                                ) : key === "expert" ? (
+                                                                    value === null ? "NOT ASSIGNED YET" : value.name + " " + value.surname
+                                                                ) : (
+                                                                    typeof value === "object" ? value.hasOwnProperty("surname") ? value.name + " " + value.surname : value.name : value
+                                                                )}
+                                                            </Typography>
+                                                        )}
+                                                    </Grid>)}
+                                            </>) : null
                                     ))}
-                                    </tbody>
-                                </table>
+                                </Grid>
+                            )}
+                            <Typography variant="h4" sx={{textTransform: "uppercase", fontWeight: "bold"}}>Ticket Status
+                                History</Typography>
+                            {ticket && ticketStatus && (
+                                <TicketStatusHistory history={ticketStatus}/>
                             )}
                         </Paper>
                     </Grid>
                     <Grid item xs={12} md>
                         <Paper
                             sx={{
-                                height: "70vh",
+                                height: "75vh",
                                 backgroundColor: colors.greenAccent[800],
                                 color:
                                     theme.palette.mode === "dark"
@@ -100,10 +156,7 @@ const Ticket = () => {
                             }}
                         >
                             <Typography variant="h3">Messages</Typography>
-                            {/* Includi qui il componente Chat */}
-                            {ticket && (
-                                <Chat ticket={ticket}/>
-                            )}
+                            {ticket && <Chat ticket={ticket}/>}
                         </Paper>
                     </Grid>
                 </Grid>
