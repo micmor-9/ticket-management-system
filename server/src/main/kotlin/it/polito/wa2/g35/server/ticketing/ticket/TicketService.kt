@@ -20,4 +20,8 @@ interface TicketService {
     fun updateTicketStatus(ticketId: Long, statusValue: String) : TicketDTO?
 
     fun updateTicketPriority(ticketId: Long, priorityValue: String) : TicketDTO?
+
+    // TODO: add the following methods
+    //fun updateTicketCategory(ticketId: Long, categoryValue: String) : TicketDTO?
+    // fun deleteTicket(ticketId: Long) : Boolean
 }

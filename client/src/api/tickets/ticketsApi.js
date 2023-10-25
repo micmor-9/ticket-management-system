@@ -66,7 +66,6 @@ const getTicketById = async (ticketId) => {
 };
 
 const createTicket = async (ticketData) => {
-  console.log("ticketData", ticketData);
   try {
     const response = await api.post("/tickets/", ticketData, {
       headers: {
@@ -81,7 +80,11 @@ const createTicket = async (ticketData) => {
 
 const updateTicket = async (ticketId, ticketData) => {
   try {
-    const response = await api.put(`/tickets/${ticketId}`, ticketData);
+    const response = await api.put(`/tickets/${ticketId}`, ticketData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response.data;
   } catch (error) {
     handleApiError(error);

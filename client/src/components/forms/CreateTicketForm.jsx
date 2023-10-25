@@ -23,7 +23,7 @@ const CreateTicketForm = () => {
   const [description, setDescription] = useState("");
   const [ticketArea, setTicketArea] = useState("");
   const [descriptionError, setDescriptionError] = useState(false);
-  const [areaError, setAreaError] = useState(false);
+  const [categoryError, setAreaError] = useState(false);
 
   const { orderId } = useParams();
   const [order, setOrder] = useState();
@@ -72,6 +72,7 @@ const CreateTicketForm = () => {
         expertId: null,
         productId: order.product.id,
         customerId: order.customer.email,
+        category: ticketArea,
         };
 
         TicketsAPI.createTicket(createTicketRequest)
@@ -102,13 +103,13 @@ const CreateTicketForm = () => {
     gridColumn: "span 2",
   };
 
-
   const ticketAreas = [
     "Battery",
     "Display",
     "Keyboard",
     "Mouse",
     "Power Supply",
+    "Speaker",
   ];
 
   const handleChangeAreaTicket = (event) => {
@@ -189,7 +190,7 @@ const CreateTicketForm = () => {
           required
           sx={{
             gridColumn: "span 1",
-            color: areaError ? colors.redAccent[600] : colors.greenAccent[300],
+            color: categoryError ? colors.redAccent[600] : colors.greenAccent[300],
             backgroundColor: colors.primary[400],
           }}
           
@@ -203,9 +204,9 @@ const CreateTicketForm = () => {
           label="Area"
           onChange={handleChangeAreaTicket}
         >
-          {ticketAreas.map((area) => (
-            <MenuItem key={area} value={area}>
-              {area}
+          {ticketAreas.map((category) => (
+            <MenuItem key={category} value={category}>
+              {category}
             </MenuItem>
           ))}
         </Select>

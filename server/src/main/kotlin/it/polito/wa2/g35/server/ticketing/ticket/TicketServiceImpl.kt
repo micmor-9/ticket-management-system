@@ -203,6 +203,7 @@ class TicketServiceImpl(
                     null,
                     product.toProduct(),
                     customer.toCustomer(),
+                    ticket.category
                 )
             )
             ticketStatusService.createTicketStatus(
@@ -212,7 +213,8 @@ class TicketServiceImpl(
                     status = TicketStatusValues.OPEN,
                     description = ticketToSave.issueDescription,
                     ticket = ticketToSave,
-                    expert = ticketToSave.expert
+                    expert = ticketToSave.expert,
+                    category = ticketToSave.category
                 )
             )
             log.info("Create ticket successful (repository)")
@@ -267,7 +269,8 @@ class TicketServiceImpl(
                     status = ticketToUpdate.status,
                     description = ticketToUpdate.issueDescription,
                     ticket = ticketToUpdate,
-                    expert = ticketToUpdate.expert
+                    expert = ticketToUpdate.expert,
+                    category = ticketToUpdate.category
                 )
             )
         }
@@ -295,7 +298,8 @@ class TicketServiceImpl(
                 },
                 expert,
                 currentTicket.product,
-                currentTicket.customer
+                currentTicket.customer,
+                ticket.category
             )
         )
         return ticketToUpdate
@@ -357,7 +361,8 @@ class TicketServiceImpl(
                 status = ticket.status,
                 description = ticket.issueDescription,
                 ticket = ticket,
-                expert = ticket.expert
+                expert = ticket.expert,
+                category = ticket.category
             )
         )
     }

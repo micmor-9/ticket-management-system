@@ -32,7 +32,7 @@ const getAllExperts = async () => {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-        });
+        }); 
         return response.data;
     } catch (error) {
         handleApiError(error);

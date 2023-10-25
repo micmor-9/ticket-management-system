@@ -17,7 +17,7 @@ class TicketStatusServiceImpl(private val ticketStatusRepository: TicketStatusRe
     )
     override fun createTicketStatus(ticketStatus: TicketStatusDTO): TicketStatusDTO? {
         log.info("Create tickets status request successful (repository)")
-        return ticketStatusRepository.save(TicketStatus(ticketStatus.id, Date(), ticketStatus.status, ticketStatus.description, ticketStatus.ticket, ticketStatus.expert )).toDTO()
+        return ticketStatusRepository.save(TicketStatus(ticketStatus.id, Date(), ticketStatus.status, ticketStatus.description, ticketStatus.ticket, ticketStatus.expert, ticketStatus.category)).toDTO()
     }
     @Observed(
         name = "status/{ticketId}",
