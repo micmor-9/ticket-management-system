@@ -6,10 +6,8 @@ import it.polito.wa2.g35.server.products.ProductService
 import it.polito.wa2.g35.server.products.toProduct
 import it.polito.wa2.g35.server.profiles.customer.CustomerService
 import it.polito.wa2.g35.server.profiles.customer.toCustomer
-import it.polito.wa2.g35.server.profiles.employee.expert.ExpertService
-import it.polito.wa2.g35.server.profiles.employee.expert.toExpert
 import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
-import it.polito.wa2.g35.server.profiles.employee.expert.Expert
+import it.polito.wa2.g35.server.profiles.employee.expert.*
 import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.order.OrderNotFoundException
 import it.polito.wa2.g35.server.ticketing.order.OrderService
@@ -248,14 +246,6 @@ class TicketServiceImpl(
             SecurityConfig.MANAGER_ROLE -> {
                 ticketToUpdate = accessGrantedUpdateTicket(currentTicket, ticket, expert)
             }
-            SecurityConfig.EXPERT_ROLE -> {
-                if(currentTicket.expert?.email == authentication.name) {
-                    ticketToUpdate = accessGrantedUpdateTicket(currentTicket, ticket, expert)
-                }
-                else
-                    log.error("Update ticket failed by unauthorized access")
-                    throw UnauthorizedTicketException("You can't access this ticket!")
-                   }
             else -> {
                 log.error("Update ticket failed by unauthorized access")
                 throw UnauthorizedTicketException("You can't access this ticket!")
@@ -351,6 +341,7 @@ class TicketServiceImpl(
         }
     }
 
+
     fun accessGrantedUpdateTicketStatus(ticket: Ticket, status: TicketStatusValues) {
         ticket.status = status
         ticketRepository.save(ticket)
@@ -386,5 +377,48 @@ class TicketServiceImpl(
         log.info("Update ticket priority successful (repository)")
         return ticketRepository.save(ticket).toDTO()
     }
+
+    fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
+        val expert = expertService.getExpertById(expertId)?.toExpert()
+        if (expert == null) {
+            log.error("No Expert found with this ID: $expertId")
+        }
+
+        ticket.expert = expert
+        ticketRepository.save(ticket)
+
+        ticketStatusService.createTicketStatus(
+                TicketStatusDTO(
+                        id = null,
+                        statusTimestamp = null,
+                        status = ticket.status,
+                        description = ticket.issueDescription,
+                        ticket = ticket,
+                        expert = expert
+                )
+        )
+    }
+
+
+
+    @Observed(
+            name = "tickets/{ticketId}/expertId/{expertId}",
+            contextualName = "put-ticket-expertId-request-service"
+    )
+    override fun updateTicketExpert(ticketId: Long, expertId: String): TicketDTO? {
+        val ticket = getTicketById(ticketId)?.toTicket()
+        if (ticket == null) {
+            log.error("No Ticket found with this Id: $ticketId")
+            throw TicketNotFoundException("Ticket not found!")
+        }
+
+        accessGrantedUpdateTicketExpert(ticket, expertId)
+
+        log.info("Update expert successful (repository)")
+        return ticketRepository.save(ticket).toDTO()
+    }
+
+
+
 
 }

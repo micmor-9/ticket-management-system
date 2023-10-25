@@ -11,17 +11,15 @@ import {
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import NorthOutlinedIcon from "@mui/icons-material/NorthOutlined";
-import SouthOutlinedIcon from "@mui/icons-material/SouthOutlined";
-import EastOutlinedIcon from "@mui/icons-material/EastOutlined";
 import Header from "../../components/Header";
-import { Form, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { dataGridStyles } from "../../styles/dataGridStyles";
 import ProfilesAPI from "../../api/profiles/profilesApi";
-import { red } from "@mui/material/colors";
+import PriorityBadge from "../../components/PriorityBadge";
+import StatusBadge from "../../components/StatusBadge";
 
 const Tickets = () => {
   const theme = useTheme();
@@ -106,35 +104,7 @@ const Tickets = () => {
       headerName: "Priority",
       cellClassName: "priority-column--cell",
       renderCell: ({ row: { priority } }) => {
-        return (
-          <Box
-            width="60%"
-            m="0 auto 0 0"
-            p="5px"
-            display="flex"
-            backgroundColor={"transparent"}
-          >
-            <Tooltip
-              title={
-                priority === "LOW"
-                  ? "Low"
-                  : priority === "MEDIUM"
-                  ? "Medium"
-                  : "High"
-              }
-            >
-              <Typography color={colors.priority[priority]}>
-                {priority === "LOW" ? (
-                  <SouthOutlinedIcon />
-                ) : priority === "MEDIUM" ? (
-                  <EastOutlinedIcon />
-                ) : (
-                  <NorthOutlinedIcon />
-                )}
-              </Typography>
-            </Tooltip>
-          </Box>
-        );
+        return <PriorityBadge priority={priority} />;
       },
     },
     {
@@ -143,27 +113,12 @@ const Tickets = () => {
       flex: 1,
       cellClassName: "status-column--cell",
       renderCell: ({ row: { status } }) => {
-        return (
-          <Box
-            width="60%"
-            m="0 auto 0 0"
-            p="5px"
-            display="flex"
-            justifyContent={"center"}
-            backgroundColor={colors.status[status]}
-            borderRadius={"5px"}
-          >
-            <Typography color={colors.primary[400]}>
-              {status.replace("_", " ")}
-            </Typography>
-          </Box>
-        );
+        return <StatusBadge statusValue={status} />;
       },
     },
     {
       field: "category",
       headerName: "Category",
-
       cellClassName: "category-column--cell",
     },
     {
@@ -246,8 +201,8 @@ const Tickets = () => {
           sx={{
             height: "70vh",
             "& .MuiSelect-select": {
-                whiteSpace: "break-spaces !important",
-            }
+              whiteSpace: "break-spaces !important",
+            },
           }}
           onRowClick={(row) => navigate(`/tickets/${row.id}`)}
         />

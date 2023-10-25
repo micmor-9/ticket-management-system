@@ -104,7 +104,7 @@ class TicketController(private val ticketService: TicketService) {
 
     @PutMapping("/tickets/{ticketId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('Manager', 'Expert')")
+    @PreAuthorize("hasAnyRole('Manager')")
     @Observed(
         name = "tickets/{ticketId}",
         contextualName = "put-ticket-request"
@@ -155,5 +155,21 @@ class TicketController(private val ticketService: TicketService) {
     ) {
         log.info("Update ticket priority successful")
         ticketService.updateTicketPriority(ticketId, priority)
+    }
+
+    @PatchMapping("/tickets/{ticketId}/expert/{expertId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('Manager')")
+    @Observed(
+            name = "tickets/{ticketId}/expert/{expertId}",
+            contextualName = "put-ticket-expert-request"
+    )
+    fun updateTicketExpert(
+            @PathVariable("ticketId") ticketId: Long,
+            @PathVariable("expertId") expertId: String
+    ) {
+
+        log.info("Update ticket expert successful")
+        ticketService.updateTicketExpert(ticketId, expertId)
     }
 }
