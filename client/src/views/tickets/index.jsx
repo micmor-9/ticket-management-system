@@ -10,11 +10,11 @@ import TicketsAPI from "../../api/tickets/ticketsApi";
 import {useContext, useEffect, useState} from "react";
 import {AuthContext} from "../../utils/AuthContext";
 import {dataGridStyles} from "../../styles/dataGridStyles";
+import PriorityBadge from "../../components/PriorityBadge";
+import StatusBadge from "../../components/StatusBadge";
 
 const Tickets = () => {
     const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-
     const [currentUser] = useContext(AuthContext);
     const navigate = useNavigate();
     const [tickets, setTickets] = useState([]);
@@ -23,7 +23,6 @@ const Tickets = () => {
         const fetchTickets = async () => {
             try {
                 let ticketsData = [];
-                console.log(currentUser.role + " " + currentUser.id + " " + currentUser.email);
                 if (currentUser.role === "Client") {
                     ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.email);
                 }
@@ -61,35 +60,7 @@ const Tickets = () => {
             headerName: "Priority",
             cellClassName: "priority-column--cell",
             renderCell: ({row: {priority}}) => {
-                return (
-                    <Box
-                        width="60%"
-                        m="0 auto 0 0"
-                        p="5px"
-                        display="flex"
-                        backgroundColor={"transparent"}
-                    >
-                        <Tooltip
-                            title={
-                                priority === "LOW"
-                                    ? "Low"
-                                    : priority === "MEDIUM"
-                                        ? "Medium"
-                                        : "High"
-                            }
-                        >
-                            <Typography color={colors.priority[priority]}>
-                                {priority === "LOW" ? (
-                                    <SouthOutlinedIcon/>
-                                ) : priority === "MEDIUM" ? (
-                                    <EastOutlinedIcon/>
-                                ) : (
-                                    <NorthOutlinedIcon/>
-                                )}
-                            </Typography>
-                        </Tooltip>
-                    </Box>
-                );
+                return (<PriorityBadge priority={priority}/>);
             },
         },
         {
@@ -99,19 +70,7 @@ const Tickets = () => {
             cellClassName: "status-column--cell",
             renderCell: ({row: {status}}) => {
                 return (
-                    <Box
-                        width="60%"
-                        m="0 auto 0 0"
-                        p="5px"
-                        display="flex"
-                        justifyContent={"center"}
-                        backgroundColor={colors.status[status]}
-                        borderRadius={"5px"}
-                    >
-                        <Typography color={colors.primary[400]}>
-                            {status.replace("_", " ")}
-                        </Typography>
-                    </Box>
+                    <StatusBadge statusValue={status}/>
                 );
             },
         },
