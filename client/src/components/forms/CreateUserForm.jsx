@@ -1,14 +1,29 @@
-import {Box, Button, TextField} from "@mui/material";
-import {Formik} from "formik";
+import {Box, Button, TextField, useTheme} from "@mui/material";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import profilesApi from "../../api/profiles/profilesApi";
 import {useNavigate} from "react-router-dom";
+import React, {useState} from "react";
+import {tokens} from "../../theme";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SendIcon from "@mui/icons-material/Send";
 
 const CreateUserForm = () => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const navigate = useNavigate();
+    const theme = useTheme();
+    const [errors, setErrors] = useState({});
+    const colors = tokens(theme.palette.mode);
+    /*const initialProfile = {
+        firstName: "",
+        lastName: "",
+        email: "",
+        contact: "",
+        address1: "",
+        address2: "",
+    };*/
 
+    const [profile, setProfile] = useState({});
     const handleFormSubmit = (values) => {
 
         const profile = {
@@ -18,132 +33,111 @@ const CreateUserForm = () => {
             surname: values.lastName,
         };
         console.log('Dati inviati al server:', profile);
-        profilesApi.createUser(profile)
-            .then((response) => {
-                console.log(response);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+
+        /* profilesApi.createUser(profile)
+             .then((response) => {
+                 console.log(response);
+             })
+             .catch((error) => {
+                 console.log(error);
+             });*/
 
     };
 
+    const handleFieldChange = (fieldName, value) => {
+        setProfile({ ...profile, [fieldName]: value });
+    };
+
     return (
-        <Formik
-            onSubmit={handleFormSubmit}
-            initialValues={initialValues}
-            validationSchema={checkoutSchema}
-        >
-            {({
-                  values,
-                  errors,
-                  touched,
-                  handleBlur,
-                  handleChange,
-                  handleSubmit,
-              }) => (
-                <form onSubmit={handleSubmit}>
                     <Box
                         display="grid"
                         gap="30px"
                         gridTemplateColumns="repeat(4, minmax(0, 1fr))"
                         sx={{
-                            "& > div": {gridColumn: isNonMobile ? undefined : "span 4"},
+                            backgroundColor: colors.primary[400],
+                            color:
+                                theme.palette.mode === "dark"
+                                    ? colors.primary[100]
+                                    : colors.primary[500],
+                            borderRadius: "10px",
+                            padding: "20px",
                         }}
+                        component="form"
                     >
                         <TextField
                             fullWidth
-                            variant="filled"
                             type="text"
                             label="First Name"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.firstName}
-                            name="firstName"
-                            error={!!touched.firstName && !!errors.firstName}
-                            helperText={touched.firstName && errors.firstName}
+                            value={profile? profile.firstName: ""}
                             sx={{gridColumn: "span 2"}}
                         />
                         <TextField
                             fullWidth
-                            variant="filled"
                             type="text"
                             label="Last Name"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.lastName}
+                            value={profile? profile.lastName : ""}
                             name="lastName"
-                            error={!!touched.lastName && !!errors.lastName}
-                            helperText={touched.lastName && errors.lastName}
                             sx={{gridColumn: "span 2"}}
                         />
                         <TextField
                             fullWidth
-                            variant="filled"
                             type="text"
                             label="Email"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.email}
+                            value={profile? profile.email: ""}
                             name="email"
-                            error={!!touched.email && !!errors.email}
-                            helperText={touched.email && errors.email}
                             sx={{gridColumn: "span 4"}}
                         />
                         <TextField
                             fullWidth
-                            variant="filled"
                             type="text"
                             label="Contact Number"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.contact}
+                            value={profile ? profile.contact: ""}
                             name="contact"
-                            error={!!touched.contact && !!errors.contact}
-                            helperText={touched.contact && errors.contact}
                             sx={{gridColumn: "span 4"}}
                         />
                         <TextField
                             fullWidth
-                            variant="filled"
                             type="text"
                             label="Address 1"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.address1}
+                            value={profile ? profile.address1 : ""}
                             name="address1"
-                            error={!!touched.address1 && !!errors.address1}
-                            helperText={touched.address1 && errors.address1}
                             sx={{gridColumn: "span 4"}}
                         />
                         <TextField
                             fullWidth
-                            variant="filled"
                             type="text"
                             label="Address 2"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.address2}
+                            value={profile ? profile.address2 : ""}
                             name="address2"
-                            error={!!touched.address2 && !!errors.address2}
-                            helperText={touched.address2 && errors.address2}
                             sx={{gridColumn: "span 4"}}
                         />
-                    </Box>
-                    <Box display="flex" justifyContent="end" mt="20px">
-                        <Button type="button" color="secondary" variant="outlined" style={{marginRight: '20px'}}
+
+                    <Box display="flex" justifyContent="flex-end" gridColumn="span 4">
+                        <Button type="button"  variant="contained" startIcon={<DeleteIcon />}
+                                sx={{
+                                    backgroundColor: colors.redAccent[600],
+                                    margin: "0 20px 0 0",
+                                    "&:hover": {
+                                        backgroundColor: colors.redAccent[500],
+                                    },
+                                }}
                                 onClick={() => {
                                     navigate(-1);
                                 }}>
                             Cancel
                         </Button>
-                        <Button type="submit" color="secondary" variant="contained">
+                        <Button type="submit" startIcon={<SendIcon />} variant="contained"
+                                sx={{
+                                    backgroundColor: colors.greenAccent[600],
+                                    marginRight: "0px",
+                                    "&:hover": {
+                                        backgroundColor: colors.greenAccent[400],
+                                    },
+                                }}>
                             Create New User
                         </Button>
                     </Box>
-                </form>
-            )}
-        </Formik>
+                    </Box>
     );
 };
 
