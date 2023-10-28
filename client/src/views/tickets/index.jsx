@@ -1,4 +1,4 @@
-import {Box, Typography, Tooltip, useTheme} from "@mui/material";
+import {Box, Typography, Tooltip, useTheme, Button} from "@mui/material";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
 import {tokens} from "../../theme";
 import NorthOutlinedIcon from "@mui/icons-material/NorthOutlined";
@@ -12,6 +12,8 @@ import {AuthContext} from "../../utils/AuthContext";
 import {dataGridStyles} from "../../styles/dataGridStyles";
 import PriorityBadge from "../../components/PriorityBadge";
 import StatusBadge from "../../components/StatusBadge";
+import AddIcon from "@mui/icons-material/Add";
+import HeaderActions from "../../components/HeaderActions";
 
 const Tickets = () => {
     const theme = useTheme();
@@ -99,7 +101,20 @@ const Tickets = () => {
 
     return (
         <Box m="20px">
-            <Header title="TICKETS" subtitle="Manage tickets"/>
+            <Header title="TICKETS" subtitle="Manage tickets">
+                <HeaderActions>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        startIcon={<AddIcon/>}
+                        onClick={() => {
+                            navigate(`/tickets/create`)
+                        }}
+                        sx={{marginLeft: "15px"}}
+                    >New Ticket
+                    </Button>
+                </HeaderActions>
+            </Header>
             <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
                 <DataGrid
                     rows={tickets}

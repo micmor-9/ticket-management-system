@@ -63,6 +63,7 @@ function App() {
                                 <Route path="/tickets/:ticketId" element={<Ticket/>}/>
                                 <Route path="/orders" element={<Orders/>}/>
                                 <Route path="/tickets/create/:orderId" element={<CreateTicket/>}/>
+                                <Route path="/tickets/create" element={<CreateTicket/>}/>
                             </Routes>
                         </main>
                     </div>
