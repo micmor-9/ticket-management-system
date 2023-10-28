@@ -14,14 +14,14 @@ data class CustomerDTO(
     @field:Size(min=2,max=25) @NotBlank
     var surname: String,
     @field:Size(min=2,max=25) @NotBlank
-    var contact: String,
+    var contact: String ,
     @field:Size(min=2,max=25) @NotBlank
     var address1: String,
     @field:Size(min=2,max=25)
-    var address2: String
+    var address2: String?
 )
 {
-    constructor() : this(0,"","", "", "", "", "")
+    constructor() : this(0,"","", "", "", "", null)
 }
 
 
@@ -30,6 +30,6 @@ fun Customer.toDTO() : CustomerDTO {
 }
 
 fun CustomerDTO.toCustomer() : Customer {
-    return Customer(this.id, this.email, this.name, this.surname, this.contact, this.address1, this.address2)
+    return Customer(this.id, this.email, this.name, this.surname, this.contact, this.address1, this.address2?: "")
 }
 

@@ -80,7 +80,10 @@ class AuthServiceImpl() : AuthService  {
             null,
             signupRequest.email,
             signupRequest.name,
-            signupRequest.surname
+            signupRequest.surname,
+            signupRequest.contact,
+            signupRequest.address1,
+            signupRequest.address2
         )
 
         try {
