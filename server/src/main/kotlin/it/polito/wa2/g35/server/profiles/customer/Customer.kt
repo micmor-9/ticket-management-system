@@ -14,5 +14,6 @@ class Customer(
     var surname: String,
     var contact: String,
     var address1: String,
+    @Column(nullable = true)
     var address2: String
 )
