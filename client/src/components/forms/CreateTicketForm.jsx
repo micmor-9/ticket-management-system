@@ -9,12 +9,13 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import TicketsAPI from "../../api/tickets/ticketsApi";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import OrdersAPI from "../../api/orders/ordersApi";
+import {AuthContext} from "../../utils/AuthContext";
 
 const CreateTicketForm = () => {
   const theme = useTheme();
@@ -24,10 +25,16 @@ const CreateTicketForm = () => {
   const [ticketArea, setTicketArea] = useState("");
   const [descriptionError, setDescriptionError] = useState(false);
   const [areaError, setAreaError] = useState(false);
-
+  const [currentUser] = useContext(AuthContext);
   const { orderId } = useParams();
   const [order, setOrder] = useState();
-
+  const [orderTemp, setOrderTemp] = useState(null);
+  const [ticket, setTicket] = useState({
+        orderId: "",
+        product: "",
+        name: "",
+        surname: ""
+    });
   useEffect(() => {
     const fetchOrder = async () => {
       if (orderId) {
@@ -39,7 +46,33 @@ const CreateTicketForm = () => {
     };
     fetchOrder();
   }, []);
+  useEffect(() => {
 
+        const fetchOrder = async () => {
+            if (ticket.orderId) {
+                try {
+                    const orders = await OrdersAPI.getAllOrders();
+                    const orderFound = orders.find(order => order.id === parseInt(ticket.orderId));
+                    if (orderFound) {
+                        const orderData = await OrdersAPI.getOrderByOrderId(parseInt(ticket.orderId))
+                        setOrderTemp(orderData);
+                    } else {
+                        setOrderTemp(null);
+                        setTicket({ ...ticket, [ticket.name]: "" });
+                        setTicket({ ...ticket, [ticket.surname]: "" });
+                    }
+                } catch (error) {
+                    setOrderTemp(null);
+                }
+            }
+            else{
+                setOrderTemp(null);
+                setTicket({ ...ticket, [ticket.name]: "" });
+                setTicket({ ...ticket, [ticket.surname]: "" });
+            }
+        };
+        fetchOrder();
+    }, [ticket.orderId]);
   const validateForm = () => {
     let isValid = true;
     if(!description){
@@ -70,8 +103,8 @@ const CreateTicketForm = () => {
         priority: null,
         status: null,
         expertId: null,
-        productId: order.product.id,
-        customerId: order.customer.email,
+        productId: order ? order.product.id : ticket.orderId ?  orderTemp.product.id : "", //Devo recuperare il product Id dato l'ordine
+        customerId: order.customer.email, //Devo recuperare l'email dato il customer
         };
 
         TicketsAPI.createTicket(createTicketRequest)
@@ -111,6 +144,9 @@ const CreateTicketForm = () => {
     "Power Supply",
   ];
 
+  const handleFieldChange = (fieldName, value) => {
+        setTicket({ ...ticket, [fieldName]: value });
+  };
   const handleChangeAreaTicket = (event) => {
     setTicketArea(event.target.value);
   };
@@ -133,28 +169,51 @@ const CreateTicketForm = () => {
     >
       <TextField
         label="Order ID"
-        value={order ? order.id : ""}
+        value={order ? order.id : ticket.orderId}
         focused
-        disabled={order != null}
+        disabled={order != null && ticket.orderId === "" }
         sx={disabledTextFieldStyle}
+        onChange={(e) => handleFieldChange("orderId", e.target.value)}
       />
       <TextField
         label="Product"
-        value={order ? order.product.name : ""}
-        disabled={order != null}
+        value={order ?
+            order.product.name :
+             orderTemp && orderTemp.product.name ?
+                 orderTemp.product.name : ""}
+        disabled={order != null && ticket.orderId === ""}
         sx={disabledTextFieldStyle}
+        onChange={(e) => handleFieldChange("product", e.target.value)}
       />
       <TextField
         label="Customer Name"
-        value={order ? order.customer.name : ""}
-        disabled={order != null}
+        value={
+            order
+                ? order.customer.name
+                : orderTemp && orderTemp.customer.name
+                    ? orderTemp.customer.name
+                    : currentUser?.role === "Client"
+                        ? currentUser.name
+                        : ticket.name
+        }
+        disabled={order != null || currentUser?.role === "Client"}
         sx={disabledTextFieldStyle}
+        onChange={(e) => handleFieldChange("name", e.target.value)}
       />
       <TextField
         label="Customer Surname"
-        value={order ? order.customer.surname : ""}
-        disabled={order != null}
+        value={
+            order
+                ? order.customer.surname
+                : orderTemp && orderTemp.customer.surname
+                    ? orderTemp.customer.surname
+                    : currentUser?.role === "Client"
+                        ? currentUser.surname
+                        : ticket.surname
+        }
+        disabled={order != null || currentUser?.role === "Client"}
         sx={disabledTextFieldStyle}
+        onChange={(e) => handleFieldChange("surname", e.target.value)}
       />
       {/*<TextField
                 label="Order Date"
