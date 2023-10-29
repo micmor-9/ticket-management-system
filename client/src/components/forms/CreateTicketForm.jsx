@@ -29,6 +29,7 @@ const CreateTicketForm = () => {
   const { orderId } = useParams();
   const [order, setOrder] = useState();
   const [orderTemp, setOrderTemp] = useState(null);
+  const [orderError, setOrderError] = useState(false);
   const [ticket, setTicket] = useState({
         orderId: "",
         product: "",
@@ -75,6 +76,20 @@ const CreateTicketForm = () => {
     }, [ticket.orderId]);
   const validateForm = () => {
     let isValid = true;
+    if(!order){
+        const fetchOrder = async () => {
+            try {
+                console.log("here");
+                const orders = await OrdersAPI.getAllOrders();
+                const orderFound = orders.find(order => order.id === parseInt(ticket.orderId));
+                if (!orderFound){
+                    isValid = false;
+                    setOrderError("Order number not found");
+                }
+            } catch (error){}
+        }
+        fetchOrder();
+    }
     if(!description){
         setDescriptionError(true);
         isValid = false;
@@ -103,8 +118,8 @@ const CreateTicketForm = () => {
         priority: null,
         status: null,
         expertId: null,
-        productId: order ? order.product.id : ticket.orderId ?  orderTemp.product.id : "", //Devo recuperare il product Id dato l'ordine
-        customerId: order.customer.email, //Devo recuperare l'email dato il customer
+        productId: order ? order.product.id :  orderTemp.product.id ,
+        customerId: order ? order.customer.email : orderTemp.customer.email,
         };
 
         TicketsAPI.createTicket(createTicketRequest)
@@ -173,7 +188,8 @@ const CreateTicketForm = () => {
         focused
         disabled={order != null && ticket.orderId === "" }
         sx={disabledTextFieldStyle}
-        onChange={(e) => handleFieldChange("orderId", e.target.value)}
+        error = {orderError !== false}
+        onChange={(e) => {handleFieldChange("orderId", e.target.value);  setOrderError(false)}}
       />
       <TextField
         label="Product"
@@ -239,7 +255,7 @@ const CreateTicketForm = () => {
           },
           gridColumn: "span 3",
         }}
-        onChange={(event) => setDescription(event.target.value)}
+        onChange={(event) => {setDescription(event.target.value) ; setDescriptionError(false)}}
       />
 
       <FormControl sx={{ gridColumn: "span 1" }} required>
@@ -260,7 +276,10 @@ const CreateTicketForm = () => {
           id="demo-simple-select-autowidth"
           value={ticketArea}
           label="Area"
-          onChange={handleChangeAreaTicket}
+          onChange= {(event) => {
+              handleChangeAreaTicket(event);
+              setAreaError(false);
+          }}
         >
           {ticketAreas.map((area) => (
             <MenuItem key={area} value={area}>
@@ -306,3 +325,4 @@ const CreateTicketForm = () => {
 };
 
 export default CreateTicketForm;
+
