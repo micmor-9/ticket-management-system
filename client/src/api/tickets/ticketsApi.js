@@ -72,7 +72,6 @@ const getTicketById = async (ticketId) => {
 };
 
 const createTicket = async (ticketData) => {
-    console.log("ticketData", ticketData);
     try {
         const response = await api.post("/tickets/", ticketData, {
             headers: {
@@ -135,7 +134,6 @@ const getTicketStatusByTicketId = async (ticketId) => {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             }
         });
-        console.log(response.data)
         return response.data;
     } catch (error) {
         handleApiError(error);

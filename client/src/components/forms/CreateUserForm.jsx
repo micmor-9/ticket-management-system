@@ -1,6 +1,4 @@
 import {Box, Button, TextField, useTheme} from "@mui/material";
-import * as yup from "yup";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import profilesApi from "../../api/profiles/profilesApi";
 import {useNavigate} from "react-router-dom";
 import React, {useState} from "react";
@@ -9,7 +7,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 
 const CreateUserForm = () => {
-    const isNonMobile = useMediaQuery("(min-width:600px)");
     const navigate = useNavigate();
     const theme = useTheme();
     const [profile, setProfile] = useState({
@@ -43,7 +40,7 @@ const CreateUserForm = () => {
         };
 
         validateLength("firstName", profile.firstName, "First Name", 2, 50);
-        validateLength("lastName", profile.lastName,"Last Name", 2, 50);
+        validateLength("lastName", profile.lastName, "Last Name", 2, 50);
 
         if (profile.email.length === 0) {
             newErrors.email = "Required";
@@ -61,7 +58,7 @@ const CreateUserForm = () => {
         }
         validateLength("address1", profile.address1, "Address", 5, 100);
         if (profile.address2.length > 0) {
-            validateLength("address2", profile.address2, "Address2",5, 100);
+            validateLength("address2", profile.address2, "Address2", 5, 100);
         }
         setErrors(newErrors);
         if (Object.keys(newErrors).length === 0) {
@@ -87,7 +84,7 @@ const CreateUserForm = () => {
         }
     };
     const handleFieldChange = (fieldName, value) => {
-        setProfile({ ...profile, [fieldName]: value });
+        setProfile({...profile, [fieldName]: value});
     };
     const disabledTextFieldStyle = {
         "& .Mui-disabled": {
@@ -106,120 +103,120 @@ const CreateUserForm = () => {
     };
 
     return (
-                    <Box
-                        display="grid"
-                        gap="30px"
-                        gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                        sx={{
-                            backgroundColor: colors.primary[400],
-                            color:
-                                theme.palette.mode === "dark"
-                                    ? colors.primary[100]
-                                    : colors.primary[500],
-                            borderRadius: "10px",
-                            padding: "20px",
-                        }}
-                        component="form"
-                    >
-                        <TextField
-                            fullWidth
-                            type="text"
-                            label="First Name"
-                            value={profile.firstName}
-                            sx={{ ...disabledTextFieldStyle, gridColumn: "span 2" }}
-                            error={Boolean(errors.firstName)}
-                            helperText={errors.firstName}
-                            required
-                            onChange={(e) => handleFieldChange("firstName", e.target.value)}
-                        />
-                        <TextField
-                            fullWidth
-                            type="text"
-                            label="Last Name"
-                            value={profile.lastName}
-                            name="lastName"
-                            sx={{ ...disabledTextFieldStyle, gridColumn: "span 2" }}
-                            error={Boolean(errors.lastName)}
-                            helperText={errors.lastName}
-                            required
-                            onChange={(e) => handleFieldChange("lastName", e.target.value)}
-                        />
-                        <TextField
-                            fullWidth
-                            type="text"
-                            label="Email"
-                            value={profile? profile.email: ""}
-                            name="email"
-                            sx={disabledTextFieldStyle}
-                            error={Boolean(errors.email)}
-                            helperText={errors.email}
-                            required
-                            onChange={(e) => handleFieldChange("email", e.target.value)}
-                        />
-                        <TextField
-                            fullWidth
-                            type="text"
-                            label="Contact Number"
-                            value={profile ? profile.contact: ""}
-                            name="contact"
-                            sx={disabledTextFieldStyle}
-                            error={Boolean(errors.contact)}
-                            helperText={errors.contact}
-                            required
-                            onChange={(e) => handleFieldChange("contact", e.target.value)}
-                        />
-                        <TextField
-                            fullWidth
-                            type="text"
-                            label="Address 1"
-                            value={profile ? profile.address1 : ""}
-                            name="address1"
-                            sx={disabledTextFieldStyle}
-                            error={Boolean(errors.address1)}
-                            helperText={errors.address1}
-                            required
-                            onChange={(e) => handleFieldChange("address1", e.target.value)}
-                        />
-                        <TextField
-                            fullWidth
-                            type="text"
-                            label="Address 2"
-                            value={profile ? profile.address2 : ""}
-                            name="address2"
-                            sx={disabledTextFieldStyle}
-                            error={Boolean(errors.address2)}
-                            helperText={errors.address2}
-                            onChange={(e) => handleFieldChange("address2", e.target.value)}
-                        />
+        <Box
+            display="grid"
+            gap="30px"
+            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+            sx={{
+                backgroundColor: colors.primary[400],
+                color:
+                    theme.palette.mode === "dark"
+                        ? colors.primary[100]
+                        : colors.primary[500],
+                borderRadius: "10px",
+                padding: "20px",
+            }}
+            component="form"
+        >
+            <TextField
+                fullWidth
+                type="text"
+                label="First Name"
+                value={profile.firstName}
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                error={Boolean(errors.firstName)}
+                helperText={errors.firstName}
+                required
+                onChange={(e) => handleFieldChange("firstName", e.target.value)}
+            />
+            <TextField
+                fullWidth
+                type="text"
+                label="Last Name"
+                value={profile.lastName}
+                name="lastName"
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                error={Boolean(errors.lastName)}
+                helperText={errors.lastName}
+                required
+                onChange={(e) => handleFieldChange("lastName", e.target.value)}
+            />
+            <TextField
+                fullWidth
+                type="text"
+                label="Email"
+                value={profile ? profile.email : ""}
+                name="email"
+                sx={disabledTextFieldStyle}
+                error={Boolean(errors.email)}
+                helperText={errors.email}
+                required
+                onChange={(e) => handleFieldChange("email", e.target.value)}
+            />
+            <TextField
+                fullWidth
+                type="text"
+                label="Contact Number"
+                value={profile ? profile.contact : ""}
+                name="contact"
+                sx={disabledTextFieldStyle}
+                error={Boolean(errors.contact)}
+                helperText={errors.contact}
+                required
+                onChange={(e) => handleFieldChange("contact", e.target.value)}
+            />
+            <TextField
+                fullWidth
+                type="text"
+                label="Address 1"
+                value={profile ? profile.address1 : ""}
+                name="address1"
+                sx={disabledTextFieldStyle}
+                error={Boolean(errors.address1)}
+                helperText={errors.address1}
+                required
+                onChange={(e) => handleFieldChange("address1", e.target.value)}
+            />
+            <TextField
+                fullWidth
+                type="text"
+                label="Address 2"
+                value={profile ? profile.address2 : ""}
+                name="address2"
+                sx={disabledTextFieldStyle}
+                error={Boolean(errors.address2)}
+                helperText={errors.address2}
+                onChange={(e) => handleFieldChange("address2", e.target.value)}
+            />
 
-                    <Box display="flex" justifyContent="flex-end" gridColumn="span 4">
-                        <Button type="button"  variant="contained" startIcon={<DeleteIcon />}
-                                sx={{
-                                    backgroundColor: colors.redAccent[600],
-                                    margin: "0 20px 0 0",
-                                    "&:hover": {
-                                        backgroundColor: colors.redAccent[500],
-                                    },
-                                }}
-                                onClick={() => {
-                                    navigate(-1);
-                                }}>
-                            Cancel
-                        </Button>
-                        <Button type="button" startIcon={<SendIcon />} variant="contained"
-                                sx={{
-                                    backgroundColor: colors.greenAccent[600],
-                                    marginRight: "0px",
-                                    "&:hover": {
-                                        backgroundColor: colors.greenAccent[400],
-                                    },
-                                }}
-                                onClick = {handleFormSubmit}
-                                 >
-                            Create New User
-                        </Button>
-                    </Box>
-                    </Box>
+            <Box display="flex" justifyContent="flex-end" gridColumn="span 4">
+                <Button type="button" variant="contained" startIcon={<DeleteIcon/>}
+                        sx={{
+                            backgroundColor: colors.redAccent[600],
+                            margin: "0 20px 0 0",
+                            "&:hover": {
+                                backgroundColor: colors.redAccent[500],
+                            },
+                        }}
+                        onClick={() => {
+                            navigate(-1);
+                        }}>
+                    Cancel
+                </Button>
+                <Button type="button" startIcon={<SendIcon/>} variant="contained"
+                        sx={{
+                            backgroundColor: colors.greenAccent[600],
+                            marginRight: "0px",
+                            "&:hover": {
+                                backgroundColor: colors.greenAccent[400],
+                            },
+                        }}
+                        onClick={handleFormSubmit}
+                >
+                    Create New User
+                </Button>
+            </Box>
+        </Box>
     );
 };
 

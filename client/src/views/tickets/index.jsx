@@ -1,9 +1,5 @@
-import {Box, Typography, Tooltip, useTheme} from "@mui/material";
+import {Box, useTheme} from "@mui/material";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
-import {tokens} from "../../theme";
-import NorthOutlinedIcon from "@mui/icons-material/NorthOutlined";
-import SouthOutlinedIcon from "@mui/icons-material/SouthOutlined";
-import EastOutlinedIcon from "@mui/icons-material/EastOutlined";
 import Header from "../../components/Header";
 import {useNavigate} from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
@@ -12,12 +8,14 @@ import {AuthContext} from "../../utils/AuthContext";
 import {dataGridStyles} from "../../styles/dataGridStyles";
 import PriorityBadge from "../../components/PriorityBadge";
 import StatusBadge from "../../components/StatusBadge";
+import {useDialog} from "../../utils/DialogContext";
 
 const Tickets = () => {
     const theme = useTheme();
     const [currentUser] = useContext(AuthContext);
     const navigate = useNavigate();
     const [tickets, setTickets] = useState([]);
+    const {showDialog} = useDialog();
 
     useEffect(() => {
         const fetchTickets = async () => {
@@ -32,7 +30,7 @@ const Tickets = () => {
                     ticketsData = await TicketsAPI.getTickets();
                 setTickets(ticketsData);
             } catch (error) {
-                // Gestisci gli errori, ad esempio mostrando un messaggio di errore
+                showDialog("Error while fetching tickets", "error");
             }
         };
 

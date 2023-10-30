@@ -9,7 +9,8 @@ import {dataGridStyles} from "../../styles/dataGridStyles";
 import {useNavigate} from "react-router-dom";
 import HeaderActions from "../../components/HeaderActions";
 import AddIcon from "@mui/icons-material/Add";
-import { tokens } from "../../theme";
+import {tokens} from "../../theme";
+import {useDialog} from "../../utils/DialogContext";
 
 
 const Users = () => {
@@ -20,33 +21,34 @@ const Users = () => {
     const [managers, setManagers] = useState([]);
     const [experts, setExperts] = useState([]);
     const navigate = useNavigate();
+    const {showDialog} = useDialog();
 
-  const userRole = {
-    Customer: 0,
-    Expert: 1,
-    Manager: 2,
-  };
+    const userRole = {
+        Customer: 0,
+        Expert: 1,
+        Manager: 2,
+    };
 
-  useEffect(() => {
-      const fetchUsers = async () => {
-          try {
-              let usersData = [];
-              let managersData = [];
-              let expertsData = [];
-              if (currentUser.role === "Manager" || currentUser.role === "Expert") {
-                  usersData = await ProfilesAPI.getAllCustomers();
-                  managersData = await ProfilesAPI.getAllManagers();
-                  expertsData = await ProfilesAPI.getAllExperts();
-              }
-              setUsers(usersData);
-              setExperts(expertsData);
-              setManagers(managersData);
-          } catch (error) {
-              // Gestisci gli errori, ad esempio mostrando un messaggio di errore
-          }
-      };
-      fetchUsers();
-  }, [currentUser.role, currentUser.id]);
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                let usersData = [];
+                let managersData = [];
+                let expertsData = [];
+                if (currentUser.role === "Manager" || currentUser.role === "Expert") {
+                    usersData = await ProfilesAPI.getAllCustomers();
+                    managersData = await ProfilesAPI.getAllManagers();
+                    expertsData = await ProfilesAPI.getAllExperts();
+                }
+                setUsers(usersData);
+                setExperts(expertsData);
+                setManagers(managersData);
+            } catch (error) {
+                showDialog("Error while fetching users", "error");
+            }
+        };
+        fetchUsers();
+    }, [currentUser.role, currentUser.id]);
 
     const [roleFilter, setRoleFilter] = useState(userRole.Customer);
 
@@ -72,7 +74,7 @@ const Users = () => {
                     </Button>
                 </HeaderActions>
             </Header>
-            
+
             <Box height="70vh" sx={dataGridStyles(theme)}>
                 <StyledTabs value={roleFilter} onChange={handleRoleFilterChange}>
                     <StyledTab label="Customers"/>

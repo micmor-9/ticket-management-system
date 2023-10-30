@@ -10,6 +10,7 @@ import {useNavigate} from "react-router-dom";
 import {Button, Typography} from "@mui/material";
 import {tokens} from "../../theme";
 import {dataGridStyles} from "../../styles/dataGridStyles";
+import {useDialog} from "../../utils/DialogContext";
 
 const Orders = () => {
     const theme = useTheme();
@@ -17,6 +18,7 @@ const Orders = () => {
     const [currentUser] = useContext(AuthContext);
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
+    const {showDialog} = useDialog();
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -28,7 +30,7 @@ const Orders = () => {
                     ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
                 setOrders(ordersData);
             } catch (error) {
-                console.log(error);
+                showDialog("Error while fetching orders", "error");
             }
         };
         fetchOrders();
