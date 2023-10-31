@@ -37,6 +37,10 @@ const Topbar = () => {
     setTimeout(navigate("/login"), 1000);
   };
 
+  const handleMyAccount = () => {
+    navigate("/myaccount");
+    handleClose();
+  };
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
       {/* SEARCH BAR */}
@@ -84,7 +88,7 @@ const Topbar = () => {
           "aria-labelledby": "basic-button",
         }}
       >
-        <MenuItem onClick={handleClose}>My account</MenuItem>
+        <MenuItem onClick={handleMyAccount}>My account</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </Box>
