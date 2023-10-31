@@ -2,7 +2,7 @@ import {ColorModeContext, useMode} from "./theme";
 import {CssBaseline, GlobalStyles, ThemeProvider} from "@mui/material";
 import {Routes, Route} from "react-router-dom";
 import {AuthContext, useAuth} from "./utils/AuthContext";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import Topbar from "./views/global/Topbar";
 import Sidebar from "./views/global/Sidebar";
@@ -19,6 +19,7 @@ function App() {
     const [theme, colorMode] = useMode();
     const [currentUser, setCurrentUser] = useAuth();
     const navigate = useNavigate();
+
     const token = localStorage.getItem("token");
 
     useEffect(() => {

@@ -24,7 +24,7 @@ import MessagesAPI from "../api/messages/messagesApi";
 import {AuthContext} from "../utils/AuthContext";
 import Lightbox from "./Lightbox";
 import ProfilesAPI from "../api/profiles/profilesApi";
-import zIndex from "@mui/material/styles/zIndex";
+import {useDialog} from "../utils/DialogContext";
 
 const SOCKET_URL = "ws://localhost:8081/ws";
 
@@ -367,6 +367,7 @@ const Chat = ({ticket}) => {
     const [currentUser] = useContext(AuthContext);
     const clientRef = useRef(null);
     const subscriptionRef = useRef(null);
+    const {showDialog} = useDialog();
 
     const handleSendMessage = (messageText, attachedFile = null) => {
         if (messageText.trim() === "") return;
@@ -381,10 +382,9 @@ const Chat = ({ticket}) => {
 
         MessagesAPI.sendMessage(message)
             .then((response) => {
-                console.log(response);
             })
             .catch((error) => {
-                console.log(error);
+                showDialog("Error while sending message", "error");
             });
     };
 
@@ -398,14 +398,14 @@ const Chat = ({ticket}) => {
                     setChatMessages(ticketMessages);
                     setLoading(false);
                 } catch (error) {
-                    console.log(error);
+                    showDialog("Error while fetching messages", "error");
                     setLoading(false);
                 }
             }
         };
 
         fetchTicketMessages();
-    }, [ticket]);
+    }, [ticket, showDialog]);
 
     useEffect(() => {
         if (ticket) {
@@ -418,7 +418,6 @@ const Chat = ({ticket}) => {
             });
 
             client.onConnect = () => {
-                console.log("Connected!");
                 subscriptionRef.current = client.subscribe(
                     `/topic/${ticket.id}`,
                     (message) => {
@@ -450,7 +449,6 @@ const Chat = ({ticket}) => {
                 if (clientRef.current) {
                     if (clientRef.current.active) {
                         try {
-                            console.log(clientRef.current);
                             if (subscriptionRef.current)
                                 subscriptionRef.current.unsubscribe();
                             clientRef.current.deactivate();

@@ -15,5 +15,5 @@ class Customer(
     var contact: String,
     var address1: String,
     @Column(nullable = true)
-    var address2: String
+    var address2: String?
 )

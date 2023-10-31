@@ -68,7 +68,7 @@ const TicketStatusHistory = ({history}) => {
                     spacing={0.5}
                 >
                     {history.map((status) => (
-                        <Box sx={{display: "flex", flexDirection: "row"}} mb={2}>
+                        <Box sx={{display: "flex", flexDirection: "row"}} mb={2} key={status.status}>
                             <Box>
                                 {icons[String(status.status)]}
                             </Box>
