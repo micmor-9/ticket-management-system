@@ -50,18 +50,20 @@ const MyAccount = () => {
                             secondary={currentUser.email || "N/A"}
                         />
                     </ListItem>
+                    {currentUser.role === "Client" && (
                     <ListItem>
                         <ListItemText
                             primary="Contact"
                             secondary={currentUser.contact || "N/A"}
                         />
-                    </ListItem>
+                    </ListItem> )}
+                    {currentUser.role === "Client" && (
                     <ListItem>
                         <ListItemText
                             primary="Address"
                             secondary={currentUser.address || "N/A"}
                         />
-                    </ListItem>
+                    </ListItem> )}
                 </List>
             </Paper>
         </Box>
