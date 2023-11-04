@@ -201,6 +201,7 @@ class TicketServiceImpl(
                     null,
                     product.toProduct(),
                     customer.toCustomer(),
+                    ticket.category
                 )
             )
             ticketStatusService.createTicketStatus(
@@ -210,7 +211,8 @@ class TicketServiceImpl(
                     status = TicketStatusValues.OPEN,
                     description = ticketToSave.issueDescription,
                     ticket = ticketToSave,
-                    expert = ticketToSave.expert
+                    expert = ticketToSave.expert,
+                    category = ticketToSave.category
                 )
             )
             log.info("Create ticket successful (repository)")
@@ -249,7 +251,7 @@ class TicketServiceImpl(
                 throw UnauthorizedTicketException("You can't access this ticket!")
             }
         }
-        if (currentTicket.status != ticketToUpdate.status) {
+        if (currentTicket.status != ticketToUpdate.status || currentTicket.expert != ticketToUpdate.expert) {
             ticketStatusService.createTicketStatus(
                 TicketStatusDTO(
                     id = null,
@@ -257,7 +259,8 @@ class TicketServiceImpl(
                     status = ticketToUpdate.status,
                     description = ticketToUpdate.issueDescription,
                     ticket = ticketToUpdate,
-                    expert = ticketToUpdate.expert
+                    expert = ticketToUpdate.expert,
+                    category = ticketToUpdate.category
                 )
             )
         }
@@ -285,7 +288,8 @@ class TicketServiceImpl(
                 },
                 expert,
                 currentTicket.product,
-                currentTicket.customer
+                currentTicket.customer,
+                ticket.category
             )
         )
         return ticketToUpdate
@@ -348,7 +352,8 @@ class TicketServiceImpl(
                 status = ticket.status,
                 description = ticket.issueDescription,
                 ticket = ticket,
-                expert = ticket.expert
+                expert = ticket.expert,
+                category = ticket.category
             )
         )
     }
@@ -373,7 +378,7 @@ class TicketServiceImpl(
         return ticketRepository.save(ticket).toDTO()
     }
 
-    fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
+    /*fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
         val expert = expertService.getExpertById(expertId)?.toExpert()
         if (expert == null) {
             log.error("No Expert found with this ID: $expertId")
@@ -392,11 +397,11 @@ class TicketServiceImpl(
                         expert = expert
                 )
         )
-    }
+    }*/
 
 
 
-    @Observed(
+    /*@Observed(
             name = "tickets/{ticketId}/expertId/{expertId}",
             contextualName = "put-ticket-expertId-request-service"
     )
@@ -411,7 +416,7 @@ class TicketServiceImpl(
 
         log.info("Update expert successful (repository)")
         return ticketRepository.save(ticket).toDTO()
-    }
+    }*/
 
 
 

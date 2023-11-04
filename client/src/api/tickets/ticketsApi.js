@@ -73,15 +73,15 @@ const getTicketById = async (ticketId) => {
 
 const createTicket = async (ticketData) => {
     try {
-        const response = await api.post("/tickets/", ticketData, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        });
-        return response.data;
-    } catch (error) {
-        handleApiError(error);
-    }
+    const response = await api.post("/tickets/", ticketData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
 };
 
 const updateTicket = async (ticketId, ticketData) => {

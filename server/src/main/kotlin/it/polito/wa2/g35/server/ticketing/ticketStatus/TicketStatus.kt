@@ -27,4 +27,6 @@ class TicketStatus(
 
     @ManyToOne(fetch = FetchType.LAZY)
     var expert: Expert?,
+
+    var category: String?
     )

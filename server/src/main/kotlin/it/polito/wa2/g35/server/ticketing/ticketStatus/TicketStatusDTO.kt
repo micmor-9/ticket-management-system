@@ -14,13 +14,14 @@ data class TicketStatusDTO (
     val status: TicketStatusValues?,
     val description: String?,
     val ticket: Ticket?,
-    val expert: Expert?
+    val expert: Expert?,
+    val category: String?
 )
 {
-    constructor() : this(null,Date(), TicketStatusValues.valueOf(""),"",null,null)
+    constructor() : this(null, Date(), TicketStatusValues.valueOf(""),"",null,null, null)
 }
 
 
 fun TicketStatus.toDTO() : TicketStatusDTO {
-    return TicketStatusDTO(this.id, this.statusTimestamp, this.status, this.description, this.ticket, this.expert)
+    return TicketStatusDTO(this.id, this.statusTimestamp, this.status, this.description, this.ticket, this.expert, this.category)
 }

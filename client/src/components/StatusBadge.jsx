@@ -6,13 +6,14 @@ const StatusBadge = ({statusValue}) => {
     const colors = tokens(theme.palette.mode);
     return (
         <Box
-            width="60%"
+            width="100%"
             m="0 auto 0 0"
             p="5px"
             display="flex"
             justifyContent={"center"}
             backgroundColor={colors.status[statusValue]}
             borderRadius={"5px"}
+
         >
             <Typography color={colors.primary[400]}>
                 {statusValue.replace("_", " ")}

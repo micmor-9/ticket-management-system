@@ -96,7 +96,8 @@ INSERT INTO public.ticket (
     status,
     customer_id,
     expert_id,
-    product_id
+    product_id,
+    category
   )
 VALUES (
     1,
@@ -106,7 +107,8 @@ VALUES (
     'OPEN',
     '2',
     'B001',
-    '10'
+    '10',
+    'battery'
   );
 INSERT INTO public.ticket (
     id,
@@ -116,7 +118,8 @@ INSERT INTO public.ticket (
     status,
     customer_id,
     expert_id,
-    product_id
+    product_id,
+    category
   )
 VALUES (
     2,
@@ -126,7 +129,8 @@ VALUES (
     'RESOLVED',
     '1',
     'D002',
-    '11'
+    '11',
+    'display'
   );
 INSERT INTO public.ticket (
     id,
@@ -136,7 +140,8 @@ INSERT INTO public.ticket (
     status,
     customer_id,
     expert_id,
-    product_id
+    product_id,
+    category
   )
 VALUES (
     52,
@@ -146,7 +151,8 @@ VALUES (
     'IN_PROGRESS',
     '2',
     'S003',
-    '12'
+    '12',
+    'speakers'
   );
 INSERT INTO public.ticket_status (
     id,
@@ -154,7 +160,8 @@ INSERT INTO public.ticket_status (
     status,
     status_timestamp,
     expert_id,
-    ticket_id
+    ticket_id,
+    category
   )
 VALUES (
     53,
@@ -162,7 +169,8 @@ VALUES (
     'IN_PROGRESS',
     '2023-05-16 18:14:59.391000',
     'B001',
-    52
+    52,
+    'battery'
   );
 INSERT INTO public.ticket_status (
     id,
@@ -170,7 +178,8 @@ INSERT INTO public.ticket_status (
     status,
     status_timestamp,
     expert_id,
-    ticket_id
+    ticket_id,
+    category
   )
 VALUES (
     102,
@@ -178,7 +187,8 @@ VALUES (
     'IN_PROGRESS',
     '2023-05-16 18:17:26.554000',
     'D002',
-    2
+    2,
+    'display'
   );
 INSERT INTO public.ticket_status (
     id,
@@ -186,7 +196,8 @@ INSERT INTO public.ticket_status (
     status,
     status_timestamp,
     expert_id,
-    ticket_id
+    ticket_id,
+    category
   )
 VALUES (
     103,
@@ -194,5 +205,6 @@ VALUES (
     'RESOLVED',
     '2023-05-16 18:17:40.716000',
     'D002',
-    2
+    2,
+    'display'
   );
