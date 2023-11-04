@@ -8,6 +8,7 @@ import {
   Select,
   MenuItem,
   OutlinedInput,
+  Button,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -20,6 +21,8 @@ import { dataGridStyles } from "../../styles/dataGridStyles";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import PriorityBadge from "../../components/PriorityBadge";
 import StatusBadge from "../../components/StatusBadge";
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 const Tickets = () => {
   const theme = useTheme();
@@ -84,7 +87,7 @@ const Tickets = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "ID" },
+    { field: "id", headerName: "ID", flex: 0.5 },
     {
       field: "creationTimestamp",
       headerName: "Creation Date",
@@ -102,6 +105,7 @@ const Tickets = () => {
     {
       field: "priority",
       headerName: "Priority",
+      flex: 0.5,
       cellClassName: "priority-column--cell",
       renderCell: ({ row: { priority } }) => {
         return <PriorityBadge priority={priority} />;
@@ -110,7 +114,7 @@ const Tickets = () => {
     {
       field: "status",
       headerName: "Status",
-      flex: 1,
+      flex: 0.7,
       cellClassName: "status-column--cell",
       renderCell: ({ row: { status } }) => {
         return <StatusBadge statusValue={status} />;
@@ -180,10 +184,39 @@ const Tickets = () => {
     {
       field: "customer",
       headerName: "Customer",
-      flex: 1,
+      flex: 0.7,
       cellClassName: "customer-column--cell",
       valueGetter: ({ value }) => value && value.name + " " + value.surname,
     },
+    {
+        field: "action",
+        headerName: "Action",
+        flex: 0.4,
+        cellClassName: "action-column--cell",
+        renderCell: ({ row }) => {
+          return (
+            <Button sx={{color: colors.greenAccent[400]}}>
+              <CreateOutlinedIcon fontSize="small" />
+            </Button>
+          );
+        },
+    },
+    {
+        field: "view",
+        headerName: "View Details",
+        flex: 0.5,
+        cellClassName: "view-column--cell",
+        renderCell: ({ row }) => {
+            return (
+              <Button>
+                <VisibilityOutlinedIcon
+                  fontSize="small"
+                  sx={{ color: colors.greenAccent[400] }}
+                />
+              </Button>
+            );
+        }
+    }
   ];
 
   return (

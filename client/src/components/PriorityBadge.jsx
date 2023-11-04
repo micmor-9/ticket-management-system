@@ -11,7 +11,7 @@ const PriorityBadge = ({priority}) => {
 
     return (
         <Box
-            width="60%"
+            width="100%"
             m="0 auto 0 0"
             display="flex"
             backgroundColor={"transparent"}
