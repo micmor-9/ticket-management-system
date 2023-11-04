@@ -1,13 +1,9 @@
 import {
   Box,
-  Typography,
-  Tooltip,
   useTheme,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
-  OutlinedInput,
   Button,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
@@ -25,6 +21,7 @@ import HeaderActions from "../../components/HeaderActions";
 import {useDialog} from "../../utils/DialogContext";
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import ProfilesAPI from "../../api/profiles/profilesApi";
 
 const Tickets = () => {
   const theme = useTheme();
