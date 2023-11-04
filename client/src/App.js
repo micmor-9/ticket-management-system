@@ -2,7 +2,7 @@ import {ColorModeContext, useMode} from "./theme";
 import {CssBaseline, GlobalStyles, ThemeProvider} from "@mui/material";
 import {Routes, Route} from "react-router-dom";
 import {AuthContext, useAuth} from "./utils/AuthContext";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import Topbar from "./views/global/Topbar";
 import Sidebar from "./views/global/Sidebar";
@@ -14,11 +14,12 @@ import Products from "./views/products";
 import Orders from "./views/orders";
 import CreateTicket from "./views/tickets/create";
 import CreateUser from "./views/users/create";
-
+import MyAccount from "./views/myaccount";
 function App() {
     const [theme, colorMode] = useMode();
     const [currentUser, setCurrentUser] = useAuth();
     const navigate = useNavigate();
+
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -63,6 +64,8 @@ function App() {
                                 <Route path="/tickets/:ticketId" element={<Ticket/>}/>
                                 <Route path="/orders" element={<Orders/>}/>
                                 <Route path="/tickets/create/:orderId" element={<CreateTicket/>}/>
+                                <Route path="/tickets/create" element={<CreateTicket/>}/>
+                                <Route path="/myaccount" element={<MyAccount/>}/>
                             </Routes>
                         </main>
                     </div>

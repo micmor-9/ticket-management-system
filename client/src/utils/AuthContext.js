@@ -45,6 +45,9 @@ export const useAuth = () => {
                         role: decodedToken.resource_access["springboot-keycloak-client"]
                             .roles[0],
                         id: db_user?.id,
+                        address1: db_user?.address1,
+                        address2: db_user?.address2,
+                        contact: db_user?.contact,
                         profile: db_user
                     });
                 } else {

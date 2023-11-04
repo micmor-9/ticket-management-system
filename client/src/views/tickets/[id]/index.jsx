@@ -1,5 +1,5 @@
-import {useState, useEffect} from "react";
-import {Box, Grid, useTheme, Typography, Paper, Step, Stepper, StepLabel, StepContent} from "@mui/material";
+import {useState, useEffect, Fragment} from "react";
+import {Box, Grid, useTheme, Typography, Paper} from "@mui/material";
 import {tokens} from "../../../theme";
 import Header from "../../../components/Header";
 import TicketsAPI from "../../../api/tickets/ticketsApi";
@@ -7,12 +7,13 @@ import {useParams} from "react-router-dom";
 import Chat from "../../../components/Chat";
 import StatusBadge from "../../../components/StatusBadge";
 import PriorityBadge from "../../../components/PriorityBadge";
-import Button from "@mui/material/Button";
 import TicketStatusHistory from "../../../components/TicketStatusHistory";
+import {useDialog} from "../../../utils/DialogContext";
 
 const Ticket = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const {showDialog} = useDialog();
 
     const {ticketId} = useParams();
     const [ticket, setTicket] = useState(null);
@@ -28,12 +29,12 @@ const Ticket = () => {
                 setTicket(ticketData);
                 setTicketStatus(ticketStatusData);
             } catch (error) {
-                console.log(error);
+                showDialog("Error while fetching ticket", "error");
             }
         };
 
         fetchTicket();
-    }, [ticketId]);
+    }, [ticketId, showDialog]);
 
     const ticketPropertyNameStyles = {
         fontWeight: "bold",
@@ -55,8 +56,6 @@ const Ticket = () => {
         "issueDescription",
         "id"
     ]
-    console.log(ticket);
-    console.log(ticketStatus);
 
     return (
         <Box m="20px">
@@ -82,7 +81,7 @@ const Ticket = () => {
                                         return ticketPropertyOrder.indexOf(a[0]) - ticketPropertyOrder.indexOf(b[0]);
                                     }).map(([key, value]) => (
                                         key !== "id" ? (
-                                            <>
+                                            <Fragment key={key}>
                                                 <Grid item xs={3} mb={4}
                                                       style={{
                                                           display: "flex",
@@ -131,7 +130,7 @@ const Ticket = () => {
                                                             </Typography>
                                                         )}
                                                     </Grid>)}
-                                            </>) : null
+                                            </Fragment>) : null
                                     ))}
                                 </Grid>
                             )}

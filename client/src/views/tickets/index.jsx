@@ -12,24 +12,27 @@ import {
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../utils/AuthContext";
-import { dataGridStyles } from "../../styles/dataGridStyles";
-import ProfilesAPI from "../../api/profiles/profilesApi";
+import {useContext, useEffect, useState} from "react";
+import {AuthContext} from "../../utils/AuthContext";
+import {dataGridStyles} from "../../styles/dataGridStyles";
 import PriorityBadge from "../../components/PriorityBadge";
 import StatusBadge from "../../components/StatusBadge";
+import AddIcon from "@mui/icons-material/Add";
+import HeaderActions from "../../components/HeaderActions";
+import {useDialog} from "../../utils/DialogContext";
 
 const Tickets = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [currentUser] = useContext(AuthContext);
-  const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [experts, setExperts] = useState([]);
   const [ticketUpdated, setTicketUpdated] = useState(false);
+  const [currentUser] = useContext(AuthContext);
+  const navigate = useNavigate();
+  const {showDialog} = useDialog();
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -50,7 +53,7 @@ const Tickets = () => {
         setExperts(expertsData);
         setTickets(ticketsData);
       } catch (error) {
-        // Gestisci gli errori, ad esempio mostrando un messaggio di errore
+        showDialog("Error while fetching tickets", "error");
       }
     };
     fetchTickets();
@@ -188,8 +191,21 @@ const Tickets = () => {
 
   return (
     <Box m="20px">
-      <Header title="TICKETS" subtitle="Manage tickets" />
-      <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
+      <Header title="TICKETS" subtitle="Manage tickets" >
+      <HeaderActions>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        startIcon={<AddIcon/>}
+                        onClick={() => {
+                            navigate(`/tickets/create`)
+                        }}
+                        sx={{marginLeft: "15px"}}
+                    >New Ticket
+                    </Button>
+                </HeaderActions>
+            </Header>
+            <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
         <DataGrid
           rows={tickets}
           columns={columns}
