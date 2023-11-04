@@ -378,7 +378,7 @@ class TicketServiceImpl(
         return ticketRepository.save(ticket).toDTO()
     }
 
-    fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
+    /*fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
         val expert = expertService.getExpertById(expertId)?.toExpert()
         if (expert == null) {
             log.error("No Expert found with this ID: $expertId")
@@ -397,11 +397,11 @@ class TicketServiceImpl(
                         expert = expert
                 )
         )
-    }
+    }*/
 
 
 
-    @Observed(
+    /*@Observed(
             name = "tickets/{ticketId}/expertId/{expertId}",
             contextualName = "put-ticket-expertId-request-service"
     )
@@ -416,7 +416,7 @@ class TicketServiceImpl(
 
         log.info("Update expert successful (repository)")
         return ticketRepository.save(ticket).toDTO()
-    }
+    }*/
 
 
 
