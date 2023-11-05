@@ -27,7 +27,7 @@ const CreateUserForm = () => {
         address1: "",
         address2: "",
     });
-    const handleFormSubmit = () => {
+    const handleFormSubmit = async () => {
         const newErrors = {};
         const validateLength = (field, value, name, min, max) => {
             if (value.length === 0) {
@@ -49,6 +49,17 @@ const CreateUserForm = () => {
         } else {
             validateLength("email", profile.email, "Email", 2, 50);
         }
+
+        try {
+            const customer = await profilesApi.getAllCustomers();
+            const emailFound = customer.find(
+                (customer) => customer.email === profile.email)
+            if (emailFound) {
+                newErrors.email = "Profile with given email already exists";
+            }
+        } catch (error) {
+        }
+
         if (profile.contact.length === 0) {
             newErrors.contact = "Required";
         } else if (!phoneRegExp.test(profile.contact)) {
@@ -56,10 +67,11 @@ const CreateUserForm = () => {
         } else {
             validateLength("contact", profile.contact, "Contact number", 2, 50);
         }
-        validateLength("address1", profile.address1, "Address", 5, 100);
+        validateLength("address1", profile.address1, "Address", 2, 100);
         if (profile.address2.length > 0) {
-            validateLength("address2", profile.address2, "Address2", 5, 100);
+            validateLength("address2", profile.address2, "Address2", 2, 100);
         }
+
         setErrors(newErrors);
         if (Object.keys(newErrors).length === 0) {
             const profileData = {
@@ -69,18 +81,18 @@ const CreateUserForm = () => {
                 surname: profile.lastName,
                 contact: profile.contact,
                 address1: profile.address1,
-                address2: profile.address2,
+                address2: profile.address2? profile.address2:null,
             };
-            console.log(profileData);
-            profilesApi.createUser(profileData)
-                .then((response) => {
-                    console.log(response);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
 
-            navigate(-1);
+            try {
+                const response = await profilesApi.createUser(profileData);
+                console.log(response);
+                navigate(-1);
+            } catch (error) {
+                console.error("An error occurred:", error);
+            }
+
+
         }
     };
     const handleFieldChange = (fieldName, value) => {
