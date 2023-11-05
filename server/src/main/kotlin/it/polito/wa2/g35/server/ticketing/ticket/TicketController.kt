@@ -157,7 +157,7 @@ class TicketController(private val ticketService: TicketService) {
         ticketService.updateTicketPriority(ticketId, priority)
     }
 
-    /*@PatchMapping("/tickets/{ticketId}/expert/{expertId}")
+    @PatchMapping("/tickets/{ticketId}/expert/{expertId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager')")
     @Observed(
@@ -171,5 +171,5 @@ class TicketController(private val ticketService: TicketService) {
 
         log.info("Update ticket expert successful")
         ticketService.updateTicketExpert(ticketId, expertId)
-    }*/
+    }
 }
