@@ -63,7 +63,7 @@ const CreateUserForm = () => {
         setErrors(newErrors);
         if (Object.keys(newErrors).length === 0) {
             const profileData = {
-                id: 0,
+                id: null,
                 email: profile.email,
                 name: profile.firstName,
                 surname: profile.lastName,
@@ -71,7 +71,7 @@ const CreateUserForm = () => {
                 address1: profile.address1,
                 address2: profile.address2,
             };
-
+            console.log(profileData);
             profilesApi.createUser(profileData)
                 .then((response) => {
                     console.log(response);

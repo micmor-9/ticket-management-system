@@ -75,7 +75,7 @@ const Tickets = () => {
       category: row.category,
     };
 
-    TicketsAPI.updateTicket(ticketToUpdate.id, ticketToUpdate)
+    TicketsAPI.updateTicketExpert(ticketToUpdate.id, ticketToUpdate.expertId)
       .then((response) => {
         console.log("Ticket aggiornato con successo");
         setTicketUpdated(() => !ticketUpdated);

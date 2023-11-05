@@ -127,6 +127,23 @@ const updateTicketPriority = async (ticketId, priority) => {
     }
 };
 
+const updateTicketExpert = async (ticketId, expertId) => {
+    try {
+        const response = await api.patch(
+            `/tickets/${ticketId}/expert/${expertId}`,
+            null,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
+}
+
 const getTicketStatusByTicketId = async (ticketId) => {
     try {
         const response = await ticketStatusApi.get(`/status/${ticketId}`, {
@@ -141,15 +158,16 @@ const getTicketStatusByTicketId = async (ticketId) => {
 };
 
 const TicketsAPI = {
-    getTickets,
-    getTicketsByExpert,
-    getTicketsByCustomer,
-    getTicketById,
-    createTicket,
-    updateTicket,
-    updateTicketStatus,
-    updateTicketPriority,
-    getTicketStatusByTicketId,
+  getTickets,
+  getTicketsByExpert,
+  getTicketsByCustomer,
+  getTicketById,
+  createTicket,
+  updateTicket,
+  updateTicketStatus,
+  updateTicketPriority,
+  getTicketStatusByTicketId,
+  updateTicketExpert,
 };
 
 export default TicketsAPI;
