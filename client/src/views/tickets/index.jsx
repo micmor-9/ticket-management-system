@@ -43,6 +43,7 @@ const Tickets = () => {
           ticketsData = await TicketsAPI.getTicketsByCustomer(
             currentUser.email
           );
+          expertsData = ticketsData.map((ticket) => ticket.expert);
         }
         if (currentUser.role === "Expert")
           ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
@@ -148,31 +149,45 @@ const Tickets = () => {
               },
             }}
           >
-            <Select
-              onChange={(event) => handleExpertChange(event, row)}
-              disabled={row.status === "RESOLVED" || row.status === "CLOSED"}
-              value={
-                row.expert
-                  ? row.expert.name +
-                    " " +
-                    row.expert.surname +
-                    " (" +
-                    row.expert.id +
-                    ")"
-                  : ""
-              }
-            >
-              {experts.map((expert) => (
-                <MenuItem
-                  key={expert.id}
-                  value={
-                    expert.name + " " + expert.surname + " (" + expert.id + ")"
-                  }
-                >
-                  {expert.name + " " + expert.surname + " (" + expert.id + ")"}
-                </MenuItem>
-              ))}
-            </Select>
+            {currentUser.role === "Client" ? (
+              row.expert.name + " " + row.expert.surname
+            ) : (
+              <Select
+                onChange={(event) => handleExpertChange(event, row)}
+                disabled={row.status === "RESOLVED" || row.status === "CLOSED"}
+                value={
+                  row.expert
+                    ? row.expert.name +
+                      " " +
+                      row.expert.surname +
+                      " (" +
+                      row.expert.id +
+                      ")"
+                    : ""
+                }
+              >
+                {experts.map((expert) => (
+                  <MenuItem
+                    key={expert.id}
+                    value={
+                      expert.name +
+                      " " +
+                      expert.surname +
+                      " (" +
+                      expert.id +
+                      ")"
+                    }
+                  >
+                    {expert.name +
+                      " " +
+                      expert.surname +
+                      " (" +
+                      expert.id +
+                      ")"}
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
           </FormControl>
         );
       },
