@@ -66,7 +66,7 @@ const TicketStatusHistory = ({ history, expand }) => {
             alignItems: "center",
           }}
         >
-          {history.map((status) => (
+          {history.map((status, idx) => (
             <TimelineItem>
               <TimelineContent sx={{ py: "12px", px: 2 }}>
                 <Typography>
@@ -110,7 +110,7 @@ const TicketStatusHistory = ({ history, expand }) => {
                 >
                   {icons[String(status.status)]}
                 </TimelineDot>
-                <TimelineConnector />
+                {idx !== history.length - 1 ? <TimelineConnector /> : null}
               </TimelineSeparator>
               <TimelineOppositeContent
                 sx={{ py: "12px", px: 2, textAlign: "start" }}
