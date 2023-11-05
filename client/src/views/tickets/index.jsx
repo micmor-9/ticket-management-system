@@ -215,6 +215,9 @@ const Tickets = () => {
             <VisibilityOutlinedIcon
               fontSize="small"
               sx={{ color: colors.greenAccent[400] }}
+              onClick={() => {
+                navigate(`/tickets/${row.id}`);
+              }}
             />
           </Button>
         );
@@ -254,7 +257,6 @@ const Tickets = () => {
               whiteSpace: "break-spaces !important",
             },
           }}
-          // onRowClick={(row) => navigate(`/tickets/${row.id}`)}
         />
       </Box>
     </Box>

@@ -38,6 +38,7 @@ const TicketStatusHistory = ({ history, expand }) => {
       sx={{
         overflowY: "auto",
         height: expand ? "66vh" : "25vh",
+        transition: expand ? "height 0.2s ease-in-out" : "height 0.2s ease-out",
         "&::-webkit-scrollbar": {
           width: "5px",
         },
@@ -60,7 +61,7 @@ const TicketStatusHistory = ({ history, expand }) => {
         <Timeline
           sx={{
             marginTop: 0,
-            maxHeight: "66vh",
+            maxHeight: "300vh",
             position: "relative",
             alignItems: "center",
           }}

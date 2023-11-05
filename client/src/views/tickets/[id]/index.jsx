@@ -194,18 +194,16 @@ const Ticket = () => {
                 sx={{ textTransform: "uppercase", fontWeight: "bold" }}
               >
                 Ticket Status History
-                <Button>
+                <Button onClick={handleHistoryExpand}>
                   {historyExpanded ? (
                     <UnfoldLessIcon
                       fontSize="small"
                       sx={{ color: colors.greenAccent[400] }}
-                      onClick={handleHistoryExpand}
                     />
                   ) : (
                     <UnfoldMoreIcon
                       fontSize="small"
                       sx={{ color: colors.greenAccent[400] }}
-                      onClick={handleHistoryExpand}
                     />
                   )}
                 </Button>
