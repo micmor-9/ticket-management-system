@@ -11,15 +11,15 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
-import {useContext, useEffect, useState} from "react";
-import {AuthContext} from "../../utils/AuthContext";
-import {dataGridStyles} from "../../styles/dataGridStyles";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+import { dataGridStyles } from "../../styles/dataGridStyles";
 import PriorityBadge from "../../components/PriorityBadge";
 import StatusBadge from "../../components/StatusBadge";
 import AddIcon from "@mui/icons-material/Add";
 import HeaderActions from "../../components/HeaderActions";
-import {useDialog} from "../../utils/DialogContext";
-import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
+import { useDialog } from "../../utils/DialogContext";
+import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 
@@ -32,7 +32,7 @@ const Tickets = () => {
   const [ticketUpdated, setTicketUpdated] = useState(false);
   const [currentUser] = useContext(AuthContext);
   const navigate = useNavigate();
-  const {showDialog} = useDialog();
+  const { showDialog } = useDialog();
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -57,7 +57,13 @@ const Tickets = () => {
       }
     };
     fetchTickets();
-  }, [currentUser.id, currentUser.role, currentUser.email, ticketUpdated]);
+  }, [
+    currentUser.id,
+    currentUser.role,
+    currentUser.email,
+    ticketUpdated,
+    showDialog,
+  ]);
 
   const handleExpertChange = (event, row) => {
     const selectedExpertName = event.target.value;
@@ -189,53 +195,54 @@ const Tickets = () => {
       valueGetter: ({ value }) => value && value.name + " " + value.surname,
     },
     {
-        field: "action",
-        headerName: "Action",
-        flex: 0.4,
-        cellClassName: "action-column--cell",
-        renderCell: ({ row }) => {
-          return (
-            <Button sx={{color: colors.greenAccent[400]}}>
-              <CreateOutlinedIcon fontSize="small" />
-            </Button>
-          );
-        },
+      field: "action",
+      headerName: "Action",
+      flex: 0.4,
+      cellClassName: "action-column--cell",
+      renderCell: ({ row }) => {
+        return (
+          <Button sx={{ color: colors.greenAccent[400] }}>
+            <CreateOutlinedIcon fontSize="small" />
+          </Button>
+        );
+      },
     },
     {
-        field: "view",
-        headerName: "View Details",
-        flex: 0.5,
-        cellClassName: "view-column--cell",
-        renderCell: ({ row }) => {
-            return (
-              <Button>
-                <VisibilityOutlinedIcon
-                  fontSize="small"
-                  sx={{ color: colors.greenAccent[400] }}
-                />
-              </Button>
-            );
-        }
-    }
+      field: "view",
+      headerName: "View Details",
+      flex: 0.5,
+      cellClassName: "view-column--cell",
+      renderCell: ({ row }) => {
+        return (
+          <Button>
+            <VisibilityOutlinedIcon
+              fontSize="small"
+              sx={{ color: colors.greenAccent[400] }}
+            />
+          </Button>
+        );
+      },
+    },
   ];
 
   return (
     <Box m="20px">
-      <Header title="TICKETS" subtitle="Manage tickets" >
-      <HeaderActions>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        startIcon={<AddIcon/>}
-                        onClick={() => {
-                            navigate(`/tickets/create`)
-                        }}
-                        sx={{marginLeft: "15px"}}
-                    >New Ticket
-                    </Button>
-                </HeaderActions>
-            </Header>
-            <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
+      <Header title="TICKETS" subtitle="Manage tickets">
+        <HeaderActions>
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<AddIcon />}
+            onClick={() => {
+              navigate(`/tickets/create`);
+            }}
+            sx={{ marginLeft: "15px" }}
+          >
+            New Ticket
+          </Button>
+        </HeaderActions>
+      </Header>
+      <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
         <DataGrid
           rows={tickets}
           columns={columns}
