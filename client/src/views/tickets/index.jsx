@@ -137,17 +137,14 @@ const Tickets = () => {
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "transparent", // Rimuove il colore del bordo della cella
+                  borderColor: "transparent",
                 },
               },
             }}
           >
             <Select
-              renderValue={(value) => {
-                if (!value) return "Not Assigned";
-                return value;
-              }}
               onChange={(event) => handleExpertChange(event, row)}
+              disabled={row.status === "RESOLVED" || row.status === "CLOSED"}
               value={
                 row.expert
                   ? row.expert.name +
@@ -212,6 +209,7 @@ const Tickets = () => {
                 <VisibilityOutlinedIcon
                   fontSize="small"
                   sx={{ color: colors.greenAccent[400] }}
+                  onClick={() => navigate(`/tickets/${row.id}`)}
                 />
               </Button>
             );
@@ -250,7 +248,7 @@ const Tickets = () => {
               whiteSpace: "break-spaces !important",
             },
           }}
-          onRowClick={(row) => navigate(`/tickets/${row.id}`)}
+          // onRowClick={(row) => navigate(`/tickets/${row.id}`)}
         />
       </Box>
     </Box>

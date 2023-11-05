@@ -16,6 +16,7 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import OrdersAPI from "../../api/orders/ordersApi";
 import { useAuth } from "../../utils/AuthContext";
+import { useDialog } from "../../utils/DialogContext";
 
 const CreateTicketForm = () => {
   const theme = useTheme();
@@ -30,6 +31,7 @@ const CreateTicketForm = () => {
   const [order, setOrder] = useState();
   const [orderTemp, setOrderTemp] = useState(null);
   const [orderError, setOrderError] = useState(false);
+  const { showDialog } = useDialog();
   const [ticket, setTicket] = useState({
     orderId: "",
     product: "",
@@ -131,8 +133,8 @@ const CreateTicketForm = () => {
 
       TicketsAPI.createTicket(createTicketRequest)
         .then((response) => {
-          console.log("Ticket created successfully");
           setTimeout(navigate(-1), 1000);
+          showDialog("Ticket created successfully", "success");
         })
         .catch((error) => {
           console.log(error);
@@ -243,18 +245,6 @@ const CreateTicketForm = () => {
         sx={disabledTextFieldStyle}
         onChange={(e) => handleFieldChange("surname", e.target.value)}
       />
-      {/*<TextField
-                label="Order Date"
-                value={order ? new Date(order.date).toLocaleString() : null}
-                disabled={!order}
-                sx={disabledTextFieldStyle}
-            />
-            <TextField
-                label="Warranty Duration"
-                value={order ? new Date(order.warrantyDuration).toLocaleString() : null}
-                disabled
-                sx={disabledTextFieldStyle}
-            />*/}
       <TextField
         id="description"
         multiline
