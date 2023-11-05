@@ -37,7 +37,7 @@ const TicketStatusHistory = ({ history, expand }) => {
     <Box
       sx={{
         overflowY: "auto",
-        height: expand ? "66vh" : "25vh",
+        height: expand ? "66vh" : "28vh",
         transition: expand ? "height 0.2s ease-in-out" : "height 0.2s ease-out",
         "&::-webkit-scrollbar": {
           width: "5px",
