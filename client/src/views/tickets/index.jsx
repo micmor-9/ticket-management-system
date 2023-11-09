@@ -1,4 +1,4 @@
-import {Box, Typography, Tooltip, useTheme, Select, MenuItem} from "@mui/material";
+import {Box, Typography, Tooltip, useTheme, Select, MenuItem, IconButton} from "@mui/material";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
 import {tokens} from "../../theme";
 import NorthOutlinedIcon from "@mui/icons-material/NorthOutlined";
@@ -8,6 +8,8 @@ import Header from "../../components/Header";
 import {useNavigate} from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
 import {useContext, useEffect, useState} from "react";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
 import {AuthContext} from "../../utils/AuthContext";
 import {dataGridStyles} from "../../styles/dataGridStyles";
 import id from "./[id]";
@@ -245,6 +247,29 @@ const Tickets = () => {
             cellClassName: "customer-column--cell",
             valueGetter: ({value}) => value && value.name + " " + value.surname,
         },
+        {
+            field: "iconview",
+            headerName: "Ticket Details",
+            flex: 1,
+            cellClassName: "inconview-column--cell",
+            renderCell: ({ row: id }) => (
+
+                <IconButton>
+                    <VisibilityIcon />
+                </IconButton>
+            ),
+        },
+        {
+            field: "iconmodify",
+            headerName: "Modify Ticket",
+            flex: 1,
+            cellClassName: "iconmodify-column--cell",
+            renderCell: ({ row: id }) => (
+                <IconButton>
+                    <EditIcon />
+                </IconButton>
+            ),
+        },
     ];
 
     return (
@@ -263,10 +288,15 @@ const Tickets = () => {
                         height: "70vh",
                     }}
                     onCellClick={(params) => {
-                        if (params.field === "id") {
+                        if (params.field === "iconview") {
                             navigate(`/tickets/${params.id}`);
                         }
                     }}
+                    /*onCellClick={(params) => {
+                        if (params.field === "iconview") {
+                            navigate(`/tickets/${params.id}`);
+                        }
+                    }}*/
                 />
             </Box>
         </Box>
