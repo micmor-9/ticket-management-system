@@ -144,7 +144,7 @@ class TicketController(private val ticketService: TicketService) {
 
     @PatchMapping("/tickets/{ticketId}/priority/{priority}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('Manager')")
+    @PreAuthorize("hasAnyRole('Manager','Expert')")
     @Observed(
         name = "tickets/{ticketId}/priority/{priority}",
         contextualName = "put-ticket-priority-request"

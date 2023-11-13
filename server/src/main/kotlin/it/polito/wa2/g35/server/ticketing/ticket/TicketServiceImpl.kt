@@ -114,7 +114,7 @@ class TicketServiceImpl(
         try {
             val statusValue = TicketStatusValues.valueOf(status.uppercase())
             val authentication = SecurityContextHolder.getContext().authentication
-            val listTicket = ticketRepository.getTicketsByStatus(statusValue)?.map { it.toDTO() }
+            val listTicket = ticketRepository.getTicketsByStatusOrderByCreationTimestampAsc(statusValue)?.map { it.toDTO() }
             log.info("Get tickets by status request from repository successful")
             return filterListResultByRole(authentication, listTicket)
         } catch (e: IllegalArgumentException) {
@@ -130,7 +130,7 @@ class TicketServiceImpl(
             throw ProfileNotFoundException("No Expert found with this Id!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
-        val listTicket = ticketRepository.getTicketsByExpertId(idExpert)?.map { it.toDTO() }
+        val listTicket = ticketRepository.getTicketsByExpertIdOrderByCreationTimestampAsc(idExpert)?.map { it.toDTO() }
         log.info("Get tickets by expert request from repository successful")
         return filterListResultByRole(authentication, listTicket) as? List<TicketDTO> ?: emptyList()
     }
@@ -142,7 +142,7 @@ class TicketServiceImpl(
         try {
             val priorityValue = TicketPriority.valueOf(priority.uppercase())
             val authentication = SecurityContextHolder.getContext().authentication
-            val listTicket = ticketRepository.getTicketsByPriority(priorityValue)?.map { it.toDTO() }
+            val listTicket = ticketRepository.getTicketsByPriorityOrderByCreationTimestampAsc(priorityValue)?.map { it.toDTO() }
             log.info("Get tickets by priority request from repository successful")
             return filterListResultByRole(authentication, listTicket)
         } catch (e: IllegalArgumentException) {
@@ -161,7 +161,7 @@ class TicketServiceImpl(
             throw ProfileNotFoundException("Customer not found with this Id!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
-        val listTicket = ticketRepository.getTicketsByCustomerEmail(idCustomer)?.map { it.toDTO() }
+        val listTicket = ticketRepository.getTicketsByCustomerEmailOrderByCreationTimestampAsc(idCustomer)?.map { it.toDTO() }
         log.info("Get tickets by customer request from repository successful")
         return filterListResultByRole(authentication, listTicket)
     }
