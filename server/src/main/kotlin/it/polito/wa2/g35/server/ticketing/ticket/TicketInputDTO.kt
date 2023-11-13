@@ -12,4 +12,5 @@ class TicketInputDTO (
     val expertId: String?,
     val productId: String,
     var customerId: String,
+    var category: String
    )

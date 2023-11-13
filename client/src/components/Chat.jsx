@@ -24,6 +24,7 @@ import MessagesAPI from "../api/messages/messagesApi";
 import { AuthContext } from "../utils/AuthContext";
 import Lightbox from "./Lightbox";
 import ProfilesAPI from "../api/profiles/profilesApi";
+import { useDialog } from "../utils/DialogContext";
 
 const SOCKET_URL = "ws://localhost:8081/ws";
 
@@ -77,65 +78,74 @@ const ChatInputBox = ({ onSendMessage }) => {
   };
 
   return (
-    <Paper
-      component="form"
-      sx={{
-        p: "2px 4px",
-        display: "flex",
-        alignItems: "center",
-        width: "100%",
-        position: "sticky",
-        bottom: "0",
-        zIndex: 1,
-      }}
-    >
-      <InputBase
-        sx={{ ml: 1, flex: 1 }}
-        placeholder="Type your message"
-        inputProps={{ "aria-label": "type your message" }}
-        value={message}
-        onKeyDown={handleKeyDown}
-        onChange={(e) => setMessage(e.target.value)}
-        disabled={!!fileSelected}
-      />
-      <Input
-        type="file"
-        id="fileInput"
-        sx={{ display: "none" }}
-        onInput={handleFileInputChange}
-        ref={fileInputRef}
-      />
-      {fileSelected && (
+    <>
+      <Paper
+        component="form"
+        sx={{
+          p: "2px 4px",
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          position: "sticky",
+          bottom: "0",
+          zIndex: 1,
+        }}
+      >
+        <InputBase
+          sx={{ ml: 1, flex: 1 }}
+          placeholder="Type your message"
+          inputProps={{ "aria-label": "type your message" }}
+          value={message}
+          onKeyDown={handleKeyDown}
+          onChange={(e) => {
+            if (e.target.value.length <= 255) setMessage(e.target.value);
+          }}
+          disabled={!!fileSelected}
+        />
+        {message.length > 100 && (
+          <Box sx={{ color: "#ababab", marginLeft: "5px" }}>
+            {message.length}/255
+          </Box>
+        )}
+        <Input
+          type="file"
+          id="fileInput"
+          sx={{ display: "none" }}
+          onInput={handleFileInputChange}
+          ref={fileInputRef}
+        />
+        {fileSelected && (
+          <IconButton
+            type="button"
+            sx={{ p: "10px" }}
+            aria-label="delete-file"
+            onClick={handleDeleteFileSelected}
+          >
+            <DeleteRoundedIcon />
+          </IconButton>
+        )}
+        <label htmlFor="fileInput">
+          <IconButton
+            component="span"
+            sx={{ p: "10px" }}
+            aria-label="attach file"
+          >
+            <Badge color="secondary" badgeContent={1} invisible={!fileSelected}>
+              <AttachFileRoundedIcon />
+            </Badge>
+          </IconButton>
+        </label>
+        <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
         <IconButton
           type="button"
           sx={{ p: "10px" }}
-          aria-label="delete-file"
-          onClick={handleDeleteFileSelected}
+          aria-label="send"
+          onClick={handleSendMessage}
         >
-          <DeleteRoundedIcon />
+          <SendRoundedIcon />
         </IconButton>
-      )}
-      <label htmlFor="fileInput">
-        <IconButton
-          component="span"
-          sx={{ p: "10px" }}
-          aria-label="attach file"
-        >
-          <Badge color="secondary" badgeContent={1} invisible={!fileSelected}>
-            <AttachFileRoundedIcon />
-          </Badge>
-        </IconButton>
-      </label>
-      <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-      <IconButton
-        type="button"
-        sx={{ p: "10px" }}
-        aria-label="send"
-        onClick={handleSendMessage}
-      >
-        <SendRoundedIcon />
-      </IconButton>
-    </Paper>
+      </Paper>
+    </>
   );
 };
 
@@ -156,26 +166,10 @@ const ChatBubblesBox = ({ chatMessages }) => {
   return (
     <Box
       sx={{
-        maxHeight: "55vh",
+        maxHeight: "60vh",
         width: "100%",
         overflowY: "auto",
         marginBottom: "50px",
-        "&::-webkit-scrollbar": {
-          width: "5px",
-        },
-        "&::-webkit-scrollbar-track": {
-          backgroundColor: "transparent",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
-          borderRadius: "3px",
-        },
-        "&::-webkit-scrollbar-thumb:hover": {
-          backgroundColor: "rgba(0, 0, 0, 0.3)",
-        },
-        "&::-webkit-scrollbar-thumb:active": {
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
-        },
       }}
     >
       {chatMessages.length === 0 && (
@@ -374,6 +368,7 @@ const Chat = ({ ticket }) => {
   const [currentUser] = useContext(AuthContext);
   const clientRef = useRef(null);
   const subscriptionRef = useRef(null);
+  const { showDialog } = useDialog();
 
   const handleSendMessage = (messageText, attachedFile = null) => {
     if (messageText.trim() === "") return;
@@ -387,11 +382,9 @@ const Chat = ({ ticket }) => {
     };
 
     MessagesAPI.sendMessage(message)
-      .then((response) => {
-        console.log(response);
-      })
+      .then((response) => {})
       .catch((error) => {
-        console.log(error);
+        showDialog("Error while sending message", "error");
       });
   };
 
@@ -405,14 +398,14 @@ const Chat = ({ ticket }) => {
           setChatMessages(ticketMessages);
           setLoading(false);
         } catch (error) {
-          console.log(error);
+          showDialog("Error while fetching messages", "error");
           setLoading(false);
         }
       }
     };
 
     fetchTicketMessages();
-  }, [ticket]);
+  }, [ticket, showDialog]);
 
   useEffect(() => {
     if (ticket) {
@@ -425,7 +418,6 @@ const Chat = ({ ticket }) => {
       });
 
       client.onConnect = () => {
-        console.log("Connected!");
         subscriptionRef.current = client.subscribe(
           `/topic/${ticket.id}`,
           (message) => {
@@ -457,7 +449,6 @@ const Chat = ({ ticket }) => {
         if (clientRef.current) {
           if (clientRef.current.active) {
             try {
-              console.log(clientRef.current);
               if (subscriptionRef.current)
                 subscriptionRef.current.unsubscribe();
               clientRef.current.deactivate();

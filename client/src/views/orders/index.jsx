@@ -7,9 +7,10 @@ import {DataGrid, GridToolbar} from "@mui/x-data-grid";
 import Header from "../../components/Header";
 import {Box} from "@mui/system";
 import {useNavigate} from "react-router-dom";
-import {Button, Typography} from "@mui/material";
+import { Button, Typography} from "@mui/material";
 import {tokens} from "../../theme";
 import {dataGridStyles} from "../../styles/dataGridStyles";
+import {useDialog} from "../../utils/DialogContext";
 
 const Orders = () => {
     const theme = useTheme();
@@ -17,6 +18,7 @@ const Orders = () => {
     const [currentUser] = useContext(AuthContext);
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
+    const {showDialog} = useDialog();
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -28,7 +30,7 @@ const Orders = () => {
                     ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
                 setOrders(ordersData);
             } catch (error) {
-                console.log(error);
+                showDialog("Error while fetching orders", "error");
             }
         };
         fetchOrders();
@@ -73,14 +75,18 @@ const Orders = () => {
                     <Button
                         id="create-ticket"
                         sx={{
-                            backgroundColor: colors.redAccent[600],
                             "&:hover": {
-                                backgroundColor: colors.redAccent[500],
+                                backgroundColor: colors.redAccent[400],
+                                color: "white"
                             },
+                            borderRadius: "15px",
+                            borderColor: colors.redAccent[400],
+                            color: colors.redAccent[400]
                         }}
+                        variant="outlined"
                         onClick={() => navigate(`/tickets/create/${row.id}`)}
                     >
-                        <Typography color="white">Create Ticket</Typography>
+                        <Typography  fontSize="12px">Create Ticket</Typography>
                     </Button>
                 );
             },

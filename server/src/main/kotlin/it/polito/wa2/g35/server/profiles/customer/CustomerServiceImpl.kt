@@ -68,7 +68,9 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
             val checkIfProfileExists = profileRepository.findByEmail(profile.email)
             if(checkIfProfileExists == null) {
                 log.info("Create Customer request successful (repository)")
-                profileRepository.save(Customer(profile.id, profile.email, profile.name, profile.surname)).toDTO()
+                profileRepository.save(Customer(profile.id, profile.email, profile.name, profile.surname, profile.contact, profile.address1,
+                    profile.address2
+                )).toDTO()
             } else {
                 log.error("Profile with given email already exists!")
                 throw DuplicateProfileException("Profile with given email already exists!")
@@ -91,7 +93,7 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
                     }
                 }
                 log.info("Update Customer request successful (repository)")
-                profileRepository.save(Customer(profile.id, profile.email, profile.name, profile.surname)).toDTO()
+                profileRepository.save(Customer(profile.id, profile.email, profile.name, profile.surname, profile.contact, profile.address1, profile.address2)).toDTO()
             } else {
                 log.error("Profile with given email doesn't exists!")
                 throw ProfileNotFoundException("Profile with given email doesn't exists!")

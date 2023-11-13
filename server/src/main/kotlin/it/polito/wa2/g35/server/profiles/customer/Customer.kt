@@ -11,5 +11,8 @@ class Customer(
     var id: Int? = null,
     var email: String,
     var name: String,
-    var surname: String
+    var surname: String,
+    var contact: String,
+    var address1: String,
+    var address2: String?
 )

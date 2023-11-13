@@ -114,7 +114,7 @@ class TicketServiceImpl(
         try {
             val statusValue = TicketStatusValues.valueOf(status.uppercase())
             val authentication = SecurityContextHolder.getContext().authentication
-            val listTicket = ticketRepository.getTicketsByStatus(statusValue)?.map { it.toDTO() }
+            val listTicket = ticketRepository.getTicketsByStatusOrderByCreationTimestampAsc(statusValue)?.map { it.toDTO() }
             log.info("Get tickets by status request from repository successful")
             return filterListResultByRole(authentication, listTicket)
         } catch (e: IllegalArgumentException) {
@@ -130,7 +130,7 @@ class TicketServiceImpl(
             throw ProfileNotFoundException("No Expert found with this Id!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
-        val listTicket = ticketRepository.getTicketsByExpertId(idExpert)?.map { it.toDTO() }
+        val listTicket = ticketRepository.getTicketsByExpertIdOrderByCreationTimestampAsc(idExpert)?.map { it.toDTO() }
         log.info("Get tickets by expert request from repository successful")
         return filterListResultByRole(authentication, listTicket) as? List<TicketDTO> ?: emptyList()
     }
@@ -142,7 +142,7 @@ class TicketServiceImpl(
         try {
             val priorityValue = TicketPriority.valueOf(priority.uppercase())
             val authentication = SecurityContextHolder.getContext().authentication
-            val listTicket = ticketRepository.getTicketsByPriority(priorityValue)?.map { it.toDTO() }
+            val listTicket = ticketRepository.getTicketsByPriorityOrderByCreationTimestampAsc(priorityValue)?.map { it.toDTO() }
             log.info("Get tickets by priority request from repository successful")
             return filterListResultByRole(authentication, listTicket)
         } catch (e: IllegalArgumentException) {
@@ -161,7 +161,7 @@ class TicketServiceImpl(
             throw ProfileNotFoundException("Customer not found with this Id!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
-        val listTicket = ticketRepository.getTicketsByCustomerEmail(idCustomer)?.map { it.toDTO() }
+        val listTicket = ticketRepository.getTicketsByCustomerEmailOrderByCreationTimestampAsc(idCustomer)?.map { it.toDTO() }
         log.info("Get tickets by customer request from repository successful")
         return filterListResultByRole(authentication, listTicket)
     }
@@ -201,6 +201,7 @@ class TicketServiceImpl(
                     null,
                     product.toProduct(),
                     customer.toCustomer(),
+                    ticket.category
                 )
             )
             ticketStatusService.createTicketStatus(
@@ -210,7 +211,8 @@ class TicketServiceImpl(
                     status = TicketStatusValues.OPEN,
                     description = ticketToSave.issueDescription,
                     ticket = ticketToSave,
-                    expert = ticketToSave.expert
+                    expert = ticketToSave.expert,
+                    category = ticketToSave.category
                 )
             )
             log.info("Create ticket successful (repository)")
@@ -249,7 +251,7 @@ class TicketServiceImpl(
                 throw UnauthorizedTicketException("You can't access this ticket!")
             }
         }
-        if (currentTicket.status != ticketToUpdate.status) {
+        if (currentTicket.status != ticketToUpdate.status || currentTicket.expert != ticketToUpdate.expert) {
             ticketStatusService.createTicketStatus(
                 TicketStatusDTO(
                     id = null,
@@ -257,7 +259,8 @@ class TicketServiceImpl(
                     status = ticketToUpdate.status,
                     description = ticketToUpdate.issueDescription,
                     ticket = ticketToUpdate,
-                    expert = ticketToUpdate.expert
+                    expert = ticketToUpdate.expert,
+                    category = ticketToUpdate.category
                 )
             )
         }
@@ -285,7 +288,8 @@ class TicketServiceImpl(
                 },
                 expert,
                 currentTicket.product,
-                currentTicket.customer
+                currentTicket.customer,
+                ticket.category
             )
         )
         return ticketToUpdate
@@ -348,7 +352,8 @@ class TicketServiceImpl(
                 status = ticket.status,
                 description = ticket.issueDescription,
                 ticket = ticket,
-                expert = ticket.expert
+                expert = ticket.expert,
+                category = ticket.category
             )
         )
     }
@@ -383,18 +388,17 @@ class TicketServiceImpl(
         ticketRepository.save(ticket)
 
         ticketStatusService.createTicketStatus(
-                TicketStatusDTO(
-                        id = null,
-                        statusTimestamp = null,
-                        status = ticket.status,
-                        description = ticket.issueDescription,
-                        ticket = ticket,
-                        expert = expert
-                )
+            TicketStatusDTO(
+                id = null,
+                statusTimestamp = null,
+                status = ticket.status,
+                description = ticket.issueDescription,
+                ticket = ticket,
+                expert = ticket.expert,
+                category = ticket.category
+            )
         )
     }
-
-
 
     @Observed(
             name = "tickets/{ticketId}/expertId/{expertId}",

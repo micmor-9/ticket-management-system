@@ -15,6 +15,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import OrdersAPI from "../../api/orders/ordersApi";
+import { useAuth } from "../../utils/AuthContext";
+import { useDialog } from "../../utils/DialogContext";
 
 const CreateTicketForm = () => {
   const theme = useTheme();
@@ -23,11 +25,19 @@ const CreateTicketForm = () => {
   const [description, setDescription] = useState("");
   const [ticketArea, setTicketArea] = useState("");
   const [descriptionError, setDescriptionError] = useState(false);
-  const [areaError, setAreaError] = useState(false);
-
+  const [categoryError, setCategoryError] = useState(false);
+  const [currentUser] = useAuth();
   const { orderId } = useParams();
   const [order, setOrder] = useState();
-
+  const [orderTemp, setOrderTemp] = useState(null);
+  const [orderError, setOrderError] = useState(false);
+  const { showDialog } = useDialog();
+  const [ticket, setTicket] = useState({
+    orderId: "",
+    product: "",
+    name: "",
+    surname: "",
+  });
   useEffect(() => {
     const fetchOrder = async () => {
       if (orderId) {
@@ -38,50 +48,97 @@ const CreateTicketForm = () => {
       }
     };
     fetchOrder();
-  }, []);
-
+  }, [orderId]);
+  useEffect(() => {
+    const fetchOrder = async () => {
+      if (ticket.orderId) {
+        try {
+          const orders = await OrdersAPI.getAllOrders();
+          const orderFound = orders.find(
+            (order) => order.id === parseInt(ticket.orderId)
+          );
+          if (orderFound) {
+            const orderData = await OrdersAPI.getOrderByOrderId(
+              parseInt(ticket.orderId)
+            );
+            setOrderTemp(orderData);
+          } else {
+            setOrderTemp(null);
+            setTicket({ ...ticket, [ticket.name]: "" });
+            setTicket({ ...ticket, [ticket.surname]: "" });
+          }
+        } catch (error) {
+          setOrderTemp(null);
+        }
+      } else {
+        setOrderTemp(null);
+        setTicket({ ...ticket, [ticket.name]: "" });
+        setTicket({ ...ticket, [ticket.surname]: "" });
+      }
+    };
+    fetchOrder();
+  }, [ticket, ticket.orderId]);
   const validateForm = () => {
+    const currentDate = new Date().toISOString();
     let isValid = true;
-    if(!description){
-        setDescriptionError(true);
-        isValid = false;
+    if (!order) {
+      const fetchOrder = async () => {
+        try {
+          const orders = await OrdersAPI.getAllOrders();
+          const orderFound = orders.find(
+            (order) => order.id === parseInt(ticket.orderId)
+          );
+          if (!orderFound) {
+            isValid = false;
+            setOrderError("Order not found");
+          } else if (currentDate > orderTemp.warrantyDuration) {
+            setOrderError("Warranty expired");
+            isValid = false;
+          }
+        } catch (error) {}
+      };
+      fetchOrder();
+    }
+    if (!description) {
+      setDescriptionError(true);
+      isValid = false;
     } else {
-        setDescriptionError(false);
+      setDescriptionError(false);
     }
 
-    if(!ticketArea){
-        setAreaError(true);
-        isValid = false;
+    if (!ticketArea) {
+      setCategoryError(true);
+      isValid = false;
     } else {
-        setAreaError(false);
+      setCategoryError(false);
     }
 
     return isValid;
-  }
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    
-    if(validateForm()) {
-        const createTicketRequest = {
+    if (validateForm()) {
+      const createTicketRequest = {
         id: null,
         creationTimestamp: null,
         issueDescription: description,
         priority: null,
         status: null,
         expertId: null,
-        productId: order.product.id,
-        customerId: order.customer.email,
-        };
+        productId: order ? order.product.id : orderTemp.product.id,
+        customerId: order ? order.customer.email : orderTemp.customer.email,
+        category: ticketArea,
+      };
 
-        TicketsAPI.createTicket(createTicketRequest)
+      TicketsAPI.createTicket(createTicketRequest)
         .then((response) => {
-            console.log("Ticket created successfully");
-            setTimeout(navigate(-1), 1000);
+          setTimeout(navigate(-1), 1000);
+          showDialog("Ticket created successfully", "success");
         })
         .catch((error) => {
-            console.log(error);
-            alert("Ticket creation error");
+          console.log(error);
+          alert("Ticket creation error");
         });
     }
   };
@@ -102,7 +159,6 @@ const CreateTicketForm = () => {
     gridColumn: "span 2",
   };
 
-
   const ticketAreas = [
     "Battery",
     "Display",
@@ -111,6 +167,9 @@ const CreateTicketForm = () => {
     "Power Supply",
   ];
 
+  const handleFieldChange = (fieldName, value) => {
+    setTicket({ ...ticket, [fieldName]: value });
+  };
   const handleChangeAreaTicket = (event) => {
     setTicketArea(event.target.value);
   };
@@ -133,41 +192,59 @@ const CreateTicketForm = () => {
     >
       <TextField
         label="Order ID"
-        value={order ? order.id : ""}
-        focused
-        disabled={order != null}
+        value={order ? order.id : ticket.orderId}
+        disabled={order != null && ticket.orderId === ""}
         sx={disabledTextFieldStyle}
+        error={orderError !== false}
+        helperText={orderError}
+        onChange={(e) => {
+          handleFieldChange("orderId", e.target.value);
+          setOrderError(false);
+        }}
       />
       <TextField
         label="Product"
-        value={order ? order.product.name : ""}
-        disabled={order != null}
+        value={
+          order
+            ? order.product.name
+            : orderTemp && orderTemp.product.name
+            ? orderTemp.product.name
+            : ""
+        }
+        disabled={order != null && ticket.orderId === ""}
         sx={disabledTextFieldStyle}
+        onChange={(e) => handleFieldChange("product", e.target.value)}
       />
       <TextField
         label="Customer Name"
-        value={order ? order.customer.name : ""}
-        disabled={order != null}
+        value={
+          order
+            ? order.customer.name
+            : orderTemp && orderTemp.customer.name
+            ? orderTemp.customer.name
+            : currentUser?.role === "Client"
+            ? currentUser.name
+            : ticket.name
+        }
+        disabled={order != null || currentUser?.role === "Client"}
         sx={disabledTextFieldStyle}
+        onChange={(e) => handleFieldChange("name", e.target.value)}
       />
       <TextField
         label="Customer Surname"
-        value={order ? order.customer.surname : ""}
-        disabled={order != null}
+        value={
+          order
+            ? order.customer.surname
+            : orderTemp && orderTemp.customer.surname
+            ? orderTemp.customer.surname
+            : currentUser?.role === "Client"
+            ? currentUser.surname
+            : ticket.surname
+        }
+        disabled={order != null || currentUser?.role === "Client"}
         sx={disabledTextFieldStyle}
+        onChange={(e) => handleFieldChange("surname", e.target.value)}
       />
-      {/*<TextField
-                label="Order Date"
-                value={order ? new Date(order.date).toLocaleString() : null}
-                disabled={!order}
-                sx={disabledTextFieldStyle}
-            />
-            <TextField
-                label="Warranty Duration"
-                value={order ? new Date(order.warrantyDuration).toLocaleString() : null}
-                disabled
-                sx={disabledTextFieldStyle}
-            />*/}
       <TextField
         id="description"
         multiline
@@ -176,11 +253,16 @@ const CreateTicketForm = () => {
         value={description}
         sx={{
           "& .Mui-required": {
-            color: descriptionError ? colors.redAccent[600] : colors.greenAccent[300],
+            color: descriptionError
+              ? colors.redAccent[600]
+              : colors.greenAccent[300],
           },
           gridColumn: "span 3",
         }}
-        onChange={(event) => setDescription(event.target.value)}
+        onChange={(event) => {
+          setDescription(event.target.value);
+          setDescriptionError(false);
+        }}
       />
 
       <FormControl sx={{ gridColumn: "span 1" }} required>
@@ -189,10 +271,11 @@ const CreateTicketForm = () => {
           required
           sx={{
             gridColumn: "span 1",
-            color: areaError ? colors.redAccent[600] : colors.greenAccent[300],
+            color: categoryError
+              ? colors.redAccent[600]
+              : colors.greenAccent[300],
             backgroundColor: colors.primary[400],
           }}
-          
         >
           Area
         </InputLabel>
@@ -201,11 +284,14 @@ const CreateTicketForm = () => {
           id="demo-simple-select-autowidth"
           value={ticketArea}
           label="Area"
-          onChange={handleChangeAreaTicket}
+          onChange={(event) => {
+            handleChangeAreaTicket(event);
+            setCategoryError(false);
+          }}
         >
-          {ticketAreas.map((area) => (
-            <MenuItem key={area} value={area}>
-              {area}
+          {ticketAreas.map((category) => (
+            <MenuItem key={category} value={category}>
+              {category}
             </MenuItem>
           ))}
         </Select>

@@ -8,91 +8,87 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { useTheme } from "@mui/material/styles";
-import { login } from "../../api/auth/authApi";
-import { useNavigate } from "react-router-dom";
-import { tokens } from "../../theme";
+import {login} from "../../api/auth/authApi";
+import {useNavigate} from "react-router-dom";
+import {useDialog} from "../../utils/DialogContext";
 
 export default function Login() {
-  const theme = useTheme();
-  // const colors = tokens(theme.palette.mode);
+    const navigate = useNavigate();
+    const {showDialog} = useDialog();
 
-  const navigate = useNavigate();
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        const loginRequest = {
+            username: data.get("email"),
+            password: data.get("password"),
+        };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const loginRequest = {
-      username: data.get("email"),
-      password: data.get("password"),
+        login(loginRequest)
+            .then((response) => {
+                showDialog("Logged in successfully", "success");
+                setTimeout(navigate("/"), 1000);
+            })
+            .catch((error) => {
+                showDialog("Wrong email and/or password!", "error");
+            });
     };
 
-    login(loginRequest)
-      .then((response) => {
-        console.log("Login successful!");
-        setTimeout(navigate("/"), 1000);
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("Login error");
-      });
-  };
-
-  return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Login
-          </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-          </Grid>
-        </Box>
-      </Box>
-    </Container>
-  );
+    return (
+        <Container component="main" maxWidth="xs">
+            <CssBaseline/>
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                }}
+            >
+                <Avatar sx={{m: 1, bgcolor: "secondary.main"}}>
+                    <LockOutlinedIcon/>
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                    Sign in
+                </Typography>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
+                        autoFocus
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        autoComplete="current-password"
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{mt: 3, mb: 2}}
+                    >
+                        Login
+                    </Button>
+                    <Grid container>
+                        <Grid item xs>
+                            <Link href="#" variant="body2">
+                                Forgot password?
+                            </Link>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Box>
+        </Container>
+    );
 }

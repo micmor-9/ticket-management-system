@@ -13,7 +13,7 @@ data class OrderDTO (
     val warrantyDuration: Date
 )
 {
-    constructor() : this(null, Customer(null, "","",""),Product("",""), 0,Date(),Date())
+    constructor() : this(null, Customer(null, "","","", "", "", ""),Product("",""), 0,Date(),Date())
 }
 
 
