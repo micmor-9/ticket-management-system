@@ -1,4 +1,4 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, Button, Tooltip, Typography, useTheme } from "@mui/material";
 import Header from "../../components/Header";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
@@ -6,11 +6,12 @@ import { useEffect, useState, useContext } from "react";
 import ProductsAPI from "../../api/products/productsApi";
 import { AuthContext } from "../../utils/AuthContext";
 import { dataGridStyles } from "../../styles/dataGridStyles";
+import { tokens } from "../../theme";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 
 const Products = () => {
   const theme = useTheme();
-
-  const navigate = useNavigate();
+  const colors = tokens(theme.palette.mode);
   const [products, setProducts] = useState([]);
   const [currentUser] = useContext(AuthContext);
 
@@ -26,12 +27,54 @@ const Products = () => {
     fetchProducts();
   }, [currentUser.role, currentUser.id]);
 
+  const handleBuyNow = (event, row) => {
+    console.log("Buy now");
+    const productToBuy = {
+      id: null,
+      customerId: currentUser.id,
+      productId: row.id,
+      quantity: 1,
+      date: new Date(),
+      warrantyDuration: new Date(),
+    }
+
+
+    /*
+    val id: Long?,
+    val customerId: String,
+    val productId: String,
+    val quantity: Int?,
+    val date: Date,
+    val warrantyDuration: Date
+    */
+  }
+
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "name", headerName: "Name", flex: 1 },
     { field: "description", headerName: "Description", flex: 1 },
     { field: "price", headerName: "Price", flex: 1 },
     { field: "quantity", headerName: "Quantity", flex: 1 },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+      type: "button",
+      renderCell: ({ row }) => {
+        return (
+          <Tooltip title="Buy now">
+            <AddShoppingCartIcon
+              fontSize="small"
+              sx={{
+                color: colors.greenAccent[400],
+                "&:hover": { color: colors.greenAccent[600] },
+              }}
+              onClick={(event) => handleBuyNow(event, row)}
+            />
+          </Tooltip>
+        );
+      },
+    },
   ];
 
   return (
