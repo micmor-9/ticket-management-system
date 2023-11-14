@@ -55,6 +55,7 @@ const Products = () => {
     { field: "description", headerName: "Description", flex: 1 },
     { field: "price", headerName: "Price", flex: 1 },
     { field: "quantity", headerName: "Quantity", flex: 1 },
+    { field: "warrantyDuration", headerName: "Warranty Duration", type:"date", flex: 1, valueGetter: ({value}) => value && new Date(value)},
     {
       field: "action",
       headerName: "Action",

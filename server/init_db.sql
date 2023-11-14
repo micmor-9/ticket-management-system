@@ -34,12 +34,12 @@ VALUES (
     'Malnati',
     'battery'
   );
-INSERT INTO public.product (id, name, description, price, quantity)
-VALUES ('10', 'iphone', 'iPhone 15 Pro Max', 1000, 10);
-INSERT INTO public.product (id, name, description, price, quantity)
-VALUES ('11', 'ipad', 'iPad 15 Pro Max', 1000, 10);
-INSERT INTO public.product (id, name, description, price, quantity)
-VALUES ('12', 'mac', 'Mac 15 Pro Max', 2000, 20);
+INSERT INTO public.product (id, name, description, price, quantity, warranty_duration)
+VALUES ('10', 'iphone', 'iPhone 15 Pro Max', 1000, 10, '2022-05-16 16:19:09.000000');
+INSERT INTO public.product (id, name, description, price, quantity, warranty_duration)
+VALUES ('11', 'ipad', 'iPad 15 Pro Max', 1000, 10, '2024-05-16 16:19:09.000000');
+INSERT INTO public.product (id, name, description, price, quantity, warranty_duration)
+VALUES ('12', 'mac', 'Mac 15 Pro Max', 2000, 20, '2023-06-10 16:19:09.000000');
 INSERT INTO public.orders (
     id,
     date,

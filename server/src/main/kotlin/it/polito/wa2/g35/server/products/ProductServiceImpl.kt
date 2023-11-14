@@ -44,7 +44,7 @@ class ProductServiceImpl(
             val checkIfProductExists = productRepository.findByIdOrNull(product.id)
             if(checkIfProductExists == null) {
                 log.info("Create product request successful (repository)")
-                productRepository.save(Product(product.id, product.name)).toDTO()
+                productRepository.save(Product(product.id, product.name, product.description, product.price, product.quantity, product.warrantyDuration)).toDTO()
             } else {
                 log.error("Product with given id already exists!")
                 throw DuplicateProductException("Product with given id already exists!")
