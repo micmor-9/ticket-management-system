@@ -42,8 +42,7 @@ const CreateTicketForm = () => {
                 if (currentUser.role === "Client") {
                     const userOrders = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
                     setOrders(userOrders);
-                }
-                else if (currentUser.role === "Manager") {
+                } else if (currentUser.role === "Manager") {
                     const ord = await OrdersAPI.getAllOrders();
                     setOrders(ord);
                 }
@@ -57,7 +56,8 @@ const CreateTicketForm = () => {
                 try {
                     const orderData = await OrdersAPI.getOrderByOrderId(orderSelected);
                     setOrderTemp(orderData);
-                } catch (error) {}
+                } catch (error) {
+                }
             }
             fetchOrder();
         }
@@ -130,7 +130,6 @@ const CreateTicketForm = () => {
     const handleChangeAreaTicket = (event) => {
         setTicketArea(event.target.value);
     };
-
     return (<Box
         sx={{
             backgroundColor: colors.primary[400],
@@ -254,7 +253,9 @@ const CreateTicketForm = () => {
                         backgroundColor: colors.redAccent[500],
                     },
                 }}
-                onClick={() => setDescription("")}
+                onClick={() => {
+                    navigate(-1);
+                }}
             >
                 Cancel
             </Button>
