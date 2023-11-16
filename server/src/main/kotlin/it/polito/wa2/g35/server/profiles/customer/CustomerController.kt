@@ -55,7 +55,7 @@ class CustomerController(private val customerService: CustomerService) {
         return customerService.getAllCustomers()
     }
 
-    @PostMapping("/customers")
+    @PostMapping("/customers/")
     @ResponseStatus(HttpStatus.CREATED)
     @Observed(
         name = "/customers/",

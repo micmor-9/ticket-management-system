@@ -8,10 +8,10 @@ data class ProductDTO(
     var description: String?,
     var price: Double?,
     var quantity: Int?,
-    val warrantyDuration: Date
+    val warrantyDuration: String
 )
 {
-    constructor() : this("","", "", 0.0, 0, Date())
+    constructor() : this("","", "", 0.0, 0, "")
 }
 
 fun Product.toDTO(): ProductDTO {

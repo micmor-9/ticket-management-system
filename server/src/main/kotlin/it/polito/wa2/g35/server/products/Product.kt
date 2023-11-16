@@ -13,7 +13,5 @@ class Product (
     var description: String? = "",
     var price: Double? = 0.0,
     var quantity: Int? = 0,
-
-    @Temporal(TemporalType.TIMESTAMP)
-    val warrantyDuration: Date,
+    var warrantyDuration: String
 )

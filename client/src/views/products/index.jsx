@@ -1,19 +1,23 @@
-import { Box, Button, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Modal, Stack, TextField, Tooltip, Typography, useTheme } from "@mui/material";
 import Header from "../../components/Header";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import ProductsAPI from "../../api/products/productsApi";
 import { AuthContext } from "../../utils/AuthContext";
 import { dataGridStyles } from "../../styles/dataGridStyles";
 import { tokens } from "../../theme";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import OrdersAPI from "../../api/orders/ordersApi";
+import { useDialog } from "../../utils/DialogContext";
+import CheckIcon from "@mui/icons-material/Check";
 
 const Products = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [products, setProducts] = useState([]);
   const [currentUser] = useContext(AuthContext);
+  const { showDialog } = useDialog();
+  const [selectQty, setSelectQty] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -21,33 +25,65 @@ const Products = () => {
         let productsData = await ProductsAPI.getAllProducts();
         setProducts(productsData);
       } catch (error) {
-        // Gestisci gli errori, ad esempio mostrando un messaggio di errore
+        showDialog("Error while fetching products", "error");
       }
     };
     fetchProducts();
   }, [currentUser.role, currentUser.id]);
 
   const handleBuyNow = (event, row) => {
-    console.log("Buy now");
-    const productToBuy = {
+    // event.preventDefault();
+    const warranty = row.warrantyDuration.split(" ");
+    let warrantyDuration = new Date();
+    if (warranty[1] === "years") {
+      warrantyDuration.setFullYear(
+        warrantyDuration.getFullYear() + parseInt(warranty[0])
+      );
+    } else if (warranty[1] === "months") {
+      warrantyDuration.setMonth(
+        warrantyDuration.getMonth() + parseInt(warranty[0])
+      );
+    }
+    const productToOrder = {
       id: null,
-      customerId: currentUser.id,
+      customerId: currentUser.email,
       productId: row.id,
       quantity: 1,
       date: new Date(),
-      warrantyDuration: new Date(),
-    }
+      warrantyDuration: warrantyDuration,
+    };
 
+    console.log(productToOrder);
 
-    /*
-    val id: Long?,
-    val customerId: String,
-    val productId: String,
-    val quantity: Int?,
-    val date: Date,
-    val warrantyDuration: Date
-    */
+    OrdersAPI.createOrder(productToOrder)
+      .then((response) => {
+        showDialog("Order created successfully", "success");
+      })
+      .catch((error) => {
+        showDialog("Error while creating order", "error");
+      });
   }
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setOpen(false);
+    setSelectQty(false);
+  };
+  const [quantity, setQuantity] = useState(1);
+
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: colors.greenAccent[800],
+    border: "2px solid #000",
+    boxShadow: 24,
+    borderRadius: "20px",
+    p: 4,
+  };
 
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
@@ -55,7 +91,7 @@ const Products = () => {
     { field: "description", headerName: "Description", flex: 1 },
     { field: "price", headerName: "Price", flex: 1 },
     { field: "quantity", headerName: "Quantity", flex: 1 },
-    { field: "warrantyDuration", headerName: "Warranty Duration", type:"date", flex: 1, valueGetter: ({value}) => value && new Date(value)},
+    { field: "warrantyDuration", headerName: "Warranty Duration", flex: 1},
     {
       field: "action",
       headerName: "Action",
@@ -63,16 +99,58 @@ const Products = () => {
       type: "button",
       renderCell: ({ row }) => {
         return (
-          <Tooltip title="Buy now">
-            <AddShoppingCartIcon
-              fontSize="small"
-              sx={{
-                color: colors.greenAccent[400],
-                "&:hover": { color: colors.greenAccent[600] },
-              }}
-              onClick={(event) => handleBuyNow(event, row)}
-            />
-          </Tooltip>
+          <>
+            {selectQty === true ? (
+              <Modal open={open} onClose={handleClose}>
+                <Stack
+                  sx={style}
+                  justifyItems="center"
+                  direction="row"
+                  flexWrap="initial"
+                  useFlexGap
+                  spacing={2}
+                >
+                  <Typography
+                    id="modal-modal-title"
+                    variant="h4"
+                    component="h2"
+                    sx={{ marginBottom: "20px" }}
+                  >
+                    Select the quantity
+                  </Typography>
+                  <TextField
+                    label="Quantity"
+                    type="number"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    inputProps={{
+                      defaultValue: quantity,
+                      min: 1,
+                      max: parseInt(row.quantity),
+                    }}
+                    onChange={(event) => setQuantity(event.target.value)}
+                  />
+                  <CheckIcon fontSize="large" />
+                </Stack>
+              </Modal>
+            ) : (
+              <Tooltip title="Buy now">
+                <AddShoppingCartIcon
+                  fontSize="small"
+                  sx={{
+                    color: colors.greenAccent[400],
+                    "&:hover": { color: colors.greenAccent[600] },
+                  }}
+                  onClick={() => {
+                    setSelectQty(true);
+                    handleOpen();
+                    console.log(row.quantity);
+                  }}
+                />
+              </Tooltip>
+            )}
+          </>
         );
       },
     },
