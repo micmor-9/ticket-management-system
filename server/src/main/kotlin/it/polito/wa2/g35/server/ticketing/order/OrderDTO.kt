@@ -12,11 +12,6 @@ data class OrderDTO (
     val date: Date,
     val warrantyDuration: Date
 )
-{
-    /*constructor() : this(null, Customer(null, "","","", "", "", ""),
-        Product("","", "", 0.0, 0, "" ), 0,Date(),Date())*/
-}
-
 
 fun Order.toDTO() : OrderDTO {
     return OrderDTO(this.id, this.customer, this.product, this.quantity, this.date, this.warrantyDuration)
