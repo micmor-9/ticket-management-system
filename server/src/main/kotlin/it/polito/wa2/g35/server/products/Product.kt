@@ -1,8 +1,7 @@
 package it.polito.wa2.g35.server.products
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
+import java.util.Date
 
 
 @Entity
@@ -14,4 +13,5 @@ class Product (
     var description: String? = "",
     var price: Double? = 0.0,
     var quantity: Int? = 0,
+    var warrantyDuration: String
 )

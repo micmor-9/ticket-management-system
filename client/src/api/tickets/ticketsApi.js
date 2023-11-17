@@ -7,13 +7,7 @@ const api = axios.create({
         "Content-Type": "application/json",
     },
 });
-const ticketStatusApi = axios.create({
-    baseURL: `${backendUrl}`,
-    headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-});
+
 const handleApiError = (error) => {
     console.log("Error during API call:", error);
     throw error;
@@ -149,7 +143,7 @@ const updateTicketExpert = async (ticketId, expertId) => {
 
 const getTicketStatusByTicketId = async (ticketId) => {
   try {
-    const response = await ticketStatusApi.get(`/status/${ticketId}`,{
+    const response = await api.get(`/status/${ticketId}`,{
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

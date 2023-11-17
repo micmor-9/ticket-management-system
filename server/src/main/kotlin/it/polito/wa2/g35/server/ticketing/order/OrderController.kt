@@ -60,7 +60,7 @@ class OrderController(private val orderService: OrderService) {
 
     @PostMapping("/orders/")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('Manager')")
+    @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
     @Observed(
         name = "/orders/",
         contextualName = "post-order-request"

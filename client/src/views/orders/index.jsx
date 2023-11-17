@@ -28,6 +28,7 @@ const Orders = () => {
                     ordersData = await OrdersAPI.getAllOrders();
                 if (currentUser.role === "Client")
                     ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
+                console.log("ordersData", ordersData);
                 setOrders(ordersData);
             } catch (error) {
                 showDialog("Error while fetching orders", "error");
@@ -37,60 +38,65 @@ const Orders = () => {
     }, [currentUser.id, currentUser.role, currentUser.email]);
 
     const columns = [
-        {field: "id", headerName: "ID"},
-        {
-            field: "date",
-            headerName: "Date",
-            flex: 1,
-            type: "date",
-            valueGetter: ({value}) => value && new Date(value),
+      { field: "id", headerName: "ID" },
+      {
+        field: "date",
+        headerName: "Date",
+        flex: 1,
+        type: "date",
+        valueGetter: ({ value }) => value && new Date(value),
+      },
+      {
+        field: "warrantyDuration",
+        headerName: "Warranty Duration",
+        flex: 1,
+        type: "date",
+        valueGetter: ({ value }) => value && new Date(value),
+      },
+      {
+        field: "customer",
+        headerName: "Customer",
+        flex: 1,
+        type: "string",
+        valueGetter: ({ value }) => value && value.name + " " + value.surname,
+      },
+      {
+        field: "product",
+        headerName: "Product",
+        flex: 1,
+        valueGetter: ({ value }) => value && value.description,
+      },
+      {
+        field: "quantity",
+        headerName: "Quantity",
+        flex: 1,
+      },
+      {
+        field: "button",
+        headerName: "Ticket",
+        flex: 1,
+        type: "button",
+        renderCell: ({ row }) => {
+          return (
+            <Button
+              id="create-ticket"
+              sx={{
+                "&:hover": {
+                  backgroundColor: colors.redAccent[400],
+                  color: "white",
+                },
+                borderRadius: "15px",
+                borderColor: colors.redAccent[400],
+                color: colors.redAccent[400],
+              }}
+              variant="outlined"
+              onClick={() => navigate(`/tickets/create/${row.id}`)}
+            >
+              <Typography fontSize="12px">Create Ticket</Typography>
+            </Button>
+          );
         },
-        {
-            field: "warrantyDuration",
-            headerName: "Warranty Duration",
-            flex: 1,
-            type: "date",
-            valueGetter: ({value}) => value && new Date(value),
-        },
-        {
-            field: "customer",
-            headerName: "Customer",
-            flex: 1,
-            type: "string",
-            valueGetter: ({value}) => value && value.name + " " + value.surname,
-        },
-        {
-            field: "product",
-            headerName: "Product",
-            flex: 1,
-            valueGetter: ({value}) => value && value.name,
-        },
-        {
-            field: "button",
-            headerName: "Ticket",
-            flex: 1,
-            type: "button",
-            renderCell: ({row}) => {
-                return (
-                    <Button
-                        id="create-ticket"
-                        sx={{
-                            "&:hover": {
-                                backgroundColor: colors.redAccent[400],
-                                color: "white"
-                            },
-                            borderRadius: "15px",
-                            borderColor: colors.redAccent[400],
-                            color: colors.redAccent[400]
-                        }}
-                        variant="outlined"
-                        onClick={() => navigate(`/tickets/create/${row.id}`)}
-                    >
-                        <Typography  fontSize="12px">Create Ticket</Typography>
-                    </Button>
-                );
-            },
-        },
+      },
     ];
 
 

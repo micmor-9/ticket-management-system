@@ -1,7 +1,8 @@
-INSERT INTO public.customer (id, email, name, surname)
-VALUES (1, 'user1@example.com', 'Mario', 'Rossi');
-INSERT INTO public.customer (id, email, name, surname)
-VALUES (2, 'user2@example.com', 'Giulio', 'Bianchi');
+INSERT INTO public.customer (id, email, name, surname, contact, address1, address2)
+VALUES (1, 'user1@example.com', 'Mario', 'Rossi', '3333333333', 'Via Roma 1', 'Milano');
+INSERT INTO public.customer (id, email, name, surname, contact, address1)
+VALUES (2, 'user2@example.com', 'Giulio', 'Bianchi', '3454447632', 'Corso Peschiera');
+
 INSERT INTO public.expert (id, email, name, surname, specialization)
 VALUES (
     'B001',
@@ -34,12 +35,12 @@ VALUES (
     'Malnati',
     'battery'
   );
-INSERT INTO public.product (id, name, description, price, quantity)
-VALUES ('10', 'iphone', 'iPhone 15 Pro Max', 1000, 10);
-INSERT INTO public.product (id, name, description, price, quantity)
-VALUES ('11', 'ipad', 'iPad 15 Pro Max', 1000, 10);
-INSERT INTO public.product (id, name, description, price, quantity)
-VALUES ('12', 'mac', 'Mac 15 Pro Max', 2000, 20);
+INSERT INTO public.product (id, name, description, price, quantity, warranty_duration)
+VALUES ('10', 'iphone', 'iPhone 15 Pro Max', 1000, 10, '6 months');
+INSERT INTO public.product (id, name, description, price, quantity, warranty_duration)
+VALUES ('11', 'ipad', 'iPad Air', 1000, 10, '2 years');
+INSERT INTO public.product (id, name, description, price, quantity, warranty_duration)
+VALUES ('12', 'mac', 'Mac 15 Pro Max', 2000, 20, '4 years');
 INSERT INTO public.orders (
     id,
     date,

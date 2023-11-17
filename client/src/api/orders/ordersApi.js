@@ -52,12 +52,25 @@ const getOrderByOrderId = async (orderId) => {
   }
 };
 
+const createOrder = async (order) => {
+  try {
+    const response = await api.post(`/orders/`, order, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+}
 
 
 const OrdersAPI = {
   getAllOrders,
   getOrdersByCustomerId,
   getOrderByOrderId,
+  createOrder,
 };
 
 export default OrdersAPI;

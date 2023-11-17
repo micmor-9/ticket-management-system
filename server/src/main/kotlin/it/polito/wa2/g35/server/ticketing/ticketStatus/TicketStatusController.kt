@@ -30,7 +30,7 @@ class TicketStatusController(private val ticketStatusService: TicketStatusServic
 
     @GetMapping("/status/{ticketId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('Manager')")
+    @PreAuthorize("hasAnyRole('Manager', 'Client', 'Expert')")
     @Observed(
         name = "status/{ticketId}",
         contextualName = "get-ticket-status-request"
