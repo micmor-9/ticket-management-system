@@ -44,11 +44,14 @@ const CreateTicketForm = () => {
         try {
           const orderData = await OrdersAPI.getOrderByOrderId(orderId);
           setOrder(orderData);
-        } catch (error) {}
+        } catch (error) {
+          showDialog("Error while fetching order", "error");
+        }
       }
     };
     fetchOrder();
   }, [orderId]);
+
   useEffect(() => {
     const fetchOrder = async () => {
       if (ticket.orderId) {
@@ -126,7 +129,7 @@ const CreateTicketForm = () => {
         priority: null,
         status: null,
         expertId: null,
-        productId: order ? order.product.id : orderTemp.product.id,
+        orderId: order ? order.id : orderTemp.id,
         customerId: order ? order.customer.email : orderTemp.customer.email,
         category: ticketArea,
       };
@@ -138,7 +141,7 @@ const CreateTicketForm = () => {
         })
         .catch((error) => {
           console.log(error);
-          alert("Ticket creation error");
+          alert("Ticket creation error", error);
         });
     }
   };

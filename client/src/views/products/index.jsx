@@ -2,12 +2,10 @@ import {
   Box,
   Button,
   Grid,
-  InputLabel,
   MenuItem,
   Modal,
   Select,
   Stack,
-  TextField,
   Tooltip,
   Typography,
   useTheme,
@@ -22,7 +20,6 @@ import { tokens } from "../../theme";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import OrdersAPI from "../../api/orders/ordersApi";
 import { useDialog } from "../../utils/DialogContext";
-import CheckIcon from "@mui/icons-material/Check";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const Products = () => {
@@ -70,8 +67,6 @@ const Products = () => {
       date: new Date(),
       warrantyDuration: warrantyDuration,
     };
-
-    console.log("productToOrder", productToOrder);
 
     OrdersAPI.createOrder(productToOrder)
       .then((response) => {

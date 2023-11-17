@@ -41,7 +41,11 @@ INSERT INTO public.product (id, name, description, price, quantity, warranty_dur
 VALUES ('11', 'ipad', 'iPad Air', 1000, 10, '2 years');
 INSERT INTO public.product (id, name, description, price, quantity, warranty_duration)
 VALUES ('12', 'mac', 'Mac 15 Pro Max', 2000, 20, '4 years');
-INSERT INTO public.orders (
+
+
+
+
+/*INSERT INTO public.orders (
     id,
     date,
     warranty_duration,
@@ -208,4 +212,4 @@ VALUES (
     'D002',
     2,
     'display'
-  );
+  );*/

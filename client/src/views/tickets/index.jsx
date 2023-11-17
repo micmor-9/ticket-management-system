@@ -56,7 +56,6 @@ const Tickets = () => {
           ticketsData = await TicketsAPI.getTickets();
           expertsData = await ProfilesAPI.getAllExperts();
         }
-        console.log("ticketsData", ticketsData);
         setExperts(expertsData);
         setTickets(ticketsData);
       } catch (error) {
@@ -83,7 +82,7 @@ const Tickets = () => {
       priority: row.priority,
       status: row.status,
       expertId: expertId,
-      productId: row.product.id,
+      orderId: row.order.id,
       customerId: row.customer.id,
       category: row.category,
     };
@@ -292,11 +291,11 @@ const Tickets = () => {
       },
     },
     {
-      field: "product",
+      field: "order",
       headerName: "Product",
       flex: 1,
       cellClassName: "product-column--cell",
-      valueGetter: ({ value }) => value && value.description,
+      valueGetter: ({ value }) => value && value.product.description,
     },
     {
       field: "customer",

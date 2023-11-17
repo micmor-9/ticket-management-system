@@ -16,3 +16,7 @@ data class OrderDTO (
 fun Order.toDTO() : OrderDTO {
     return OrderDTO(this.id, this.customer, this.product, this.quantity, this.date, this.warrantyDuration)
 }
+
+fun OrderDTO.toOrder() : Order {
+    return Order(this.id, this.date, this.warrantyDuration, this.customer, this.product, this.quantity)
+}
