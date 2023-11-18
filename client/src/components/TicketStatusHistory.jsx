@@ -19,7 +19,7 @@ const TicketStatusHistory = ({ history, expand }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const iconStyles = (status) => {
+  const iconStyles = () => {
     return {
       fontSize: "x-large",
     };
@@ -69,37 +69,35 @@ const TicketStatusHistory = ({ history, expand }) => {
           {history.map((status, idx) => (
             <TimelineItem>
               <TimelineContent sx={{ py: "12px", px: 2 }}>
-                <Typography>
-                  <Typography
-                    variant={"h4"}
-                    sx={{
-                      fontWeight: "bold",
-                      color: colors.greenAccent[400],
-                      textAlign: "end",
-                    }}
-                  >
-                    {status.status.replace("_", " ")}
-                  </Typography>
-                  <Typography variant={"h5"} sx={{ textAlign: "end" }}>
-                    {status.description}
-                  </Typography>
-                  {status.expert && (
-                    <Typography
-                      variant={"subtitle1"}
-                      sx={{ color: colors.greenAccent[500], textAlign: "end" }}
-                    >
-                      {status.expert.name + " " + status.expert.surname}
-                    </Typography>
-                  )}
-                  <Typography
-                    variant={"subtitle2"}
-                    sx={{ color: colors.primary[200], textAlign: "end" }}
-                  >
-                    {new Date(status.statusTimestamp)
-                      .toLocaleString()
-                      .replace(",", "")}
-                  </Typography>
+              <Typography
+                variant={"h4"}
+                sx={{
+                  fontWeight: "bold",
+                  color: colors.greenAccent[400],
+                  textAlign: "end",
+                }}
+              >
+                {status.status.replace("_", " ")}
+              </Typography>
+              <Typography variant={"h5"} sx={{ textAlign: "end" }}>
+                {status.description}
+              </Typography>
+              {status.expert && (
+                <Typography
+                  variant={"subtitle1"}
+                  sx={{ color: colors.greenAccent[500], textAlign: "end" }}
+                >
+                  {status.expert.name + " " + status.expert.surname}
                 </Typography>
+              )}
+              <Typography
+                variant={"subtitle2"}
+                sx={{ color: colors.primary[200], textAlign: "end" }}
+              >
+                {new Date(status.statusTimestamp)
+                  .toLocaleString()
+                  .replace(",", "")}
+              </Typography>
               </TimelineContent>
               <TimelineSeparator>
                 <TimelineDot
