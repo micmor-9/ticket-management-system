@@ -77,22 +77,12 @@ const Tickets = () => {
     const selectedExpertName = event.target.value;
     const expertId = selectedExpertName.split("(")[1].split(")")[0];
 
-    const ticketToUpdate = {
-      id: row.id,
-      creationTimestamp: row.creationTimestamp,
-      issueDescription: row.issueDescription,
-      priority: row.priority,
-      status: row.status,
-      expertId: expertId,
-      orderId: row.order.id,
-      customerId: row.customer.id,
-      category: row.category,
-    };
+    const ticketId = row.id;
 
-    TicketsAPI.updateTicketExpert(ticketToUpdate.id, ticketToUpdate.expertId)
+    TicketsAPI.updateTicketExpert(ticketId, expertId)
       .then((response) => {
         setTicketUpdated(() => !ticketUpdated);
-        showDialog("Ticket updated successfully", "success");
+        showDialog("Ticket Expert updated successfully", "success");
       })
       .catch((error) => {
         showDialog("Error while updating ticket", "error");
@@ -101,26 +91,26 @@ const Tickets = () => {
 
   const handlePriorityChange = async (event, ticketId) => {
     const newPriority = event.target.value;
-    try {
-      if (currentUser.role === "Manager" || currentUser.role === "Expert")
-        await TicketsAPI.updateTicketPriority(ticketId, newPriority);
-      const updatedTickets = tickets.map((ticket) =>
-        ticket.id === ticketId ? { ...ticket, priority: newPriority } : ticket
-      );
-      setTickets(updatedTickets);
-    } catch (error) {}
+
+    TicketsAPI.updateTicketPriority(ticketId, newPriority)
+    .then(() => {
+      setTicketUpdated(() => !ticketUpdated);
+      showDialog("Ticket Priority updated successfully", "success");
+    }).catch((error) => {
+      showDialog("Error while updating ticket", "error");
+    });
   };
 
   const handleStatusChange = async (event, ticketId) => {
     const newStatus = event.target.value;
-    try {
-      if (currentUser.role === "Manager" || currentUser.role === "Expert")
-        await TicketsAPI.updateTicketStatus(ticketId, newStatus);
-      const updatedTickets = tickets.map((ticket) =>
-        ticket.id === ticketId ? { ...ticket, status: newStatus } : ticket
-      );
-      setTickets(updatedTickets);
-    } catch (error) {}
+
+    TicketsAPI.updateTicketStatus(ticketId, newStatus)
+    .then(() => {
+      setTicketUpdated(() => !ticketUpdated);
+      showDialog("Ticket Status updated successfully", "success");
+    }).catch((error) => {
+      showDialog("Error while updating ticket", "error");
+    });
   };
 
   const columns = [
