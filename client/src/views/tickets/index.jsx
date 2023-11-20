@@ -229,7 +229,7 @@ const Tickets = () => {
                 },
               }}
             >
-              {(modify.active && modify.id === row.id) ? (
+              {modify.active && modify.id === row.id ? (
                 <Select
                   onChange={(event) => handleExpertChange(event, row)}
                   disabled={
@@ -246,30 +246,34 @@ const Tickets = () => {
                       : ""
                   }
                 >
-                  {experts.map((expert) => (
-                    <MenuItem
-                      key={expert.id}
-                      value={
-                        expert.name +
-                        " " +
-                        expert.surname +
-                        " (" +
-                        expert.id +
-                        ")"
-                      }
-                    >
-                      {expert.name +
-                        " " +
-                        expert.surname +
-                        " (" +
-                        expert.id +
-                        ")"}
-                    </MenuItem>
-                  ))}
+                  {experts
+                    .filter((expert) => expert.specialization === row.category)
+                    .map((expert) => (
+                      <MenuItem
+                        key={expert.id}
+                        value={
+                          expert.name +
+                          " " +
+                          expert.surname +
+                          " (" +
+                          expert.id +
+                          ")"
+                        }
+                      >
+                        {expert.name +
+                          " " +
+                          expert.surname +
+                          " (" +
+                          expert.id +
+                          ")"}
+                      </MenuItem>
+                    ))}
                 </Select>
               ) : (
                 <Typography>
-                  {row.expert ? row.expert.name + " " + row.expert.surname : "Not assigned yet"}
+                  {row.expert
+                    ? row.expert.name + " " + row.expert.surname
+                    : "Not assigned yet"}
                 </Typography>
               )}
             </FormControl>

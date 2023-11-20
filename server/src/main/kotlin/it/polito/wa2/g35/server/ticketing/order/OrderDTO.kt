@@ -8,7 +8,7 @@ data class OrderDTO (
     val id: Long?,
     val customer: Customer,
     val product: Product,
-    val quantity: Int?,
+    val quantity: Int,
     val date: Date,
     val warrantyDuration: Date
 )

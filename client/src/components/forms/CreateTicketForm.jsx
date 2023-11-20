@@ -50,7 +50,7 @@ const CreateTicketForm = () => {
       }
     };
     fetchOrder();
-  }, [orderId]);
+  }, [orderId, showDialog]);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -168,6 +168,7 @@ const CreateTicketForm = () => {
     "Keyboard",
     "Mouse",
     "Power Supply",
+    "Speakers",
   ];
 
   const handleFieldChange = (fieldName, value) => {

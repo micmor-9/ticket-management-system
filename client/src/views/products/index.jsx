@@ -21,6 +21,7 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import OrdersAPI from "../../api/orders/ordersApi";
 import { useDialog } from "../../utils/DialogContext";
 import DeleteIcon from "@mui/icons-material/Delete";
+import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 
 const Products = () => {
   const theme = useTheme();
@@ -33,6 +34,7 @@ const Products = () => {
   const [maxQuantity, setMaxQuantity] = useState(0);
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState(0);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -44,7 +46,7 @@ const Products = () => {
       }
     };
     fetchProducts();
-  }, [currentUser.role, currentUser.id]);
+  }, [currentUser.role, currentUser.id, showDialog]);
 
   const handleBuyNow = (event, row) => {
     event.preventDefault();
@@ -77,7 +79,6 @@ const Products = () => {
       });
   };
 
-  const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => {
     setOpen(false);
@@ -154,6 +155,7 @@ const Products = () => {
                     </Grid>
                   </Grid>
                   <Grid
+                    item
                     container
                     direction="row"
                     justifyContent="flex-end"
@@ -201,103 +203,34 @@ const Products = () => {
                     </Grid>
                   </Grid>
                 </Stack>
-
-                {/* <Stack sx={style} direction="column" spacing={3}>
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      mb: "20px",
-                    }}
-                  >
-                    NEW ORDER
-                  </Typography>
-                  <Typography variant="h5">
-                    Order info: {productName}
-                  </Typography>
-                  <Stack direction="row" alignItems="baseline" spacing={10}>
-                    <Typography id="modal-modal-title" variant="h5">
-                      Select quantity
-                    </Typography>
-                    <Select
-                      value={quantity}
-                      onChange={(event) => setQuantity(event.target.value)}
-                      size="small"
-                    >
-                      {quantityValue.map((value) => (
-                        <MenuItem value={value} key={value}>
-                          {value}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Stack>
-                  <Stack direction="row">
-                    <Typography variant="h5">Sub Total:</Typography>
-                    <Typography variant="h5">
-                      {row.price * quantity} 
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={2}
-                    justifyContent="flex-end"
-                    mt={4}
-                  >
-                    <Button
-                      variant="contained"
-                      startIcon={<DeleteIcon />}
-                      size="small"
-                      onClick={() => {
-                        handleModalClose();
-                        setQuantity(1);
-                      }}
-                      sx={{
-                        backgroundColor: colors.redAccent[600],
-                        "&:hover": {
-                          backgroundColor: colors.redAccent[500],
-                        },
-                      }}
-                    >
-                      CANCEL
-                    </Button>
-                    <Button
-                      variant="contained"
-                      startIcon={<AddShoppingCartIcon />}
-                      size="small"
-                      sx={{
-                        backgroundColor: colors.greenAccent[600],
-                        "&:hover": {
-                          backgroundColor: colors.greenAccent[400],
-                        },
-                      }}
-                      onClick={(event) => {
-                        handleBuyNow(event, row);
-                        handleModalClose();
-                        setQuantity(1);
-                      }}
-                    >
-                      ORDER NOW
-                    </Button>
-                  </Stack>
-                </Stack> */}
               </Modal>
             ) : (
-              <Tooltip title="Buy now">
-                <AddShoppingCartIcon
-                  fontSize="small"
-                  sx={{
-                    color: colors.greenAccent[400],
-                    "&:hover": { color: colors.greenAccent[600] },
-                  }}
-                  onClick={() => {
-                    setSelectQty(true);
-                    handleModalOpen();
-                    setProductId(row.id);
-                    setMaxQuantity(row.quantity);
-                    setProductName(row.description);
-                    setProductPrice(row.price);
-                  }}
-                />
+              <Tooltip title={row.quantity > 0 ? "Buy now" : "Available soon!"}>
+                {row.quantity > 0 ? (
+                  <AddShoppingCartIcon
+                    fontSize="small"
+                    sx={{
+                      color: colors.greenAccent[400],
+                      "&:hover": { color: colors.greenAccent[600] },
+                    }}
+                    onClick={() => {
+                      setSelectQty(true);
+                      handleModalOpen();
+                      setProductId(row.id);
+                      setMaxQuantity(row.quantity);
+                      setProductName(row.description);
+                      setProductPrice(row.price);
+                    }}
+                  />
+                ) : (
+                  <RemoveShoppingCartIcon
+                    fontSize="small"
+                    sx={{
+                      color: colors.redAccent[400],
+                      "&:hover": { color: colors.redAccent[600] },
+                    }}
+                  />
+                )}
               </Tooltip>
             )}
           </>
