@@ -1,17 +1,14 @@
 import {
   Box,
   Typography,
-  Tooltip,
   useTheme,
   Select,
   MenuItem,
   FormControl,
+  Tooltip,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import NorthOutlinedIcon from "@mui/icons-material/NorthOutlined";
-import SouthOutlinedIcon from "@mui/icons-material/SouthOutlined";
-import EastOutlinedIcon from "@mui/icons-material/EastOutlined";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
@@ -27,6 +24,7 @@ import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import Button from "@mui/material/Button";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 const Tickets = () => {
   const theme = useTheme();
@@ -38,6 +36,8 @@ const Tickets = () => {
   const [currentUser] = useAuth();
   const navigate = useNavigate();
   const { showDialog } = useDialog();
+  const [modify, setModify] = useState({id: '', active: false});
+
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -50,8 +50,10 @@ const Tickets = () => {
           );
           expertsData = ticketsData.map((ticket) => ticket.expert);
         }
-        if (currentUser.role === "Expert")
+        if (currentUser.role === "Expert") {
           ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
+          expertsData = await ProfilesAPI.getAllExperts();
+        }
         if (currentUser.role === "Manager") {
           ticketsData = await TicketsAPI.getTickets();
           expertsData = await ProfilesAPI.getAllExperts();
@@ -89,12 +91,11 @@ const Tickets = () => {
 
     TicketsAPI.updateTicketExpert(ticketToUpdate.id, ticketToUpdate.expertId)
       .then((response) => {
-        console.log("Ticket aggiornato con successo");
         setTicketUpdated(() => !ticketUpdated);
+        showDialog("Ticket updated successfully", "success");
       })
       .catch((error) => {
-        console.error("Errore nell'aggiornamento del ticket", error);
-        alert("Errore nell'aggiornamento del ticket");
+        showDialog("Error while updating ticket", "error");
       });
   };
 
@@ -123,7 +124,7 @@ const Tickets = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "ID" },
+    { field: "id", headerName: "ID", flex: 0.2 },
     {
       field: "creationTimestamp",
       headerName: "Creation Date",
@@ -135,65 +136,48 @@ const Tickets = () => {
     {
       field: "issueDescription",
       headerName: "Issue Description",
-      flex: 1,
+      flex: 0.7,
       cellClassName: "issueDescription-column--cell",
     },
     {
       field: "priority",
       headerName: "Priority",
-      flex: 0.5,
+      flex: 0.8,
       cellClassName: "priority-column--cell",
-      renderCell: ({ row: { priority, id } }) => {
+      renderCell: ({ row }) => {
         if (currentUser.role === "Manager" || currentUser.role === "Expert") {
           return (
             <>
-              <Box
-                width="60%"
-                m="0 auto 0 0"
-                p="5px"
-                display="flex"
-                backgroundColor={"transparent"}
-              >
-                <Tooltip
-                  title={
-                    priority === "LOW"
-                      ? "Low"
-                      : priority === "MEDIUM"
-                      ? "Medium"
-                      : "High"
-                  }
-                >
-                  <Typography color={colors.priority[priority]}>
-                    {priority === "LOW" ? (
-                      <SouthOutlinedIcon />
-                    ) : priority === "MEDIUM" ? (
-                      <EastOutlinedIcon />
-                    ) : (
-                      <NorthOutlinedIcon />
-                    )}
-                  </Typography>
-                </Tooltip>
+              <Box width="20%" m="0 25px 0 0" p="5px">
+                <PriorityBadge priority={row.priority} />
               </Box>
-              <Select
-                sx={{ height: "40%", width: "40%" }}
-                native
-                onChange={(event) => handlePriorityChange(event, id)}
-              >
-                <option value={"LOW"}>Low</option>
-                <option value={"MEDIUM"}>Medium</option>
-                <option value={"HIGH"}>High</option>
-              </Select>
+              {modify.active && modify.id === row.id && (
+                <Select
+                  sx={{
+                    width: "30%",
+                    height: 30,
+                    borderRadius: 6,
+                    color: "transparent",
+                  }}
+                  onChange={(event) => handlePriorityChange(event, row.id)}
+                  value={row.priority ? row.priority : ""}
+                >
+                  <MenuItem value={"LOW"}>LOW</MenuItem>
+                  <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>
+                  <MenuItem value={"HIGH"}>HIGH</MenuItem>
+                </Select>
+              )}
             </>
           );
         } else {
-          return <PriorityBadge priority={priority} />;
+          return <PriorityBadge priority={row.priority} />;
         }
       },
     },
     {
       field: "status",
       headerName: "Status",
-      flex: 1,
+      flex: 1.2,
       cellClassName: "status-column--cell",
       renderCell: ({ row: { status, id } }) => {
         if (currentUser.role === "Manager" || currentUser.role === "Expert") {
@@ -212,17 +196,24 @@ const Tickets = () => {
                   {status.replace("_", " ")}
                 </Typography>
               </Box>
-              <Select
-                sx={{ height: "40%", width: "20%" }}
-                native
-                onChange={(event) => handleStatusChange(event, id)}
-              >
-                <option value={"OPEN"}>Open</option>
-                <option value={"IN_PROGRESS"}>In Progress</option>
-                <option value={"CLOSED"}>Closed</option>
-                <option value={"RESOLVED"}>Resolved</option>
-                <option value={"REOPENED"}>Reopened</option>
-              </Select>
+              {modify.active && modify.id === id && (
+                <Select
+                  sx={{
+                    width: "20%",
+                    height: 30,
+                    borderRadius: 6,
+                    color: "transparent",
+                  }}
+                  value={status}
+                  onChange={(event) => handleStatusChange(event, id)}
+                >
+                  <MenuItem value={"OPEN"}>Open</MenuItem>
+                  <MenuItem value={"IN_PROGRESS"}>In Progress</MenuItem>
+                  <MenuItem value={"CLOSED"}>Closed</MenuItem>
+                  <MenuItem value={"RESOLVED"}>Resolved</MenuItem>
+                  <MenuItem value={"REOPENED"}>Reopened</MenuItem>
+                </Select>
+              )}
             </>
           );
         } else {
@@ -233,62 +224,81 @@ const Tickets = () => {
     {
       field: "expert",
       headerName: "Expert",
-      flex: 1,
+      flex: 1.2,
       cellClassName: "expert-column--cell",
       renderCell: ({ row }) => {
-        return (
-          <FormControl
-            fullWidth
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "transparent",
+        if (currentUser.role === "Manager" || currentUser.role === "Expert") {
+          return (
+            <FormControl
+              fullWidth
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "transparent",
+                  },
                 },
-              },
-            }}
-          >
-            {currentUser.role === "Client" ? (
-                row.expert ? (row.expert.name + " " + row.expert.surname) : "Not assigned yet"
-            ) : (
-              <Select
-                onChange={(event) => handleExpertChange(event, row)}
-                disabled={row.status === "RESOLVED" || row.status === "CLOSED"}
-                value={
-                  row.expert
-                    ? row.expert.name +
-                      " " +
-                      row.expert.surname +
-                      " (" +
-                      row.expert.id +
-                      ")"
-                    : ""
-                }
-              >
-                {experts.map((expert) => (
-                  <MenuItem
-                    key={expert.id}
-                    value={
-                      expert.name +
-                      " " +
-                      expert.surname +
-                      " (" +
-                      expert.id +
-                      ")"
-                    }
-                  >
-                    {expert.name +
-                      " " +
-                      expert.surname +
-                      " (" +
-                      expert.id +
-                      ")"}
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
-          </FormControl>
-        );
+              }}
+            >
+              {(modify.active && modify.id === row.id) ? (
+                <Select
+                  onChange={(event) => handleExpertChange(event, row)}
+                  disabled={
+                    row.status === "RESOLVED" || row.status === "CLOSED"
+                  }
+                  value={
+                    row.expert
+                      ? row.expert.name +
+                        " " +
+                        row.expert.surname +
+                        " (" +
+                        row.expert.id +
+                        ")"
+                      : ""
+                  }
+                >
+                  {experts.map((expert) => (
+                    <MenuItem
+                      key={expert.id}
+                      value={
+                        expert.name +
+                        " " +
+                        expert.surname +
+                        " (" +
+                        expert.id +
+                        ")"
+                      }
+                    >
+                      {expert.name +
+                        " " +
+                        expert.surname +
+                        " (" +
+                        expert.id +
+                        ")"}
+                    </MenuItem>
+                  ))}
+                </Select>
+              ) : (
+                <Typography>
+                  {row.expert ? row.expert.name + " " + row.expert.surname : "Not assigned yet"}
+                </Typography>
+              )}
+            </FormControl>
+          );
+        } else {
+          return (
+            <Typography>
+              {row.expert ? row.expert.name + " " + row.expert.surname : ""}
+            </Typography>
+          );
+        }
+        
       },
+    },
+    {
+      field: "category",
+      headerName: "Category",
+      flex: 0.7,
+      cellClassName: "category-column--cell",
     },
     {
       field: "order",
@@ -303,19 +313,6 @@ const Tickets = () => {
       flex: 0.7,
       cellClassName: "customer-column--cell",
       valueGetter: ({ value }) => value && value.name + " " + value.surname,
-    },
-    {
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      cellClassName: "action-column--cell",
-      renderCell: ({ row }) => {
-        return (
-          <Button sx={{ color: colors.greenAccent[400] }}>
-            <CreateOutlinedIcon fontSize="small" />
-          </Button>
-        );
-      },
     },
     {
       field: "view",
@@ -337,6 +334,40 @@ const Tickets = () => {
       },
     },
   ];
+
+  if(currentUser.role === "Manager" || currentUser.role === "Expert") {
+    columns.push({
+      field: "action",
+      headerName: "Action",
+      flex: 0.5,
+      cellClassName: "action-column--cell",
+      renderCell: ({ row }) => {
+        return (
+          <Button sx={{ color: colors.greenAccent[400] }}>
+            {modify.active === false && (
+              <Tooltip title="Modify Ticket">
+                <CreateOutlinedIcon
+                  fontSize="small"
+                  onClick={() => {
+                    setModify({ id: row.id, active: !modify.active });
+                    console.log(modify);
+                  }}
+                />
+              </Tooltip>
+            )}
+            {modify.active === true && modify.id === row.id && (
+              <Tooltip title="Save Changes">
+                <CheckCircleOutlineIcon
+                  fontSize="small"
+                  onClick={() => setModify({ id: "", active: !modify.active })}
+                />
+              </Tooltip>
+            )}
+          </Button>
+        );
+      },
+    });
+  }
 
   return (
     <Box m="20px">

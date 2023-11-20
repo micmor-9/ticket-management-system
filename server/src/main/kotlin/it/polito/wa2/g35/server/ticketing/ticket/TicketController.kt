@@ -104,7 +104,7 @@ class TicketController(private val ticketService: TicketService) {
 
     @PutMapping("/tickets/{ticketId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('Manager')")
+    @PreAuthorize("hasAnyRole('Manager', 'Expert')")
     @Observed(
         name = "tickets/{ticketId}",
         contextualName = "put-ticket-request"
