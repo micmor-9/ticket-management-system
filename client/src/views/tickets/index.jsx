@@ -342,19 +342,20 @@ const Tickets = () => {
   return (
     <Box m="20px">
       <Header title="TICKETS" subtitle="Manage tickets">
-        <HeaderActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            startIcon={<AddIcon />}
-            onClick={() => {
-              navigate(`/tickets/create`);
-            }}
-            sx={{ marginLeft: "15px" }}
-          >
-            New Ticket
-          </Button>
-        </HeaderActions>
+        {currentUser.role === "Client" || currentUser.role === "Manager" && (
+            <HeaderActions>
+              <Button
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<AddIcon />}
+                  onClick={() => {
+                    navigate(`/tickets/create`);
+                  }}
+                  sx={{ marginLeft: "15px" }}
+              >
+                New Ticket
+              </Button>
+            </HeaderActions>)}
       </Header>
       <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
         <DataGrid
