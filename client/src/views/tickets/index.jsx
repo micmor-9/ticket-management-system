@@ -12,7 +12,7 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../utils/AuthContext";
 import { dataGridStyles } from "../../styles/dataGridStyles";
 import PriorityBadge from "../../components/PriorityBadge";
@@ -25,6 +25,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import Button from "@mui/material/Button";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import {SentimentDissatisfied, SentimentDissatisfiedOutlined} from "@mui/icons-material";
 
 const Tickets = () => {
   const theme = useTheme();
@@ -35,7 +36,7 @@ const Tickets = () => {
   const [ticketUpdated, setTicketUpdated] = useState(false);
   const [currentUser] = useAuth();
   const navigate = useNavigate();
-  const { showDialog } = useDialog();
+  const {showDialog} = useDialog();
   const [modify, setModify] = useState({id: '', active: false});
 
 
@@ -46,7 +47,7 @@ const Tickets = () => {
         let expertsData = [];
         if (currentUser.role === "Client") {
           ticketsData = await TicketsAPI.getTicketsByCustomer(
-            currentUser.email
+              currentUser.email
           );
           expertsData = ticketsData.map((ticket) => ticket.expert);
         }
@@ -80,23 +81,23 @@ const Tickets = () => {
     const ticketId = row.id;
 
     TicketsAPI.updateTicketExpert(ticketId, expertId)
-      .then((response) => {
-        setTicketUpdated(() => !ticketUpdated);
-        showDialog("Ticket Expert updated successfully", "success");
-      })
-      .catch((error) => {
-        showDialog("Error while updating ticket", "error");
-      });
+        .then((response) => {
+          setTicketUpdated(() => !ticketUpdated);
+          showDialog("Ticket Expert updated successfully", "success");
+        })
+        .catch((error) => {
+          showDialog("Error while updating ticket", "error");
+        });
   };
 
   const handlePriorityChange = async (event, ticketId) => {
     const newPriority = event.target.value;
 
     TicketsAPI.updateTicketPriority(ticketId, newPriority)
-    .then(() => {
-      setTicketUpdated(() => !ticketUpdated);
-      showDialog("Ticket Priority updated successfully", "success");
-    }).catch((error) => {
+        .then(() => {
+          setTicketUpdated(() => !ticketUpdated);
+          showDialog("Ticket Priority updated successfully", "success");
+        }).catch((error) => {
       showDialog("Error while updating ticket", "error");
     });
   };
@@ -105,305 +106,327 @@ const Tickets = () => {
     const newStatus = event.target.value;
 
     TicketsAPI.updateTicketStatus(ticketId, newStatus)
-    .then(() => {
-      setTicketUpdated(() => !ticketUpdated);
-      showDialog("Ticket Status updated successfully", "success");
-    }).catch((error) => {
+        .then(() => {
+          setTicketUpdated(() => !ticketUpdated);
+          showDialog("Ticket Status updated successfully", "success");
+        }).catch((error) => {
       showDialog("Error while updating ticket", "error");
     });
   };
 
-  const columns = [
-    { field: "id", headerName: "ID", flex: 0.2 },
-    {
-      field: "creationTimestamp",
-      headerName: "Creation Date",
-      flex: 1,
-      type: "date",
-      valueGetter: ({ value }) => value && new Date(value),
-      cellClassName: "creationTimestamp-column--cell",
-    },
-    {
-      field: "issueDescription",
-      headerName: "Issue Description",
-      flex: 0.7,
-      cellClassName: "issueDescription-column--cell",
-    },
-    {
-      field: "priority",
-      headerName: "Priority",
-      flex: 0.8,
-      cellClassName: "priority-column--cell",
-      renderCell: ({ row }) => {
-        if (currentUser.role === "Manager" || currentUser.role === "Expert") {
-          return (
-            <>
-              <Box width="20%" m="0 25px 0 0" p="5px">
-                <PriorityBadge priority={row.priority} />
-              </Box>
-              {modify.active && modify.id === row.id && (
-                <Select
-                  sx={{
-                    width: "30%",
-                    height: 30,
-                    borderRadius: 6,
-                    color: "transparent",
-                  }}
-                  onChange={(event) => handlePriorityChange(event, row.id)}
-                  value={row.priority ? row.priority : ""}
-                >
-                  <MenuItem value={"LOW"}>LOW</MenuItem>
-                  <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>
-                  <MenuItem value={"HIGH"}>HIGH</MenuItem>
-                </Select>
-              )}
-            </>
-          );
-        } else {
-          return <PriorityBadge priority={row.priority} />;
-        }
+    const columns = [
+      {field: "id", headerName: "ID", flex: 0.2},
+      {
+        field: "creationTimestamp",
+        headerName: "Creation Date",
+        flex: 1,
+        type: "date",
+        valueGetter: ({value}) => value && new Date(value),
+        cellClassName: "creationTimestamp-column--cell",
       },
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1.2,
-      cellClassName: "status-column--cell",
-      renderCell: ({ row: { status, id } }) => {
-        if (currentUser.role === "Manager" || currentUser.role === "Expert") {
-          return (
-            <>
-              <Box
-                width="60%"
-                m="0 25px 0 0"
-                p="5px"
-                display="flex"
-                justifyContent={"center"}
-                backgroundColor={colors.status[status]}
-                borderRadius={"5px"}
-              >
-                <Typography color={colors.primary[400]}>
-                  {status.replace("_", " ")}
-                </Typography>
-              </Box>
-              {modify.active && modify.id === id && (
-                <Select
-                  sx={{
-                    width: "20%",
-                    height: 30,
-                    borderRadius: 6,
-                    color: "transparent",
-                  }}
-                  value={status}
-                  onChange={(event) => handleStatusChange(event, id)}
-                >
-                  <MenuItem value={"OPEN"}>Open</MenuItem>
-                  <MenuItem value={"IN_PROGRESS"}>In Progress</MenuItem>
-                  <MenuItem value={"CLOSED"}>Closed</MenuItem>
-                  <MenuItem value={"RESOLVED"}>Resolved</MenuItem>
-                  <MenuItem value={"REOPENED"}>Reopened</MenuItem>
-                </Select>
-              )}
-            </>
-          );
-        } else {
-          return <StatusBadge statusValue={status} />;
-        }
+      {
+        field: "issueDescription",
+        headerName: "Issue Description",
+        flex: 0.7,
+        cellClassName: "issueDescription-column--cell",
       },
-    },
-    {
-      field: "expert",
-      headerName: "Expert",
-      flex: 1.2,
-      cellClassName: "expert-column--cell",
-      renderCell: ({ row }) => {
-        if (currentUser.role === "Manager" || currentUser.role === "Expert") {
-          return (
-            <FormControl
-              fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "transparent",
-                  },
-                },
-              }}
-            >
-              {modify.active && modify.id === row.id ? (
-                <Select
-                  onChange={(event) => handleExpertChange(event, row)}
-                  disabled={
-                    row.status === "RESOLVED" || row.status === "CLOSED"
-                  }
-                  value={
-                    row.expert
-                      ? row.expert.name +
-                        " " +
-                        row.expert.surname +
-                        " (" +
-                        row.expert.id +
-                        ")"
-                      : ""
-                  }
-                >
-                  {experts
-                    .filter((expert) => expert.specialization === row.category)
-                    .map((expert) => (
-                      <MenuItem
-                        key={expert.id}
-                        value={
-                          expert.name +
-                          " " +
-                          expert.surname +
-                          " (" +
-                          expert.id +
-                          ")"
-                        }
+      {
+        field: "priority",
+        headerName: "Priority",
+        flex: 0.8,
+        cellClassName: "priority-column--cell",
+        renderCell: ({row}) => {
+          if (currentUser.role === "Manager" || currentUser.role === "Expert") {
+            return (
+                <>
+                  <Box width="20%" m="0 25px 0 0" p="5px">
+                    <PriorityBadge priority={row.priority}/>
+                  </Box>
+                  {modify.active && modify.id === row.id && (
+                      <Select
+                          sx={{
+                            width: "30%",
+                            height: 30,
+                            borderRadius: 6,
+                            color: "transparent",
+                          }}
+                          onChange={(event) => handlePriorityChange(event, row.id)}
+                          value={row.priority ? row.priority : ""}
                       >
-                        {expert.name +
-                          " " +
-                          expert.surname +
-                          " (" +
-                          expert.id +
-                          ")"}
-                      </MenuItem>
-                    ))}
-                </Select>
-              ) : (
+                        <MenuItem value={"LOW"}>LOW</MenuItem>
+                        <MenuItem value={"MEDIUM"}>MEDIUM</MenuItem>
+                        <MenuItem value={"HIGH"}>HIGH</MenuItem>
+                      </Select>
+                  )}
+                </>
+            );
+          } else {
+            return <PriorityBadge priority={row.priority}/>;
+          }
+        },
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        flex: 1.2,
+        cellClassName: "status-column--cell",
+        renderCell: ({row: {status, id}}) => {
+          if (currentUser.role === "Manager" || currentUser.role === "Expert") {
+            return (
+                <>
+                  <Box
+                      width="60%"
+                      m="0 25px 0 0"
+                      p="5px"
+                      display="flex"
+                      justifyContent={"center"}
+                      backgroundColor={colors.status[status]}
+                      borderRadius={"5px"}
+                  >
+                    <Typography color={colors.primary[400]}>
+                      {status.replace("_", " ")}
+                    </Typography>
+                  </Box>
+                  {modify.active && modify.id === id && (
+                      <Select
+                          sx={{
+                            width: "20%",
+                            height: 30,
+                            borderRadius: 6,
+                            color: "transparent",
+                          }}
+                          value={status}
+                          onChange={(event) => handleStatusChange(event, id)}
+                      >
+                        <MenuItem value={"OPEN"}>Open</MenuItem>
+                        <MenuItem value={"IN_PROGRESS"}>In Progress</MenuItem>
+                        <MenuItem value={"CLOSED"}>Closed</MenuItem>
+                        <MenuItem value={"RESOLVED"}>Resolved</MenuItem>
+                        <MenuItem value={"REOPENED"}>Reopened</MenuItem>
+                      </Select>
+                  )}
+                </>
+            );
+          } else {
+            return <StatusBadge statusValue={status}/>;
+          }
+        },
+      },
+      {
+        field: "expert",
+        headerName: "Expert",
+        flex: 1.2,
+        cellClassName: "expert-column--cell",
+        renderCell: ({row}) => {
+          if (currentUser.role === "Manager" || currentUser.role === "Expert") {
+            return (
+                <FormControl
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "transparent",
+                        },
+                      },
+                    }}
+                >
+                  {modify.active && modify.id === row.id ? (
+                      <Select
+                          onChange={(event) => handleExpertChange(event, row)}
+                          disabled={
+                              row.status === "RESOLVED" || row.status === "CLOSED"
+                          }
+                          value={
+                            row.expert
+                                ? row.expert.name +
+                                " " +
+                                row.expert.surname +
+                                " (" +
+                                row.expert.id +
+                                ")"
+                                : ""
+                          }
+                      >
+                        {experts
+                            .filter((expert) => expert.specialization === row.category)
+                            .map((expert) => (
+                                <MenuItem
+                                    key={expert.id}
+                                    value={
+                                        expert.name +
+                                        " " +
+                                        expert.surname +
+                                        " (" +
+                                        expert.id +
+                                        ")"
+                                    }
+                                >
+                                  {expert.name +
+                                      " " +
+                                      expert.surname +
+                                      " (" +
+                                      expert.id +
+                                      ")"}
+                                </MenuItem>
+                            ))}
+                      </Select>
+                  ) : (
+                      <Typography>
+                        {row.expert
+                            ? row.expert.name + " " + row.expert.surname
+                            : "Not assigned yet"}
+                      </Typography>
+                  )}
+                </FormControl>
+            );
+          } else {
+            return (
                 <Typography>
-                  {row.expert
-                    ? row.expert.name + " " + row.expert.surname
-                    : "Not assigned yet"}
+                  {row.expert ? row.expert.name + " " + row.expert.surname : ""}
                 </Typography>
-              )}
-            </FormControl>
-          );
-        } else {
+            );
+          }
+
+        },
+      },
+      {
+        field: "category",
+        headerName: "Category",
+        flex: 0.7,
+        cellClassName: "category-column--cell",
+      },
+      {
+        field: "order",
+        headerName: "Product",
+        flex: 1,
+        cellClassName: "product-column--cell",
+        valueGetter: ({value}) => value && value.product.description,
+      },
+      {
+        field: "customer",
+        headerName: "Customer",
+        flex: 0.7,
+        cellClassName: "customer-column--cell",
+        valueGetter: ({value}) => value && value.name + " " + value.surname,
+      },
+      {
+        field: "view",
+        headerName: "View Details",
+        flex: 0.5,
+        cellClassName: "view-column--cell",
+        renderCell: ({row}) => {
           return (
-            <Typography>
-              {row.expert ? row.expert.name + " " + row.expert.surname : ""}
-            </Typography>
+              <Button>
+                <VisibilityOutlinedIcon
+                    fontSize="small"
+                    sx={{color: colors.greenAccent[400]}}
+                    onClick={() => {
+                      navigate(`/tickets/${row.id}`);
+                    }}
+                />
+              </Button>
           );
-        }
-        
+        },
       },
-    },
-    {
-      field: "category",
-      headerName: "Category",
-      flex: 0.7,
-      cellClassName: "category-column--cell",
-    },
-    {
-      field: "order",
-      headerName: "Product",
-      flex: 1,
-      cellClassName: "product-column--cell",
-      valueGetter: ({ value }) => value && value.product.description,
-    },
-    {
-      field: "customer",
-      headerName: "Customer",
-      flex: 0.7,
-      cellClassName: "customer-column--cell",
-      valueGetter: ({ value }) => value && value.name + " " + value.surname,
-    },
-    {
-      field: "view",
-      headerName: "View Details",
-      flex: 0.5,
-      cellClassName: "view-column--cell",
-      renderCell: ({ row }) => {
-        return (
-          <Button>
-            <VisibilityOutlinedIcon
-              fontSize="small"
-              sx={{ color: colors.greenAccent[400] }}
-              onClick={() => {
-                navigate(`/tickets/${row.id}`);
-              }}
-            />
-          </Button>
-        );
-      },
-    },
-  ];
+    ];
 
-  if(currentUser.role === "Manager" || currentUser.role === "Expert") {
-    columns.push({
-      field: "action",
-      headerName: "Action",
-      flex: 0.5,
-      cellClassName: "action-column--cell",
-      renderCell: ({ row }) => {
-        return (
-          <Button sx={{ color: colors.greenAccent[400] }}>
-            {modify.active === false && (
-              <Tooltip title="Modify Ticket">
-                <CreateOutlinedIcon
-                  fontSize="small"
-                  onClick={() => {
-                    setModify({ id: row.id, active: !modify.active });
-                    console.log(modify);
-                  }}
-                />
-              </Tooltip>
+    if (currentUser.role === "Manager" || currentUser.role === "Expert") {
+      columns.push({
+        field: "action",
+        headerName: "Action",
+        flex: 0.5,
+        cellClassName: "action-column--cell",
+        renderCell: ({row}) => {
+          return (
+              <Button sx={{color: colors.greenAccent[400]}}>
+                {modify.active === false && (
+                    <Tooltip title="Modify Ticket">
+                      <CreateOutlinedIcon
+                          fontSize="small"
+                          onClick={() => {
+                            setModify({id: row.id, active: !modify.active});
+                            console.log(modify);
+                          }}
+                      />
+                    </Tooltip>
+                )}
+                {modify.active === true && modify.id === row.id && (
+                    <Tooltip title="Save Changes">
+                      <CheckCircleOutlineIcon
+                          fontSize="small"
+                          onClick={() => setModify({id: "", active: !modify.active})}
+                      />
+                    </Tooltip>
+                )}
+              </Button>
+          );
+        },
+      });
+    }
+
+      return (
+          <Box m="20px">
+            <Header title="TICKETS" subtitle="Manage tickets">
+              <HeaderActions>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<AddIcon />}
+                    onClick={() => {
+                      navigate(`/tickets/create`);
+                    }}
+                    sx={{ marginLeft: "15px" }}
+                >
+                  New Ticket
+                </Button>
+              </HeaderActions>
+            </Header>
+
+            {tickets.length === 0 ? (
+                <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    height="400px"
+                >
+                  <SentimentDissatisfiedOutlined style={{ fontSize: 80, color: '#ff4081' }} />
+                  <Typography variant="h3" color="textSecondary">
+                    No tickets found
+                  </Typography>
+                  <Box mt={2}>
+                    <Typography variant="body" color="textSecondary">
+                      Looks like there are no tickets available.
+                    </Typography>
+                  </Box>
+                </Box>
+            ) :  (
+                <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
+                  <DataGrid
+                      rows={tickets}
+                      columns={columns}
+                      loading={!tickets.length}
+                      getRowId={(row) => row.id}
+                      slots={{
+                        toolbar: GridToolbar,
+                      }}
+                      sx={{
+                        height: "70vh",
+                        "& .MuiSelect-select": {
+                          whiteSpace: "break-spaces !important",
+                        },
+                      }}
+                      initialState={{
+                        sorting: {
+                          sortModel: [{ field: "creationTimestamp", sort: "desc" }],
+                        },
+                      }}
+                  />
+                </Box>
             )}
-            {modify.active === true && modify.id === row.id && (
-              <Tooltip title="Save Changes">
-                <CheckCircleOutlineIcon
-                  fontSize="small"
-                  onClick={() => setModify({ id: "", active: !modify.active })}
-                />
-              </Tooltip>
-            )}
-          </Button>
-        );
-      },
-    });
-  }
+          </Box>
+      );
 
-  return (
-    <Box m="20px">
-      <Header title="TICKETS" subtitle="Manage tickets">
-        <HeaderActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            startIcon={<AddIcon />}
-            onClick={() => {
-              navigate(`/tickets/create`);
-            }}
-            sx={{ marginLeft: "15px" }}
-          >
-            New Ticket
-          </Button>
-        </HeaderActions>
-      </Header>
-      <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
-        <DataGrid
-          rows={tickets}
-          columns={columns}
-          loading={!tickets.length}
-          getRowId={(row) => row.id}
-          slots={{
-            toolbar: GridToolbar,
-          }}
-          sx={{
-            height: "70vh",
-            "& .MuiSelect-select": {
-              whiteSpace: "break-spaces !important",
-            },
-          }}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "creationTimestamp", sort: "desc" }],
-            },
-          }}
-        />
-      </Box>
-    </Box>
-  );
-};
-
+    }
+  ;
 export default Tickets;
