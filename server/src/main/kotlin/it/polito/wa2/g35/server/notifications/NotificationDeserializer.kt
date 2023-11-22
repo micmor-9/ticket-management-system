@@ -13,12 +13,10 @@ class NotificationDeserializer : Deserializer<Notification> {
     override fun deserialize(topic: String?, data: ByteArray?): Notification? {
         log.info("Deserializing...")
         return objectMapper.readValue(
-            String(
-                data ?: throw SerializationException("Error when deserializing byte[] to Notification"), UTF_8
-            ), Notification::class.java
+            data?.toString(Charsets.UTF_8),
+            Notification::class.java
         )
     }
 
     override fun close() {}
-
 }

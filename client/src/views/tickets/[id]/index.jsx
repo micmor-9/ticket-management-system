@@ -62,8 +62,8 @@ const Ticket = () => {
   };
 
   const ticketPropertyOrder = [
-    "category",
     "creationTimestamp",
+    "category",
     "customer",
     "expert",
     "product",

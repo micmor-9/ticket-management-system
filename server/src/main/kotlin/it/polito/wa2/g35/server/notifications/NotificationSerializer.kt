@@ -11,9 +11,9 @@ class NotificationSerializer : Serializer<Notification> {
 
     override fun serialize(topic: String?, data: Notification?): ByteArray? {
         log.info("Serializing...")
-        return objectMapper.writeValueAsBytes(
-            data ?: throw SerializationException("Error when serializing Notification to ByteArray[]")
-        )
+        return objectMapper.writeValueAsString(data)
+            ?.toByteArray(Charsets.UTF_8)
     }
+
     override fun close() {}
 }

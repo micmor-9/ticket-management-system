@@ -15,7 +15,7 @@ class NotificationListener {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @KafkaListener(topics = ["\${spring.kafka.topics.notifications}"], groupId = "ppr")
+    @KafkaListener(topics = ["\${spring.kafka.topics.notifications}"], groupId = "kafka-notifications")
     fun listenGroupFoo(consumerRecord: ConsumerRecord<String, Notification>, ack: Acknowledgment) {
         logger.info("Notification received {}", consumerRecord)
         val notification = consumerRecord.value()

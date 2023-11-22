@@ -25,6 +25,7 @@ class NotificationServiceImpl: NotificationService {
         val message: Message<Notification> = MessageBuilder
             .withPayload(notification)
             .setHeader(KafkaHeaders.TOPIC, topic)
+            .setHeader(KafkaHeaders.GROUP_ID, "kafka-notifications")
             .build()
         kafkaTemplate.send(message)
         log.info("Message sent with success")
