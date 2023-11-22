@@ -36,6 +36,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-jose")
     implementation("org.keycloak:keycloak-admin-client:15.0.2")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.springframework.kafka:spring-kafka")
 
     // using new @Observed on class and enaabled @ObservedAspect
     implementation("org.springframework.boot:spring-boot-starter-aop")

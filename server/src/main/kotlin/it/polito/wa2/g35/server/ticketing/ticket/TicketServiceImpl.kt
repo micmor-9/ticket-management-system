@@ -1,6 +1,8 @@
 package it.polito.wa2.g35.server.ticketing.ticket
 
 import io.micrometer.observation.annotation.Observed
+import it.polito.wa2.g35.server.notifications.Notification
+import it.polito.wa2.g35.server.notifications.NotificationService
 import it.polito.wa2.g35.server.products.ProductNotFoundException
 import it.polito.wa2.g35.server.products.ProductService
 import it.polito.wa2.g35.server.products.toProduct
@@ -45,6 +47,9 @@ class TicketServiceImpl(
 
     @Autowired
     lateinit var orderService: OrderService
+
+    @Autowired
+    lateinit var notificationService: NotificationService
 
     private fun filterResultByRole(auth: Authentication, resultTicket: TicketDTO?) : TicketDTO? {
         when (auth.authorities.map { it.authority }[0]) {
@@ -354,6 +359,16 @@ class TicketServiceImpl(
                 ticket = ticket,
                 expert = ticket.expert,
                 category = ticket.category
+            )
+        )
+        notificationService.send(
+            Notification(
+                url = "/tickets/${ticket.id}",
+                description = "Ticket ${ticket.id} status changed to ${ticket.status}",
+                title = "Ticket status changed",
+                recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id),
+                senderId = null,
+                timestamp = Date()
             )
         )
     }
