@@ -11,6 +11,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { AuthContext } from "../../utils/AuthContext";
+import Notifications from "../../components/Notifications";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -43,6 +44,7 @@ const Topbar = () => {
   };
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
+      <Notifications />
       {/* SEARCH BAR */}
       <Box
         display="flex"
