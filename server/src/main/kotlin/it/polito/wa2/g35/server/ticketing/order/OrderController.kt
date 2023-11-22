@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 @CrossOrigin(origins = ["http://localhost:5000"])
 class OrderController(private val orderService: OrderService) {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
-    @GetMapping("/orders/{customerId}/{productId}")
+    /*@GetMapping("/orders/{customerId}/{productId}")
     @PreAuthorize("hasAnyRole('Client', 'Manager')")
     @Observed(
         name = "/orders/{customerId}/{productId}",
@@ -22,7 +22,7 @@ class OrderController(private val orderService: OrderService) {
     fun getOrderByCustomerAndProduct(@PathVariable customerId: String, @PathVariable productId: String): OrderDTO? {
         log.info("Get order by Customer and Product request successful")
         return orderService.getOrderByCustomerAndProduct(customerId, productId)
-    }
+    }*/
 
     @GetMapping("/order/{orderId}")
     @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
@@ -30,7 +30,7 @@ class OrderController(private val orderService: OrderService) {
         name = "/order/{orderId}",
         contextualName = "get-order-by-id-request"
     )
-    fun getOrderByOrderId(@PathVariable orderId: String): OrderDTO? {
+    fun getOrderById(@PathVariable orderId: String): OrderDTO? {
         log.info("Get order by id request successful")
         return orderService.getOrderByOrderId(orderId)
     }
