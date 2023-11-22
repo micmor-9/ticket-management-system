@@ -12,36 +12,37 @@ import {useAuth} from "../../utils/AuthContext";
 import {useDialog} from "../../utils/DialogContext";
 import productsApi from "../../api/products/productsApi";
 
-
 const CreateProductForm = () => {
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [currentUser] = useAuth();
     const [product, setProduct] = useState({
-        id: 0,
-        name : "",
-        description: "",
+        id: "",
+        category : "",
+        product: "",
         price: 0.0,
-        quantity: 0
+        quantity: 0,
+        warrantyDuration: ""
     });
+    const validateForm = () => {
+
+        /* Controllare se esiste l'ordine con quell'id"*/
+
+
+    }
     const handleFormSubmit = async () => {
         console.log(product);
-        /*const productData = {
-            id: product.id,
-            name: product.name,
-            description:  product.description ,
-            price: parseFloat(product.price) ,
-            quantity: parseInt(product.quantity),
-        };*/
+
         const productData = {
-            id: "13",
-            name: "Mac",
-            description: "MacBook Pro",
-            price: 0.0 ,
-            quantity: 10,
-            warrantyDuration: "",
+            id: product.id ,
+            name: product.product,
+            description:  product.category ? product.category : "",
+            price: product.price ? parseFloat(product.price) : 0,
+            quantity: product.quantity ? parseInt(product.quantity) : 0,
+            warrantyDuration: product.warrantyDuration ? product.warrantyDuration : ""
         };
+
         console.log(productData);
         try {
             const response = await productsApi.createProducts(productData);
@@ -49,8 +50,10 @@ const CreateProductForm = () => {
             navigate(-1);
         } catch (error) {
             console.error("An error occurred:", error);
-            if (error.response) {
-                console.log("Server response:", error.response.data);
+            if (error.response.data?.type === "ProductAlreadyExists") {
+                // Handle the case where the product ID already exists
+                // You can show a user-friendly message or take appropriate actions
+                console.log("Product with this ID already exists!");
             }
         }
 
@@ -91,29 +94,23 @@ const CreateProductForm = () => {
             }}
             component="form"
         >
+
             <TextField
                 fullWidth
                 type="text"
-                label="Id"
-                value={product.id}
+                label="Product"
+                value={product.product}
+                required
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("id", e.target.value)}
+                onChange={(e) => handleFieldChange("product", e.target.value)}
             />
             <TextField
                 fullWidth
                 type="text"
-                label="Name"
-                value={product.name}
+                label="Category"
+                value={product.category}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("name", e.target.value)}
-            />
-            <TextField
-                fullWidth
-                type="text"
-                label="Description"
-                value={product.description}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("description", e.target.value)}
+                onChange={(e) => handleFieldChange("category", e.target.value)}
             />
             <TextField
                 fullWidth
@@ -136,6 +133,26 @@ const CreateProductForm = () => {
                 }}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 onChange={(e) => handleFieldChange("quantity", e.target.value)}
+            />
+            <TextField
+                fullWidth
+                type="text"
+                label="Id"
+                value={product.id}
+                required
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                onChange={(e) => handleFieldChange("id", e.target.value)}
+            />
+            <TextField
+                fullWidth
+                type="text"
+                label="Warranty Duration"
+                value={product.warrantyDuration}
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                onChange={(e) => handleFieldChange("warrantyDuration", e.target.value)}
             />
             <Box display="flex" justifyContent="flex-end" gridColumn="span 4">
                 <Button type="button" variant="contained" startIcon={<DeleteIcon/>}

@@ -11,7 +11,6 @@ data class ProductDTO(
 {
     constructor() : this("","", "", 0.0, 0, "")
 }
-
 fun Product.toDTO(): ProductDTO {
     return ProductDTO(this.id, this.name, this.description, this.price, this.quantity, this.warrantyDuration)
 }
