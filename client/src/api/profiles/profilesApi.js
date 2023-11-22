@@ -105,7 +105,7 @@ const getUsernameByEmail = async (email) => {
 
 const createUser = async (userData) => {
   try {
-    const response = await api.post("/customers", userData,{
+    const response = await api.post("/customers/", userData,{
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

@@ -1,5 +1,5 @@
 import {useTheme} from "@emotion/react";
-import {useContext} from "react";
+import React, {useContext} from "react";
 import {AuthContext} from "../../utils/AuthContext";
 import OrdersAPI from "../../api/orders/ordersApi";
 import {useState, useEffect} from "react";
@@ -11,6 +11,7 @@ import { Button, Typography} from "@mui/material";
 import {tokens} from "../../theme";
 import {dataGridStyles} from "../../styles/dataGridStyles";
 import {useDialog} from "../../utils/DialogContext";
+import {SentimentDissatisfiedOutlined} from "@mui/icons-material";
 
 const Orders = () => {
     const theme = useTheme();
@@ -103,6 +104,29 @@ const Orders = () => {
     return (
         <Box m="20px">
             <Header title="ORDERS" subtitle="Orders history"/>
+            {orders.length === 0 ? (
+                <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    height="400px"
+                >
+                    <SentimentDissatisfiedOutlined style={{ fontSize: 80, color: '#ff4081' }} />
+                    <Typography variant="h3" color="textSecondary">
+                        No orders found
+                    </Typography>
+                    <Box mt={3}>
+                        <Typography variant="body" color="textSecondary">
+                            Looks like there are no orders available.
+                        </Typography>
+                        <Typography variant="body1" color="textSecondary">
+                            If you purchase a product, you will see your order here.
+                        </Typography>
+
+                    </Box>
+                </Box>
+            ) : (
             <Box m="40px 0 0 0" height="70vh" sx={dataGridStyles(theme)}>
                 <DataGrid
                     rows={orders}
@@ -117,6 +141,7 @@ const Orders = () => {
                     }}
                 />
             </Box>
+                )}
         </Box>
     );
 };

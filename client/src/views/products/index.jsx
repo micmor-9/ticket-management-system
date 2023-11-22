@@ -1,4 +1,15 @@
-import { Box, Button, InputLabel, MenuItem, Modal, Select, Stack, TextField, Tooltip, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  MenuItem,
+  Modal,
+  Select,
+  Stack,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import Header from "../../components/Header";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import React, { useEffect, useState, useContext } from "react";
@@ -9,9 +20,8 @@ import { tokens } from "../../theme";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import OrdersAPI from "../../api/orders/ordersApi";
 import { useDialog } from "../../utils/DialogContext";
-import CheckIcon from "@mui/icons-material/Check";
 import DeleteIcon from "@mui/icons-material/Delete";
-
+import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 
 const Products = () => {
   const theme = useTheme();
@@ -22,7 +32,10 @@ const Products = () => {
   const [selectQty, setSelectQty] = useState(false);
   const [productId, setProductId] = useState(null);
   const [maxQuantity, setMaxQuantity] = useState(0);
-  
+  const [productName, setProductName] = useState("");
+  const [productPrice, setProductPrice] = useState(0);
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -33,7 +46,7 @@ const Products = () => {
       }
     };
     fetchProducts();
-  }, [currentUser.role, currentUser.id]);
+  }, [currentUser.role, currentUser.id, showDialog]);
 
   const handleBuyNow = (event, row) => {
     event.preventDefault();
@@ -57,8 +70,6 @@ const Products = () => {
       warrantyDuration: warrantyDuration,
     };
 
-    console.log("productToOrder", productToOrder )
-
     OrdersAPI.createOrder(productToOrder)
       .then((response) => {
         showDialog("Order created successfully", "success");
@@ -66,9 +77,8 @@ const Products = () => {
       .catch((error) => {
         showDialog("Error while creating order", "error");
       });
-  }
+  };
 
-  const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => {
     setOpen(false);
@@ -86,7 +96,7 @@ const Products = () => {
     border: "2px solid #000",
     boxShadow: 24,
     borderRadius: "20px",
-    p: 6,
+    p: 3,
   };
   const quantityValue = [...Array(maxQuantity).keys()].map((num) => num + 1);
 
@@ -96,8 +106,11 @@ const Products = () => {
     { field: "description", headerName: "Product", flex: 1 },
     { field: "price", headerName: "Price ($)", flex: 1 },
     { field: "quantity", headerName: "Quantity", flex: 1 },
-    { field: "warrantyDuration", headerName: "Warranty Duration", flex: 1},
-    {
+    { field: "warrantyDuration", headerName: "Warranty Duration", flex: 1 },
+  ];
+
+  if (currentUser.role === "Client") {
+    columns.push({
       field: "action",
       headerName: "Action",
       flex: 1,
@@ -107,91 +120,124 @@ const Products = () => {
           <>
             {selectQty === true ? (
               <Modal open={open} onClose={handleModalClose}>
-                <Stack sx={style}>
-                  <Stack direction="row" alignItems="baseline" spacing={4}>
-                    <Typography id="modal-modal-title" variant="h3">
-                      Select quantity
-                    </Typography>
-                   {/* /********* OPTION 1 *********/} 
-                    <Select
-                      value={quantity}
-                      onChange={(event) => setQuantity(event.target.value)}
-                    >
-                      {quantityValue.map((value) => (
-                        <MenuItem value={value} key={value}>
-                          {value}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {/* new order
-                    quantità
-                    prezzo totale in base alla quantita */}
-                  </Stack>
-                  <Stack
+                <Stack sx={style} spacing={2}>
+                  <Typography variant="h2">New Order</Typography>
+                  <Grid container alignItems="center" spacing={2}>
+                    <Grid item xs={8}>
+                      <Typography variant="h5">Order info: </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography variant="h5">{productName}</Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography variant="h5">Select quantity: </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Select
+                        value={quantity}
+                        onChange={(event) => setQuantity(event.target.value)}
+                        size="small"
+                      >
+                        {quantityValue.map((value) => (
+                          <MenuItem value={value} key={value}>
+                            {value}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography variant="h5">Sub Total: </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography variant="h5">
+                        {productPrice * quantity}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid
+                    item
+                    container
                     direction="row"
-                    alignItems="center"
-                    spacing={2}
                     justifyContent="flex-end"
-                    mt={4}
+                    spacing={2}
+                    xs={11}
                   >
-                    <Button
-                      variant="contained"
-                      startIcon={<DeleteIcon />}
-                      size="small"
-                      onClick={() => {
-                        handleModalClose();
-                        setQuantity(1);
-                      }}
-                      sx={{
-                        backgroundColor: colors.redAccent[600],
-                        margin: "0 20px 0 0",
-                        "&:hover": {
-                          backgroundColor: colors.redAccent[500],
-                        },
-                      }}
-                    >
-                      CANCEL
-                    </Button>
-                    <Button
-                      variant="contained"
-                      startIcon={<AddShoppingCartIcon />}
-                      size="small"
-                      sx={{
-                        backgroundColor: colors.greenAccent[600],
-                        marginRight: "0px",
-                        "&:hover": {
-                          backgroundColor: colors.greenAccent[400],
-                        },
-                      }}
-                      onClick={(event) => {handleBuyNow(event, row); handleModalClose(); setQuantity(1);}}
-                    >
-                      ORDER NOW
-                    </Button>
-                  </Stack>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        startIcon={<DeleteIcon />}
+                        size="small"
+                        onClick={() => {
+                          handleModalClose();
+                          setQuantity(1);
+                        }}
+                        sx={{
+                          backgroundColor: colors.redAccent[600],
+                          "&:hover": {
+                            backgroundColor: colors.redAccent[500],
+                          },
+                        }}
+                      >
+                        CANCEL
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        startIcon={<AddShoppingCartIcon />}
+                        size="small"
+                        sx={{
+                          backgroundColor: colors.greenAccent[600],
+                          "&:hover": {
+                            backgroundColor: colors.greenAccent[400],
+                          },
+                        }}
+                        onClick={(event) => {
+                          handleBuyNow(event, row);
+                          handleModalClose();
+                          setQuantity(1);
+                        }}
+                      >
+                        ORDER NOW
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </Stack>
               </Modal>
             ) : (
-              <Tooltip title="Buy now">
-                <AddShoppingCartIcon
-                  fontSize="small"
-                  sx={{
-                    color: colors.greenAccent[400],
-                    "&:hover": { color: colors.greenAccent[600] },
-                  }}
-                  onClick={() => {
-                    setSelectQty(true);
-                    handleModalOpen();
-                    setProductId(row.id);
-                    setMaxQuantity(row.quantity);
-                  }}
-                />
+              <Tooltip title={row.quantity > 0 ? "Buy now" : "Available soon!"}>
+                {row.quantity > 0 ? (
+                  <AddShoppingCartIcon
+                    fontSize="small"
+                    sx={{
+                      color: colors.greenAccent[400],
+                      "&:hover": { color: colors.greenAccent[600] },
+                    }}
+                    onClick={() => {
+                      setSelectQty(true);
+                      handleModalOpen();
+                      setProductId(row.id);
+                      setMaxQuantity(row.quantity);
+                      setProductName(row.description);
+                      setProductPrice(row.price);
+                    }}
+                  />
+                ) : (
+                  <RemoveShoppingCartIcon
+                    fontSize="small"
+                    sx={{
+                      color: colors.redAccent[400],
+                      "&:hover": { color: colors.redAccent[600] },
+                    }}
+                  />
+                )}
               </Tooltip>
             )}
           </>
         );
       },
-    },
-  ];
+    });
+  }
 
   return (
     <Box m="20px">

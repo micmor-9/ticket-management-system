@@ -14,6 +14,7 @@ import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.order.OrderNotFoundException
 import it.polito.wa2.g35.server.ticketing.order.OrderService
 import it.polito.wa2.g35.server.ticketing.order.WarrantyExpiredException
+import it.polito.wa2.g35.server.ticketing.order.toOrder
 import it.polito.wa2.g35.server.ticketing.ticketStatus.TicketStatusDTO
 import it.polito.wa2.g35.server.ticketing.ticketStatus.TicketStatusService
 import org.slf4j.Logger
@@ -182,12 +183,14 @@ class TicketServiceImpl(
             log.error("No Customer found with this Id: $ticket.customerId")
             throw ProfileNotFoundException("Customer not found with this id!")
         }
-        val product = productService.getProductById(ticket.productId)
-            if(product==null){
-                log.error("No Product found with this Id: $ticket.productId")
-                throw ProductNotFoundException("Product not found with this id!")
-            }
-        val warranty = orderService.getOrderByCustomerAndProduct(customer.email, product.id)
+        val order = orderService.getOrderByOrderId(ticket.orderId)
+
+        if(order == null){
+            log.error("No Order found with this Id: $ticket.orderId")
+            throw OrderNotFoundException("Order not found with this id!")
+        }
+
+        val warranty = orderService.getOrderByCustomerAndProduct(customer.email, order.product.id)
             if(warranty == null){
                 log.error("No Warranty found with those Customer: $ticket.customerId and Product: $ticket.productId")
                 throw OrderNotFoundException("Order not found with this combination of product and customer!")
@@ -204,7 +207,7 @@ class TicketServiceImpl(
                     null,
                     TicketStatusValues.OPEN,
                     null,
-                    product.toProduct(),
+                    order.toOrder(),
                     customer.toCustomer(),
                     ticket.category
                 )
@@ -292,7 +295,7 @@ class TicketServiceImpl(
                     throw TicketStatusValueInvalidException("Ticket Status not valid!")
                 },
                 expert,
-                currentTicket.product,
+                currentTicket.order,
                 currentTicket.customer,
                 ticket.category
             )
