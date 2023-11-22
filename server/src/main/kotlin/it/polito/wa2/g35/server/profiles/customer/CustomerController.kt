@@ -65,7 +65,7 @@ class CustomerController(private val customerService: CustomerService) {
 
 
 
-    @PostMapping("/customers/")
+    /*@PostMapping("/customers/")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('Manager', 'Client','Expert')")
     @Observed(
@@ -84,7 +84,7 @@ class CustomerController(private val customerService: CustomerService) {
             log.info("Create Profile request successful")
             return customerService.createCustomer(p)
         }
-    }
+    }*/
 
 
 
