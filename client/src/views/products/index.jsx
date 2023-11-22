@@ -1,4 +1,4 @@
-import { Box, useTheme } from "@mui/material";
+import {Box, Button, useTheme} from "@mui/material";
 import Header from "../../components/Header";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +6,8 @@ import { useEffect, useState, useContext } from "react";
 import ProductsAPI from "../../api/products/productsApi";
 import { AuthContext } from "../../utils/AuthContext";
 import { dataGridStyles } from "../../styles/dataGridStyles";
+import AddIcon from "@mui/icons-material/Add";
+import HeaderActions from "../../components/HeaderActions";
 
 const Products = () => {
   const theme = useTheme();
@@ -36,7 +38,21 @@ const Products = () => {
 
   return (
     <Box m="20px">
-      <Header title="PRODUCTS" subtitle="Products catalog" />
+      <Header title="PRODUCTS" subtitle="Products catalog" >
+        {currentUser.role === "Manager" && (
+        <HeaderActions>
+          <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<AddIcon/>}
+              onClick={() => {
+                navigate(`/products/create`)
+              }}
+              sx={{marginLeft: "15px"}}
+          >New Product
+          </Button>
+        </HeaderActions>)}
+      </Header>
       <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
         <DataGrid
           rows={products}

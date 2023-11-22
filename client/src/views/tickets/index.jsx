@@ -243,7 +243,7 @@ const Tickets = () => {
   return (
     <Box m="20px">
       <Header title="TICKETS" subtitle="Manage tickets">
-        {currentUser.role === "Client" || currentUser.role === "Manager" && (
+        {(currentUser.role === "Client" || currentUser.role === "Manager") && (
             <HeaderActions>
               <Button
                   variant="contained"

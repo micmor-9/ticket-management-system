@@ -6,15 +6,16 @@ data class ProductDTO(
     var description: String?,
     var price: Double?,
     var quantity: Int?,
+    val warrantyDuration: String?
 )
 {
-    constructor() : this("","", "", 0.0, 0)
+    constructor() : this("","", "", 0.0, 0, "")
 }
 
 fun Product.toDTO(): ProductDTO {
-    return ProductDTO(this.id, this.name, this.description, this.price, this.quantity)
+    return ProductDTO(this.id, this.name, this.description, this.price, this.quantity, this.warrantyDuration)
 }
 
 fun ProductDTO.toProduct(): Product {
-    return Product(this.id, this.name, this.description, this.price, this.quantity)
+    return Product(this.id, this.name, this.description, this.price, this.quantity, this.warrantyDuration)
 }

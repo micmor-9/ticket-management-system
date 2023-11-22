@@ -15,6 +15,7 @@ import Orders from "./views/orders";
 import CreateTicket from "./views/tickets/create";
 import CreateUser from "./views/users/create";
 import MyAccount from "./views/myaccount";
+import CreateProduct from "./views/products/create";
 function App() {
     const [theme, colorMode] = useMode();
     const [currentUser, setCurrentUser] = useAuth();
@@ -60,6 +61,7 @@ function App() {
                                 <Route path="/users" element={<Users/>}/>
                                 <Route path="/users/create" element={<CreateUser/>}/>
                                 <Route path="/products" element={<Products/>}/>
+                                <Route path="/products/create" element={<CreateProduct/>}/>
                                 <Route path="/tickets" element={<Tickets/>}/>
                                 <Route path="/tickets/:ticketId" element={<Ticket/>}/>
                                 <Route path="/orders" element={<Orders/>}/>
