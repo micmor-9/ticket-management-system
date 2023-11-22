@@ -15,6 +15,9 @@ import Orders from "./views/orders";
 import CreateTicket from "./views/tickets/create";
 import CreateUser from "./views/users/create";
 import MyAccount from "./views/myaccount";
+import CreateUserForm from "./components/forms/CreateUserForm";
+import Signup from "./views/Signup";
+
 function App() {
     const [theme, colorMode] = useMode();
     const [currentUser, setCurrentUser] = useAuth();
@@ -23,7 +26,7 @@ function App() {
     const token = localStorage.getItem("token");
 
     useEffect(() => {
-        if (!token) {
+        if (!token && window.location.pathname !== '/signup') {
             navigate("/login");
         }
     }, [token, navigate]);
@@ -58,7 +61,6 @@ function App() {
                             <Routes>
                                 <Route path="/" element={<Dashboard/>}/>
                                 <Route path="/users" element={<Users/>}/>
-                                <Route path="/users/create" element={<CreateUser/>}/>
                                 <Route path="/products" element={<Products/>}/>
                                 <Route path="/tickets" element={<Tickets/>}/>
                                 <Route path="/tickets/:ticketId" element={<Ticket/>}/>

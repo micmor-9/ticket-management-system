@@ -65,13 +65,12 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
         }
     }
 
-    /*override fun createCustomer(profile: CustomerDTO?, password: String): CustomerDTO? {
+    override fun createCustomer(profile: CustomerDTO?): CustomerDTO? {
         return if (profile != null) {
             val checkIfProfileExists = profileRepository.findByEmail(profile.email)
             if(checkIfProfileExists == null) {
                 log.info("Create Customer request successful (repository)")
-                authService.signupCustomer(SignupCustomerRequest(profile.email, profile.name,  profile.surname, profile.contact, profile.address1, profile.address2,
-                ))
+                profileRepository.save(Customer(profile.id,profile.email,profile.name,profile.surname,profile.contact,profile.address1,profile.address2)).toDTO()
             } else {
                 log.error("Profile with given email already exists!")
                 throw DuplicateProfileException("Profile with given email already exists!")
@@ -80,7 +79,7 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
             log.error("Create Customer request failed")
             null
         }
-    }*/
+    }
 
     override fun updateCustomer(profile: CustomerDTO?): CustomerDTO? {
         return if(profile != null) {

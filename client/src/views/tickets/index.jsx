@@ -40,6 +40,7 @@ const Tickets = () => {
   const [modify, setModify] = useState({id: '', active: false});
 
 
+
   useEffect(() => {
     const fetchTickets = async () => {
       try {

@@ -1,3 +1,5 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -8,13 +10,12 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import {login} from "../../api/auth/authApi";
-import {useNavigate} from "react-router-dom";
-import {useDialog} from "../../utils/DialogContext";
+import { login } from "../../api/auth/authApi";
+import { useDialog } from "../../utils/DialogContext";
 
 export default function Login() {
     const navigate = useNavigate();
-    const {showDialog} = useDialog();
+    const { showDialog } = useDialog();
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -27,7 +28,9 @@ export default function Login() {
         login(loginRequest)
             .then((response) => {
                 showDialog("Logged in successfully", "success");
-                setTimeout(navigate("/"), 1000);
+                setTimeout(() => {
+                    navigate("/");
+                }, 1000);
             })
             .catch((error) => {
                 showDialog("Wrong email and/or password!", "error");
@@ -36,7 +39,7 @@ export default function Login() {
 
     return (
         <Container component="main" maxWidth="xs">
-            <CssBaseline/>
+            <CssBaseline />
             <Box
                 sx={{
                     marginTop: 8,
@@ -45,13 +48,13 @@ export default function Login() {
                     alignItems: "center",
                 }}
             >
-                <Avatar sx={{m: 1, bgcolor: "secondary.main"}}>
-                    <LockOutlinedIcon/>
+                <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                    <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
                         required
@@ -76,10 +79,22 @@ export default function Login() {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{mt: 3, mb: 2}}
+                        sx={{ mt: 3, mb: 2 }}
                     >
                         Login
                     </Button>
+                    <Button
+                        type="button"
+                        onClick={() => {
+                            navigate("/signup");
+                        }}
+                        fullWidth
+                        variant="outlined"
+                        sx={{ mt: 1, mb: 2 }}
+                    >
+                        Sign Up
+                    </Button>
+
                     <Grid container>
                         <Grid item xs>
                             <Link href="#" variant="body2">
