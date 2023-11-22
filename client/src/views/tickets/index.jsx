@@ -248,7 +248,7 @@ const Tickets = () => {
               },
             }}
           >
-            {currentUser.role === "Client" ? (
+            {currentUser.role === "Client" || currentUser.role === "Expert" ? (
                 row.expert ? (row.expert.name + " " + row.expert.surname) : "Not assigned yet"
             ) : (
               <Select
@@ -342,7 +342,7 @@ const Tickets = () => {
   return (
     <Box m="20px">
       <Header title="TICKETS" subtitle="Manage tickets">
-        {currentUser.role === "Client" || currentUser.role === "Manager" && (
+        {(currentUser.role === "Client" || currentUser.role === "Manager") && (
             <HeaderActions>
               <Button
                   variant="contained"
