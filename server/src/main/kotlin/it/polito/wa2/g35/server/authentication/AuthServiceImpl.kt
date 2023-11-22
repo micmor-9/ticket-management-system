@@ -104,7 +104,6 @@ class AuthServiceImpl() : AuthService  {
             log.error("Error creating customer! ${e.message}")
             return null
         }
-        customerService.createCustomer(customerDTO)
         log.info("Customer created! $customerDTO")
         return customerDTO
     }
@@ -142,7 +141,7 @@ class AuthServiceImpl() : AuthService  {
             signupRequest.id,
             signupRequest.name,
             signupRequest.surname,
-            signupRequest.specialization,
+            signupRequest.email,
             signupRequest.specialization
         )
 

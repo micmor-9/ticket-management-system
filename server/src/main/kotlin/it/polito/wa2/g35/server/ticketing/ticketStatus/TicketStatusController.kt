@@ -23,7 +23,7 @@ class TicketStatusController(private val ticketStatusService: TicketStatusServic
         contextualName = "post-ticket-status-request"
     )
     fun postTicketStatus(
-        @RequestBody ts: T  icketStatusDTO,
+        @RequestBody ts: TicketStatusDTO,
     ) {
         ticketStatusService.createTicketStatus(ts)
     }*/

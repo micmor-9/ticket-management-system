@@ -3,6 +3,7 @@ package it.polito.wa2.g35.server.ticketing.ticket
 import it.polito.wa2.g35.server.products.Product
 import it.polito.wa2.g35.server.profiles.customer.Customer
 import it.polito.wa2.g35.server.profiles.employee.expert.Expert
+import it.polito.wa2.g35.server.ticketing.order.Order
 import jakarta.persistence.*
 import java.util.*
 
@@ -30,8 +31,8 @@ class Ticket(
     var expert: Expert?,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    var product: Product,
+    @JoinColumn(name = "order_id")
+    var order: Order,
 
     @ManyToOne(fetch = FetchType.LAZY)
     var customer: Customer,

@@ -102,17 +102,17 @@ const CreateTicketForm = () => {
                 category: ticketArea,
             };
 
-            TicketsAPI.createTicket(createTicketRequest)
-                .then((response) => {
-                    setTimeout(navigate(-1), 1000);
-                    showDialog("Ticket created successfully", "success");
-                })
-                .catch((error) => {
-                    console.log(error);
-                    alert("Ticket creation error");
-                });
-        }
-    };
+      TicketsAPI.createTicket(createTicketRequest)
+        .then((response) => {
+          setTimeout(navigate(-1), 1000);
+          showDialog("Ticket created successfully", "success");
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Ticket creation error");
+        });
+    }
+  };
 
     const disabledTextFieldStyle = {
         "& .Mui-disabled": {

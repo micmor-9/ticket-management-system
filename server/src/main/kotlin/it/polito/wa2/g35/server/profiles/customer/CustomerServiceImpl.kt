@@ -1,5 +1,7 @@
 package it.polito.wa2.g35.server.profiles.customer
 
+import it.polito.wa2.g35.server.authentication.AuthService
+import it.polito.wa2.g35.server.authentication.SignupCustomerRequest
 import it.polito.wa2.g35.server.profiles.DuplicateProfileException
 import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
 import it.polito.wa2.g35.server.profiles.UnauthorizedProfileException
@@ -7,13 +9,13 @@ import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.ticket.TicketController
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
 @Service
 class CustomerServiceImpl(private val profileRepository: CustomerRepository) : CustomerService {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
-
     override fun getCustomer(customerEmail: String): CustomerDTO? {
         val profile = profileRepository.findByEmail(customerEmail)?.toDTO()
         if(profile != null) {
@@ -63,14 +65,13 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
         }
     }
 
-    override fun createCustomer(profile: CustomerDTO?): CustomerDTO? {
+    /*override fun createCustomer(profile: CustomerDTO?, password: String): CustomerDTO? {
         return if (profile != null) {
             val checkIfProfileExists = profileRepository.findByEmail(profile.email)
             if(checkIfProfileExists == null) {
                 log.info("Create Customer request successful (repository)")
-                profileRepository.save(Customer(profile.id, profile.email, profile.name, profile.surname, profile.contact, profile.address1,
-                    profile.address2
-                )).toDTO()
+                authService.signupCustomer(SignupCustomerRequest(profile.email, profile.name,  profile.surname, profile.contact, profile.address1, profile.address2,
+                ))
             } else {
                 log.error("Profile with given email already exists!")
                 throw DuplicateProfileException("Profile with given email already exists!")
@@ -79,7 +80,7 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
             log.error("Create Customer request failed")
             null
         }
-    }
+    }*/
 
     override fun updateCustomer(profile: CustomerDTO?): CustomerDTO? {
         return if(profile != null) {

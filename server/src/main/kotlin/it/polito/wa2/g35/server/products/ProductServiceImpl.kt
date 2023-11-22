@@ -53,4 +53,21 @@ class ProductServiceImpl(
             null
         }
     }
+    @Observed(
+        name = "/products/{productId}",
+        contextualName = "put-product-request-service"
+    )
+    override fun updateProductAvailability(productId: String, quantity: Int): ProductDTO? {
+        val product = productRepository.findByIdOrNull(productId)
+        if(product != null) {
+            log.info("Update product availability request successful (repository)")
+            product.quantity = product.quantity?.minus(quantity)
+            productRepository.save(product)
+            return product.toDTO()
+        }
+        else {
+            log.error("Product not found with this product id!")
+            throw ProductNotFoundException("Product not found with this product id!")
+        }
+    }
 }
