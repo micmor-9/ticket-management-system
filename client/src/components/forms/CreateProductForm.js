@@ -25,6 +25,14 @@ const CreateProductForm = () => {
         quantity: 0,
         warrantyDuration: ""
     });
+    const [errors, setErrors] = useState({
+        id: "",
+        category : "",
+        product: "",
+        price: "",
+        quantity: "",
+        warrantyDuration: ""
+    });
     const validateForm = () => {
 
         /* Controllare se esiste l'ordine con quell'id"*/
@@ -32,28 +40,63 @@ const CreateProductForm = () => {
 
     }
     const handleFormSubmit = async () => {
-        console.log(product);
-
-        const productData = {
-            id: product.id ,
-            name: product.product,
-            description:  product.category ? product.category : "",
-            price: product.price ? parseFloat(product.price) : 0,
-            quantity: product.quantity ? parseInt(product.quantity) : 0,
-            warrantyDuration: product.warrantyDuration ? product.warrantyDuration : ""
+        const newErrors = {};
+        const validateLength = (field, value, name, min, max) => {
+            if (value.length === 0) {
+                newErrors[field] = "Required";
+            } else if (value.length < min) {
+                newErrors[field] = `${name} is too short`;
+            } else if (value.length > max) {
+                newErrors[field] = `${name} is too long`;
+            }
         };
 
-        console.log(productData);
-        try {
-            const response = await productsApi.createProducts(productData);
-            console.log(response);
-            navigate(-1);
-        } catch (error) {
-            console.error("An error occurred:", error);
-            if (error.response.data?.type === "ProductAlreadyExists") {
-                // Handle the case where the product ID already exists
-                // You can show a user-friendly message or take appropriate actions
-                console.log("Product with this ID already exists!");
+        validateLength("id", product.id, "Id", 1, 50);
+        validateLength("product", product.product, "Product", 2, 50);
+        if (product.category.length > 0) {
+            validateLength("category", product.category, "Category", 2, 50);
+        }
+        if (product.price.length > 0) {
+            validateLength("price", product.price, "Price", 1, 10);
+        }
+        if (product.quantity.length > 0) {
+            validateLength("quantity", product.quantity, "Quantity", 1, 10);
+        }
+        if (product.warrantyDuration.length > 0) {
+            const warranty = product.warrantyDuration.split(" ");
+            if(!isNaN(parseInt(warranty[0]))){
+                if(warranty[1]!== "years" && warranty[1]!== "month"){
+                    newErrors["warrantyDuration"] = "Wrong format [years/month]"
+
+                }
+            }
+            else {
+                newErrors["warrantyDuration"] = "Wrong format [number required]"
+            }
+        }
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length === 0) {
+            const productData = {
+                id: product.id ,
+                name: product.product,
+                description:  product.category ? product.category : "",
+                price: product.price ? parseFloat(product.price) : 0,
+                quantity: product.quantity ? parseInt(product.quantity) : 0,
+                warrantyDuration: product.warrantyDuration ? product.warrantyDuration : ""
+            };
+
+            try {
+                const response = await productsApi.createProducts(productData);
+                console.log(response);
+                navigate(-1);
+            } catch (error) {
+                console.error("An error occurred:", error);
+                if (error.response.data.status === 409) {
+                    alert("Product creation error");
+                    setErrors({...errors, id: "Product with this ID already exists!"});
+                    console.log("Product with this ID already exists!");
+                    // Handle the duplicate scenario on the client side
+                }
             }
         }
 
@@ -101,6 +144,8 @@ const CreateProductForm = () => {
                 label="Product"
                 value={product.product}
                 required
+                error={Boolean(errors.product)}
+                helperText={errors.product}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 onChange={(e) => handleFieldChange("product", e.target.value)}
             />
@@ -109,6 +154,8 @@ const CreateProductForm = () => {
                 type="text"
                 label="Category"
                 value={product.category}
+                error={Boolean(errors.category)}
+                helperText={errors.category}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 onChange={(e) => handleFieldChange("category", e.target.value)}
             />
@@ -117,6 +164,8 @@ const CreateProductForm = () => {
                 type="number"
                 label="Price"
                 value={product.price}
+                error={Boolean(errors.price)}
+                helperText={errors.price}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 InputLabelProps={{
                     shrink: true,
@@ -131,6 +180,8 @@ const CreateProductForm = () => {
                 InputLabelProps={{
                     shrink: true,
                 }}
+                error={Boolean(errors.quantity)}
+                helperText={errors.quantity}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 onChange={(e) => handleFieldChange("quantity", e.target.value)}
             />
@@ -140,6 +191,8 @@ const CreateProductForm = () => {
                 label="Id"
                 value={product.id}
                 required
+                error={Boolean(errors.id)}
+                helperText={errors.id}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 onChange={(e) => handleFieldChange("id", e.target.value)}
             />
@@ -151,6 +204,8 @@ const CreateProductForm = () => {
                 InputLabelProps={{
                     shrink: true,
                 }}
+                error={Boolean(errors.warrantyDuration)}
+                helperText={errors.warrantyDuration}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 onChange={(e) => handleFieldChange("warrantyDuration", e.target.value)}
             />
@@ -169,18 +224,18 @@ const CreateProductForm = () => {
                     Cancel
                 </Button>
                 {currentUser.role === "Manager" && (
-                <Button type="button" startIcon={<SendIcon/>} variant="contained"
-                        sx={{
-                            backgroundColor: colors.greenAccent[600],
-                            marginRight: "0px",
-                            "&:hover": {
-                                backgroundColor: colors.greenAccent[400],
-                            },
-                        }}
-                        onClick={handleFormSubmit}
-                >
-                    Create New product
-                </Button>)}
+                    <Button type="button" startIcon={<SendIcon/>} variant="contained"
+                            sx={{
+                                backgroundColor: colors.greenAccent[600],
+                                marginRight: "0px",
+                                "&:hover": {
+                                    backgroundColor: colors.greenAccent[400],
+                                },
+                            }}
+                            onClick={handleFormSubmit}
+                    >
+                        Create New product
+                    </Button>)}
             </Box>
         </Box>
     );
