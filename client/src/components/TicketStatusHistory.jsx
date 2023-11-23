@@ -33,6 +33,47 @@ const TicketStatusHistory = ({ history, expand }) => {
     REOPENED: <LoopIcon sx={iconStyles("REOPENED")} />,
   };
 
+    const getStatusChangeDescription = (currentStatus, previousStatus, currentExpert, previousExpert) => {
+        if (!previousStatus && !previousExpert) {
+            return `Ticket Opened`
+        }
+
+        let changeDescription = '';
+
+        if (currentStatus !== previousStatus) {
+            switch (currentStatus) {
+                case 'IN_PROGRESS':
+                    changeDescription = 'Ticket Is Now In Progress';
+                    break;
+                case 'CLOSED':
+                    changeDescription = 'Ticket Has Been Closed';
+                    break;
+                case 'RESOLVED':
+                    changeDescription = 'Ticket Has Been Resolved';
+                    break;
+                case 'REOPENED':
+                    changeDescription = 'Ticket Has Been Reopened';
+                    break;
+                // Aggiungi altri casi secondo necessità
+                default:
+                    changeDescription = `Stato non gestito: ${currentStatus}`;
+            }
+        }
+
+
+
+        if (currentExpert  !== previousExpert) {
+            if (changeDescription) {
+                // Aggiungi una nuova riga solo se c'è già qualcosa in changeDescription
+                changeDescription += ' and ';
+            }
+            changeDescription += 'Expert Assigned To your Ticket is changed.'
+
+        }
+
+        return changeDescription
+    };
+
   return (
     <Box
       sx={{
@@ -113,9 +154,16 @@ const TicketStatusHistory = ({ history, expand }) => {
               <TimelineOppositeContent
                 sx={{ py: "12px", px: 2, textAlign: "start" }}
               >
-                <Typography variant="h6" component="span">
-                  Changes from previous status
-                </Typography>
+                  <Typography variant="h5" component="span">
+                      {console.log(history[idx].expert)}
+                      {getStatusChangeDescription(
+
+                          history[idx].status,
+                          idx > 0 ? history[idx - 1].status : null,
+                          idx > 0 ? history[idx].expert.id : null,
+                          idx > 1 ? history[idx - 1].expert.id : null,
+                      )}
+                  </Typography>
               </TimelineOppositeContent>
             </TimelineItem>
           ))}

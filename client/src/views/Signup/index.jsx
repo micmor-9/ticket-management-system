@@ -99,6 +99,7 @@ const Signup = () => {
             try {
                 const response = await authApi.signup(profileData);
                 console.log(response);
+                navigate("/login")
             } catch (error) {
                 console.error("An error occurred:", error);
             }
