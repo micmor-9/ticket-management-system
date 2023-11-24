@@ -4,7 +4,6 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 import React, {useEffect, useState} from "react";
-import TicketsAPI from "../../api/tickets/ticketsApi";
 import {useNavigate, useParams} from "react-router-dom";
 import {useTheme} from "@emotion/react";
 import {tokens} from "../../theme";
@@ -17,6 +16,7 @@ const CreateProductForm = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [currentUser] = useAuth();
+    const {showDialog} = useDialog();
     const [product, setProduct] = useState({
         id: "",
         category : "",
@@ -33,12 +33,7 @@ const CreateProductForm = () => {
         quantity: "",
         warrantyDuration: ""
     });
-    const validateForm = () => {
 
-        /* Controllare se esiste l'ordine con quell'id"*/
-
-
-    }
     const handleFormSubmit = async () => {
         const newErrors = {};
         const validateLength = (field, value, name, min, max) => {
@@ -66,12 +61,11 @@ const CreateProductForm = () => {
             const warranty = product.warrantyDuration.split(" ");
             if(!isNaN(parseInt(warranty[0]))){
                 if(warranty[1]!== "years" && warranty[1]!== "month"){
-                    newErrors["warrantyDuration"] = "Wrong format [years/month]"
-
+                    newErrors["warrantyDuration"] = "Wrong format"
                 }
             }
             else {
-                newErrors["warrantyDuration"] = "Wrong format [number required]"
+                newErrors["warrantyDuration"] = "Wrong format"
             }
         }
         setErrors(newErrors);
@@ -88,11 +82,12 @@ const CreateProductForm = () => {
             try {
                 const response = await productsApi.createProducts(productData);
                 console.log(response);
+                showDialog("Product created", "success");
                 navigate(-1);
             } catch (error) {
                 console.error("An error occurred:", error);
                 if (error.response.data.status === 409) {
-                    alert("Product creation error");
+                    showDialog("Product creation error", "error");
                     setErrors({...errors, id: "Product with this ID already exists!"});
                     console.log("Product with this ID already exists!");
                     // Handle the duplicate scenario on the client side
@@ -122,6 +117,7 @@ const CreateProductForm = () => {
     };
 
     return (
+        currentUser.role==="Manager" && (
         <Box
             display="grid"
             gap="30px"
@@ -237,7 +233,7 @@ const CreateProductForm = () => {
                         Create New product
                     </Button>)}
             </Box>
-        </Box>
+        </Box>)
     );
 
 }
