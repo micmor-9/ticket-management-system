@@ -28,6 +28,7 @@ class CustomerController(private val customerService: CustomerService) {
 
     @GetMapping("/customers/id/{customerEmail}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
     @Observed(
         name = "/customers/id/{customerEmail}",
         contextualName = "get-profile-request"
@@ -39,6 +40,7 @@ class CustomerController(private val customerService: CustomerService) {
 
     @GetMapping("/customers/{email}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
     @Observed(
         name = "/customers/{email}",
         contextualName = "get-profile-request"
@@ -65,6 +67,7 @@ class CustomerController(private val customerService: CustomerService) {
 
     @PostMapping("/customers/")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
     @Observed(
         name = "/customers/",
         contextualName = "post-profile-request"
