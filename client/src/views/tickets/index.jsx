@@ -25,7 +25,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import Button from "@mui/material/Button";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import {SentimentDissatisfied, SentimentDissatisfiedOutlined} from "@mui/icons-material";
+import {SentimentDissatisfiedOutlined} from "@mui/icons-material";
 
 const Tickets = () => {
   const theme = useTheme();

@@ -35,7 +35,7 @@ const Orders = () => {
             }
         };
         fetchOrders();
-    }, [currentUser.id, currentUser.role, currentUser.email]);
+    }, [currentUser.id, currentUser.role, currentUser.email, showDialog]);
 
     const columns = [
       { field: "id", headerName: "ID" },
