@@ -190,6 +190,19 @@ class TicketServiceImpl(
             throw OrderNotFoundException("Order not found with this id!")
         }
 
+        val tickets = customer.id?.let { order.id?.let { it1 ->
+            ticketRepository.getTicketsByCustomerIdAndOrderId(it,
+                it1
+            )
+        } }
+
+        if (tickets != null) {
+            if (tickets.isNotEmpty()) {
+                log.error("Create ticket failed, ticket already exists")
+                throw TicketAlreadyExistsException("Ticket already exists!")
+            }
+        }
+
         val warranty = orderService.getOrderByCustomerAndProduct(customer.email, order.product.id)
             if(warranty == null){
                 log.error("No Warranty found with those Customer: $ticket.customerId and Product: $ticket.productId")

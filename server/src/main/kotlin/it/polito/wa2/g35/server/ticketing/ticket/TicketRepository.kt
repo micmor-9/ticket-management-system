@@ -14,4 +14,5 @@ interface TicketRepository: JpaRepository<Ticket, Long> {
 
      fun getTicketsByCustomerEmailOrderByCreationTimestampAsc(idCustomer: String) : List<Ticket>?
 
+     fun getTicketsByCustomerIdAndOrderId(customerId: Int, orderId: Long) : List<Ticket>?
 }
