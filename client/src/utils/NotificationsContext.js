@@ -26,6 +26,7 @@ export const useNotifications = () => {
             });
 
             client.onConnect = () => {
+                sessionStorage.setItem("notifications", notifications ? btoa(JSON.stringify(notifications)) : btoa(null));
                 subscriptionRef.current = client.subscribe(
                     `/topic/notifications-${currentUser.id}`,
                     (message) => {

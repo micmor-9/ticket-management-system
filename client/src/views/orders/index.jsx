@@ -26,7 +26,7 @@ const Orders = () => {
     useEffect(() => {
         setTimeout(() => {
             setIsLoading(false);
-        }, 2000)
+        }, 500)
     }, []);
 
     useEffect(() => {
