@@ -37,14 +37,13 @@ const Orders = () => {
                     ordersData = await OrdersAPI.getAllOrders();
                 if (currentUser.role === "Client")
                     ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
-                console.log("ordersData", ordersData);
                 setOrders(ordersData);
             } catch (error) {
                 showDialog("Error while fetching orders", "error");
             }
         };
         fetchOrders();
-    }, [currentUser.id, currentUser.role, currentUser.email]);
+    }, [currentUser.id, currentUser.role, currentUser.email, showDialog]);
 
     const columns = [
         {field: "id", headerName: "ID"},
