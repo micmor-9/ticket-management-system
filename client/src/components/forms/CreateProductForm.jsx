@@ -133,7 +133,6 @@ const CreateProductForm = () => {
             }}
             component="form"
         >
-
             <TextField
                 fullWidth
                 type="text"
