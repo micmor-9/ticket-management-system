@@ -261,6 +261,7 @@ class TicketServiceImpl(
             log.error("Update Ticket failed by ticket status conflict")
             throw TicketStatusUpdateConflictException("Ticket Status update conflict!")
         }
+
         val authentication = SecurityContextHolder.getContext().authentication
         val ticketToUpdate: Ticket?
         when (authentication.authorities.map { it.authority }[0]) {

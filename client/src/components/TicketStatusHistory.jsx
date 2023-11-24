@@ -156,9 +156,8 @@ return (
                 sx={{ py: "12px", px: 2, textAlign: "start" }}
               >
                   <Typography variant="h5" component="span">
-                      {console.log(history[idx].expert)}
+                    {console.log(history[idx])}
                       {getStatusChangeDescription(
-
                           history[idx].status,
                           idx > 0 ? history[idx - 1].status : null,
                           idx > 0 ? history[idx].expert.id : null,
