@@ -16,9 +16,6 @@ import CreateTicket from "./views/tickets/create";
 import CreateUser from "./views/users/create";
 import MyAccount from "./views/myaccount";
 
-import CreateUserForm from "./components/forms/CreateUserForm";
-import Signup from "./views/Signup";
-
 import {NotificationsContext, useNotifications} from "./utils/NotificationsContext";
 
 
@@ -33,11 +30,10 @@ function App() {
 
     useEffect(() => {
 
-        if (!token && window.location.pathname !== '/signup') {
-
+        if (!token && location.pathname !== '/signup') {
             navigate("/login");
         }
-    }, [token, navigate]);
+    }, [token, navigate, location.pathname]);
 
     return (
         <AuthContext.Provider value={[currentUser, setCurrentUser]}>
