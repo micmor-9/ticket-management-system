@@ -105,11 +105,7 @@ const getUsernameByEmail = async (email) => {
 
 const createUser = async (userData) => {
   try {
-    const response = await api.post("/customers", userData,{
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    const response = await api.post("/customers/", userData);
     return response.data;
   } catch (error) {
     handleApiError(error);

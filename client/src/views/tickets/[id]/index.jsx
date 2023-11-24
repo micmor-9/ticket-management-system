@@ -41,6 +41,7 @@ const Ticket = () => {
         const ticketStatusData = await TicketsAPI.getTicketStatusByTicketId(
           ticketId
         );
+        console.log(ticketData);
         setTicket(ticketData);
         setTicketStatus(ticketStatusData);
       } catch (error) {
@@ -62,11 +63,11 @@ const Ticket = () => {
   };
 
   const ticketPropertyOrder = [
-    "category",
     "creationTimestamp",
+    "category",
     "customer",
     "expert",
-    "product",
+    "order",
     "status",
     "priority",
     "issueDescription",
@@ -180,6 +181,14 @@ const Ticket = () => {
                                       : value}
                                   </Typography>
                                 )}
+                                {key === "order" ? (
+                                    <Typography
+                                      variant="h5"
+                                      sx={ticketPropertyValueStyles}
+                                    >
+                                      {value && value.id ? value.id : "N/A"}
+                                    </Typography>
+                                ) : null}
                               </Grid>
                             )}
                           </Fragment>

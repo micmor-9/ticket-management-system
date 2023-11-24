@@ -7,13 +7,7 @@ const api = axios.create({
         "Content-Type": "application/json",
     },
 });
-const ticketStatusApi = axios.create({
-    baseURL: `${backendUrl}`,
-    headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-});
+
 const handleApiError = (error) => {
     console.log("Error during API call:", error);
     throw error;
@@ -98,33 +92,36 @@ const updateTicket = async (ticketId, ticketData) => {
 };
 
 const updateTicketStatus = async (ticketId, status) => {
-    try {
-        const response = await api.patch(`/tickets/${ticketId}/status/${status}`, null, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            }
-        });
-        return response.data;
-    } catch (error) {
-        handleApiError(error);
-    }
+  try {
+    const response = await api.patch(`/tickets/${ticketId}/status/${status}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
 };
 
 const updateTicketPriority = async (ticketId, priority) => {
-    try {
-        const response = await api.patch(
-            `/tickets/${ticketId}/priority/${priority}`,
-            null,
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                }
-            }
-        );
-        return response.data;
-    } catch (error) {
-        handleApiError(error);
-    }
+  try {
+    const response = await api.patch(
+        `/tickets/${ticketId}/priority/${priority}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
 };
 
 const updateTicketExpert = async (ticketId, expertId) => {
@@ -145,16 +142,16 @@ const updateTicketExpert = async (ticketId, expertId) => {
 }
 
 const getTicketStatusByTicketId = async (ticketId) => {
-    try {
-        const response = await ticketStatusApi.get(`/status/${ticketId}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            }
-        });
-        return response.data;
-    } catch (error) {
-        handleApiError(error);
-    }
+  try {
+    const response = await api.get(`/status/${ticketId}`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
 };
 
 const TicketsAPI = {

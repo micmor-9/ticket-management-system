@@ -23,14 +23,14 @@ class TicketStatusController(private val ticketStatusService: TicketStatusServic
         contextualName = "post-ticket-status-request"
     )
     fun postTicketStatus(
-        @RequestBody ts: T  icketStatusDTO,
+        @RequestBody ts: TicketStatusDTO,
     ) {
         ticketStatusService.createTicketStatus(ts)
     }*/
 
     @GetMapping("/status/{ticketId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('Manager')")
+    @PreAuthorize("hasAnyRole('Manager', 'Client', 'Expert')")
     @Observed(
         name = "status/{ticketId}",
         contextualName = "get-ticket-status-request"

@@ -1,5 +1,7 @@
 package it.polito.wa2.g35.server.products
 
+import java.util.Date
+
 data class ProductDTO(
     val id: String,
     val name: String,

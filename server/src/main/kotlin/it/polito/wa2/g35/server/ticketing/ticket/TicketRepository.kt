@@ -6,12 +6,13 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TicketRepository: JpaRepository<Ticket, Long> {
 
-     fun getTicketsByStatus(status: TicketStatusValues) : List<Ticket>?
+     fun getTicketsByStatusOrderByCreationTimestampAsc(status: TicketStatusValues) : List<Ticket>?
 
-     fun getTicketsByExpertId(idExpert: String) : List<Ticket>?
+     fun getTicketsByExpertIdOrderByCreationTimestampAsc(idExpert: String) : List<Ticket>?
 
-     fun getTicketsByPriority(priority: TicketPriority) : List<Ticket>?
+     fun getTicketsByPriorityOrderByCreationTimestampAsc(priority: TicketPriority) : List<Ticket>?
 
-     fun getTicketsByCustomerEmail(idCustomer: String) : List<Ticket>?
+     fun getTicketsByCustomerEmailOrderByCreationTimestampAsc(idCustomer: String) : List<Ticket>?
 
+     fun getTicketsByCustomerIdAndOrderId(customerId: Int, orderId: Long) : List<Ticket>?
 }

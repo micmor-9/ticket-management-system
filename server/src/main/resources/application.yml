@@ -12,7 +12,7 @@ spring:
           preferred_instant_jdbc_type: TIMESTAMP
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
   security:
     oauth2:
       resourceserver:
@@ -20,6 +20,10 @@ spring:
           issuer-uri: http://host.docker.internal:8080/realms/SpringBootKeycloak
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
           resource-id: springboot-keycloak-client
+  kafka:
+    bootstrapAddress: http://host.docker.internal:29092
+    topics:
+      notifications: notifications
 
 keycloak:
   admin-username: admin
@@ -30,6 +34,7 @@ logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
+    root: info
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql: TRACE
 

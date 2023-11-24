@@ -5,19 +5,26 @@ import it.polito.wa2.g35.server.exceptions.BadRequestException
 import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
 import it.polito.wa2.g35.server.ticketing.ticket.TicketController
 import jakarta.validation.Valid
+import org.aspectj.weaver.tools.cache.SimpleCacheFactory.enabled
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.BindingResult
-
+import org.keycloak.admin.client.Keycloak
+import org.keycloak.admin.client.KeycloakBuilder
+import org.keycloak.representations.idm.CredentialRepresentation
+import org.keycloak.representations.idm.UserRepresentation
+import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.*
+
 
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = ["http://localhost:5000"])
 class CustomerController(private val customerService: CustomerService) {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+
 
     @GetMapping("/customers/id/{customerEmail}")
     @ResponseStatus(HttpStatus.OK)
@@ -43,6 +50,7 @@ class CustomerController(private val customerService: CustomerService) {
         return customerService.getCustomerByEmail(email)
     }
 
+
     @GetMapping("/customers")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager', 'Expert')")
@@ -55,8 +63,11 @@ class CustomerController(private val customerService: CustomerService) {
         return customerService.getAllCustomers()
     }
 
-    @PostMapping("/customers")
+
+
+    @PostMapping("/customers/")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
     @Observed(
         name = "/customers/",
         contextualName = "post-profile-request"
@@ -74,6 +85,9 @@ class CustomerController(private val customerService: CustomerService) {
             return customerService.createCustomer(p)
         }
     }
+
+
+
 
     @PutMapping("/customers/{email}")
     @ResponseStatus(HttpStatus.OK)

@@ -1,7 +1,7 @@
 package it.polito.wa2.g35.server.products
 
 import jakarta.persistence.*
-import org.hibernate.annotations.GenericGenerator
+import java.util.Date
 
 
 @Entity

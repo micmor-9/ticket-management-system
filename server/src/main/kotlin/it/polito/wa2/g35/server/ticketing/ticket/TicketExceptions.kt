@@ -34,3 +34,4 @@ class TicketStatusValueInvalidException(message : String) : RuntimeException(mes
 class TicketPriorityInvalidException(message: String) : RuntimeException(message)
 class TicketStatusUpdateConflictException(message: String) : RuntimeException(message)
 class UnauthorizedTicketException(message: String) : RuntimeException(message)
+class TicketAlreadyExistsException(message: String) : RuntimeException(message)

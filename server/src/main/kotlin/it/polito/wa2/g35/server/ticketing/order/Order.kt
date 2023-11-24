@@ -9,7 +9,7 @@ import java.util.Date
 @Table(name = "orders")
 class Order (
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(updatable = false, nullable = false)
     var id: Long? = null,
 
@@ -25,5 +25,5 @@ class Order (
     @ManyToOne(fetch = FetchType.LAZY)
     val product: Product,
 
-    val quantity: Int?
+    val quantity: Int
 )

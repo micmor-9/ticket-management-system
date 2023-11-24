@@ -50,7 +50,7 @@ class ProductServiceImpl(
             val checkIfProductExists = productRepository.findByIdOrNull(product.id)
             if(checkIfProductExists == null) {
                 log.info("Create product request successful (repository)")
-                productRepository.save(Product(product.id, product.name, product.description, product.price,product.quantity, product.warrantyDuration)).toDTO()
+                productRepository.save(Product(product.id, product.name, product.description, product.price, product.quantity, product.warrantyDuration)).toDTO()
             } else {
                 log.error("Product with given id already exists!")
                 throw DuplicateProductException("Product with given id already exists!")
@@ -59,6 +59,11 @@ class ProductServiceImpl(
             null
         }
     }
+    
+    @Observed(
+        name = "/products",
+        contextualName = "put-product-request-service"
+    )
     override fun updateProduct(product: ProductDTO?): ProductDTO? {
         return if(product != null) {
             val checkIfProductExists = productRepository.findByIdOrNull(product.id)
@@ -84,4 +89,21 @@ class ProductServiceImpl(
     }
 
 
+    @Observed(
+        name = "/products/{productId}",
+        contextualName = "put-product-request-service"
+    )
+    override fun updateProductAvailability(productId: String, quantity: Int): ProductDTO? {
+        val product = productRepository.findByIdOrNull(productId)
+        if(product != null) {
+            log.info("Update product availability request successful (repository)")
+            product.quantity = product.quantity?.minus(quantity)
+            productRepository.save(product)
+            return product.toDTO()
+        }
+        else {
+            log.error("Product not found with this product id!")
+            throw ProductNotFoundException("Product not found with this product id!")
+        }
+    }
 }

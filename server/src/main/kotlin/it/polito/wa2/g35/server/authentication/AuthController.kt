@@ -1,7 +1,9 @@
 package it.polito.wa2.g35.server.authentication
 
 import io.micrometer.observation.annotation.Observed
+import it.polito.wa2.g35.server.profiles.customer.Customer
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
+import it.polito.wa2.g35.server.profiles.customer.toDTO
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,6 +50,7 @@ class AuthController {
     )
     fun signup(@RequestBody signupRequest: SignupCustomerRequest): ResponseEntity<String> {
         if (authService.signupCustomer(signupRequest) != null) {
+            customerService.createCustomer(Customer(null,signupRequest.email,signupRequest.name,signupRequest.surname,signupRequest.contact,signupRequest.address1,signupRequest.address2).toDTO())
             log.info("Signup request successful of the user ${signupRequest.email}")
             return ResponseEntity.ok("User created!")
         } else {
@@ -72,5 +75,6 @@ class AuthController {
             return ResponseEntity("Expert already exists", HttpStatus.CONFLICT)
         }
     }
+    
 
 }

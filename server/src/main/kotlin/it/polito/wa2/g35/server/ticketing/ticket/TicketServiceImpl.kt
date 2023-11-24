@@ -1,6 +1,8 @@
 package it.polito.wa2.g35.server.ticketing.ticket
 
 import io.micrometer.observation.annotation.Observed
+import it.polito.wa2.g35.server.notifications.Notification
+import it.polito.wa2.g35.server.notifications.NotificationService
 import it.polito.wa2.g35.server.products.ProductNotFoundException
 import it.polito.wa2.g35.server.products.ProductService
 import it.polito.wa2.g35.server.products.toProduct
@@ -12,6 +14,7 @@ import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.order.OrderNotFoundException
 import it.polito.wa2.g35.server.ticketing.order.OrderService
 import it.polito.wa2.g35.server.ticketing.order.WarrantyExpiredException
+import it.polito.wa2.g35.server.ticketing.order.toOrder
 import it.polito.wa2.g35.server.ticketing.ticketStatus.TicketStatusDTO
 import it.polito.wa2.g35.server.ticketing.ticketStatus.TicketStatusService
 import org.slf4j.Logger
@@ -45,6 +48,9 @@ class TicketServiceImpl(
 
     @Autowired
     lateinit var orderService: OrderService
+
+    @Autowired
+    lateinit var notificationService: NotificationService
 
     private fun filterResultByRole(auth: Authentication, resultTicket: TicketDTO?) : TicketDTO? {
         when (auth.authorities.map { it.authority }[0]) {
@@ -114,7 +120,7 @@ class TicketServiceImpl(
         try {
             val statusValue = TicketStatusValues.valueOf(status.uppercase())
             val authentication = SecurityContextHolder.getContext().authentication
-            val listTicket = ticketRepository.getTicketsByStatus(statusValue)?.map { it.toDTO() }
+            val listTicket = ticketRepository.getTicketsByStatusOrderByCreationTimestampAsc(statusValue)?.map { it.toDTO() }
             log.info("Get tickets by status request from repository successful")
             return filterListResultByRole(authentication, listTicket)
         } catch (e: IllegalArgumentException) {
@@ -130,7 +136,7 @@ class TicketServiceImpl(
             throw ProfileNotFoundException("No Expert found with this Id!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
-        val listTicket = ticketRepository.getTicketsByExpertId(idExpert)?.map { it.toDTO() }
+        val listTicket = ticketRepository.getTicketsByExpertIdOrderByCreationTimestampAsc(idExpert)?.map { it.toDTO() }
         log.info("Get tickets by expert request from repository successful")
         return filterListResultByRole(authentication, listTicket) as? List<TicketDTO> ?: emptyList()
     }
@@ -142,7 +148,7 @@ class TicketServiceImpl(
         try {
             val priorityValue = TicketPriority.valueOf(priority.uppercase())
             val authentication = SecurityContextHolder.getContext().authentication
-            val listTicket = ticketRepository.getTicketsByPriority(priorityValue)?.map { it.toDTO() }
+            val listTicket = ticketRepository.getTicketsByPriorityOrderByCreationTimestampAsc(priorityValue)?.map { it.toDTO() }
             log.info("Get tickets by priority request from repository successful")
             return filterListResultByRole(authentication, listTicket)
         } catch (e: IllegalArgumentException) {
@@ -161,7 +167,7 @@ class TicketServiceImpl(
             throw ProfileNotFoundException("Customer not found with this Id!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
-        val listTicket = ticketRepository.getTicketsByCustomerEmail(idCustomer)?.map { it.toDTO() }
+        val listTicket = ticketRepository.getTicketsByCustomerEmailOrderByCreationTimestampAsc(idCustomer)?.map { it.toDTO() }
         log.info("Get tickets by customer request from repository successful")
         return filterListResultByRole(authentication, listTicket)
     }
@@ -177,12 +183,27 @@ class TicketServiceImpl(
             log.error("No Customer found with this Id: $ticket.customerId")
             throw ProfileNotFoundException("Customer not found with this id!")
         }
-        val product = productService.getProductById(ticket.productId)
-            if(product==null){
-                log.error("No Product found with this Id: $ticket.productId")
-                throw ProductNotFoundException("Product not found with this id!")
+        val order = orderService.getOrderByOrderId(ticket.orderId)
+
+        if(order == null){
+            log.error("No Order found with this Id: $ticket.orderId")
+            throw OrderNotFoundException("Order not found with this id!")
+        }
+
+        val tickets = customer.id?.let { order.id?.let { it1 ->
+            ticketRepository.getTicketsByCustomerIdAndOrderId(it,
+                it1
+            )
+        } }
+
+        if (tickets != null) {
+            if (tickets.isNotEmpty()) {
+                log.error("Create ticket failed, ticket already exists")
+                throw TicketAlreadyExistsException("Ticket already exists!")
             }
-        val warranty = orderService.getOrderByCustomerAndProduct(customer.email, product.id)
+        }
+
+        val warranty = orderService.getOrderByCustomerAndProduct(customer.email, order.product.id)
             if(warranty == null){
                 log.error("No Warranty found with those Customer: $ticket.customerId and Product: $ticket.productId")
                 throw OrderNotFoundException("Order not found with this combination of product and customer!")
@@ -199,7 +220,7 @@ class TicketServiceImpl(
                     null,
                     TicketStatusValues.OPEN,
                     null,
-                    product.toProduct(),
+                    order.toOrder(),
                     customer.toCustomer(),
                     ticket.category
                 )
@@ -287,7 +308,7 @@ class TicketServiceImpl(
                     throw TicketStatusValueInvalidException("Ticket Status not valid!")
                 },
                 expert,
-                currentTicket.product,
+                currentTicket.order,
                 currentTicket.customer,
                 ticket.category
             )
@@ -354,6 +375,16 @@ class TicketServiceImpl(
                 ticket = ticket,
                 expert = ticket.expert,
                 category = ticket.category
+            )
+        )
+        notificationService.send(
+            Notification(
+                url = "/tickets/${ticket.id}",
+                description = "Ticket ${ticket.id} status changed to ${ticket.status}",
+                title = "Ticket status changed",
+                recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id),
+                senderId = null,
+                timestamp = Date()
             )
         )
     }

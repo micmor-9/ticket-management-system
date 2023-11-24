@@ -115,7 +115,9 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
             log.error("No Product found with this Id: $order.productId")
             throw ProductNotFoundException("Product not found with this id!")
         }
+        productService.updateProductAvailability(order.productId, order.quantity)
         log.info("Create order request successful (repository9")
+
         return orderRepository.save(
             Order(
                 null,
