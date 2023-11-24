@@ -225,9 +225,22 @@ const Products = () => {
   }
 
   return (
-    <Box m="20px">
-      <Header title="PRODUCTS" subtitle="Products catalog" />
-      <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
+      <Box m="20px">
+        <Header title="PRODUCTS" subtitle="Products catalog">
+          <HeaderActions>
+            <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<AddIcon/>}
+                onClick={() => {
+                  navigate(`/products/create`)
+                }}
+                sx={{marginLeft: "15px"}}
+            >New Product
+            </Button>
+          </HeaderActions>
+        </Header>
+        <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
         <DataGrid
           rows={products}
           columns={columns}
@@ -247,41 +260,7 @@ const Products = () => {
         />
       </Box>
     </Box>
-  );
-  // QUESTA E' LA PARTE DI LUCA DA INTEGRARE CON DEV (CHE SAREBBE LA PARTE SUCCESSIVA)
-  //   return (
-  //     <Box m="20px">
-  //       <Header title="PRODUCTS" subtitle="Products catalog" >
-  //         {currentUser.role === "Manager" && (
-  //         <HeaderActions>
-  //           <Button
-  //               variant="contained"
-  //               color="secondary"
-  //               startIcon={<AddIcon/>}
-  //               onClick={() => {
-  //                 navigate(`/products/create`)
-  //               }}
-  //               sx={{marginLeft: "15px"}}
-  //           >New Product
-  //           </Button>
-  //         </HeaderActions>)}
-  //       </Header>
-  //       <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
-  //         <DataGrid
-  //           rows={products}
-  //           columns={columns}
-  //           getRowId={(row) => row.id}
-  //           slots={{
-  //             toolbar: GridToolbar,
-  //           }}
-  //           loading={!products.length}
-  //           sx={{
-  //             height: "70vh",
-  //           }}
-  //         />
-  //       </Box>
-  //     </Box>
-  //   );
+  )
 };
 
 export default Products;
