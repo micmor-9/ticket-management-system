@@ -127,7 +127,7 @@ class TicketController(private val ticketService: TicketService) {
                 throw TicketConflictException("Ticket with given id doesn't exists!")
     }
 
-    @PatchMapping("/tickets/{ticketId}/status/{status}")
+   /* @PatchMapping("/tickets/{ticketId}/status/{status}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager','Expert')")
     @Observed(
@@ -140,7 +140,7 @@ class TicketController(private val ticketService: TicketService) {
     ) {
         log.info("Update ticket status successful")
         ticketService.updateTicketStatus(ticketId, status)
-    }
+    }*/
 
     @PatchMapping("/tickets/{ticketId}/priority/{priority}")
     @ResponseStatus(HttpStatus.OK)
@@ -157,7 +157,7 @@ class TicketController(private val ticketService: TicketService) {
         ticketService.updateTicketPriority(ticketId, priority)
     }
 
-    @PatchMapping("/tickets/{ticketId}/expert/{expertId}")
+   /* @PatchMapping("/tickets/{ticketId}/expert/{expertId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager')")
     @Observed(
@@ -171,5 +171,5 @@ class TicketController(private val ticketService: TicketService) {
 
         log.info("Update ticket expert successful")
         ticketService.updateTicketExpert(ticketId, expertId)
-    }
+    }*/
 }

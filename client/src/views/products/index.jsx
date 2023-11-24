@@ -1,4 +1,4 @@
-import { Box, Button, useTheme } from "@mui/material";
+import {Box, Button, Grid, MenuItem, Modal, Select, Stack, Tooltip, Typography, useTheme} from "@mui/material";
 import Header from "../../components/Header";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import React, { useEffect, useState, useContext } from "react";
@@ -7,6 +7,16 @@ import { AuthContext } from "../../utils/AuthContext";
 import { dataGridStyles } from "../../styles/dataGridStyles";
 import AddIcon from "@mui/icons-material/Add";
 import HeaderActions from "../../components/HeaderActions";
+import {tokens} from "../../theme";
+import {useDialog} from "../../utils/DialogContext";
+import OrdersAPI from "../../api/orders/ordersApi";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {useNavigate} from "react-router-dom";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
+
+
+
 
 const Products = () => {
   const theme = useTheme();
@@ -20,6 +30,7 @@ const Products = () => {
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState(0);
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {

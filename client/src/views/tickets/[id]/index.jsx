@@ -6,7 +6,7 @@ import {
   useTheme,
   Typography,
   Paper,
-  Collapse,
+  Collapse, Divider,
 } from "@mui/material";
 import { tokens } from "../../../theme";
 import Header from "../../../components/Header";
@@ -197,6 +197,7 @@ const Ticket = () => {
                   </Grid>
                 </Collapse>
               )}
+
               <Typography
                 variant="h4"
                 mb={1}
@@ -216,7 +217,9 @@ const Ticket = () => {
                     />
                   )}
                 </Button>
+
               </Typography>
+
               {ticket && ticketStatus && (
                 <TicketStatusHistory
                   history={ticketStatus}
