@@ -25,9 +25,33 @@ const getAllProducts = async () => {
         handleApiError(error);
     }
 };
+const createProducts = async (productData) => {
+    try {
+        const response = await api.post("/products", productData,{
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
+};
 
+const updateProducts = async (id, productData) => {
+    try {
+        const response = await api.put(`/products/{id}`, productData, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
+};
 const ProductsAPI = {
-    getAllProducts,
+    getAllProducts, createProducts, updateProducts
 };
 
 export default ProductsAPI;
