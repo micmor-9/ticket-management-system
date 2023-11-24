@@ -2,6 +2,8 @@ package it.polito.wa2.g35.server.products
 
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.exceptions.BadRequestException
+import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
+import it.polito.wa2.g35.server.profiles.customer.CustomerDTO
 import it.polito.wa2.g35.server.ticketing.ticket.TicketController
 import jakarta.validation.Valid
 import org.slf4j.Logger
@@ -59,5 +61,31 @@ class ProductController(private val productService: ProductService) {
             log.info("Create Product request successful")
             return productService.createProduct(p)
         }
+    }
+
+    @PutMapping("/products/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('Manager')")
+    @Observed(
+        name = "/customers/{email}",
+        contextualName = "put-profile-request"
+    )
+    fun updateProfile(
+        @PathVariable("id") id: String,
+        @RequestBody @Valid p: ProductDTO,
+        br: BindingResult
+    ) : ProductDTO? {
+        if (br.hasErrors()){
+            log.error("Update Profile failed by bad request format")
+            throw BadRequestException("Bad request format!")
+        }
+        else
+            if (id == p.id) {
+                log.info("Update Profile request successful")
+                return productService.updateProduct(p)
+            } else {
+                log.error("Profile with given email doesn't exists!")
+                throw ProfileNotFoundException("Profile with given email doesn't exists!")
+            }
     }
 }
