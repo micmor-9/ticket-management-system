@@ -39,37 +39,42 @@ const Tickets = () => {
     const {showDialog} = useDialog();
     const [modify, setModify] = useState({id: '', active: false});
 
-    useEffect(() => {
-        const fetchTickets = async () => {
-            try {
-                let ticketsData = [];
-                let expertsData = [];
-                if (currentUser.role === "Client") {
-                    ticketsData = await TicketsAPI.getTicketsByCustomer(
-                        currentUser.email
-                    );
-                    expertsData = ticketsData.map((ticket) => ticket.expert);
-                }
-                if (currentUser.role === "Expert")
-                    ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
-                if (currentUser.role === "Manager") {
-                    ticketsData = await TicketsAPI.getTickets();
-                    expertsData = await ProfilesAPI.getAllExperts();
-                }
-                setExperts(expertsData);
-                setTickets(ticketsData);
-            } catch (error) {
-                showDialog("Error while fetching tickets", "error");
-            }
-        };
-        fetchTickets();
-    }, [
-        currentUser.id,
-        currentUser.role,
-        currentUser.email,
-        ticketUpdated,
-        showDialog,
-    ]);
+
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        let ticketsData = [];
+        let expertsData = [];
+        if (currentUser.role === "Client") {
+          ticketsData = await TicketsAPI.getTicketsByCustomer(
+              currentUser.email
+          );
+          expertsData = ticketsData.map((ticket) => ticket.expert);
+        }
+        if (currentUser.role === "Expert") {
+          ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
+          expertsData = await ProfilesAPI.getAllExperts();
+        }
+        if (currentUser.role === "Manager") {
+          ticketsData = await TicketsAPI.getTickets();
+          expertsData = await ProfilesAPI.getAllExperts();
+        }
+        setExperts(expertsData);
+        setTickets(ticketsData);
+      } catch (error) {
+        showDialog("Error while fetching tickets", "error");
+      }
+    };
+    fetchTickets();
+  }, [
+    currentUser.id,
+    currentUser.role,
+    currentUser.email,
+    ticketUpdated,
+    showDialog,
+  ]);
+
 
     const handleExpertChange = (event, row) => {
         const selectedExpertName = event.target.value;

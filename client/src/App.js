@@ -15,7 +15,12 @@ import Orders from "./views/orders";
 import CreateTicket from "./views/tickets/create";
 import CreateUser from "./views/users/create";
 import MyAccount from "./views/myaccount";
+
+import CreateUserForm from "./components/forms/CreateUserForm";
+import Signup from "./views/Signup";
+
 import {NotificationsContext, useNotifications} from "./utils/NotificationsContext";
+
 
 function App() {
     const [theme, colorMode] = useMode();
@@ -27,7 +32,9 @@ function App() {
     const token = localStorage.getItem("token");
 
     useEffect(() => {
-        if (!token && location.pathname !== "/signup") {
+
+        if (!token && window.location.pathname !== '/signup') {
+
             navigate("/login");
         }
     }, [token, navigate]);
@@ -35,6 +42,7 @@ function App() {
     return (
         <AuthContext.Provider value={[currentUser, setCurrentUser]}>
             <ColorModeContext.Provider value={colorMode}>
+
                 <NotificationsContext.Provider value={[notifications, setNotifications]}>
                     <ThemeProvider theme={theme}>
                         <CssBaseline/>
