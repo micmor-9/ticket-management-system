@@ -5,6 +5,7 @@ import App from "./App";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Login from "./views/login";
 import {DialogProvider} from "./utils/DialogContext";
+import Signup from "./views/Signup";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -14,6 +15,7 @@ root.render(
                 <Routes>
                     <Route path="/*" element={<App/>}/>
                     <Route path="/login" element={<Login/>}/>
+                    <Route path="/signup" element={<Signup/>}/>
                 </Routes>
             </BrowserRouter>
         </DialogProvider>

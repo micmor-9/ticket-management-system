@@ -1,25 +1,25 @@
 import {
-  Box,
-  Typography,
-  useTheme,
-  Select,
-  MenuItem,
-  FormControl,
-  Tooltip,
+    Box,
+    Typography,
+
+    useTheme,
+    Select,
+    MenuItem,
+    FormControl,Tooltip,
 } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { tokens } from "../../theme";
+import {DataGrid, GridToolbar} from "@mui/x-data-grid";
+import {tokens} from "../../theme";
 import Header from "../../components/Header";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../../utils/AuthContext";
-import { dataGridStyles } from "../../styles/dataGridStyles";
+import React, {useContext, useEffect, useState} from "react";
+import {AuthContext} from "../../utils/AuthContext";
+import {dataGridStyles} from "../../styles/dataGridStyles";
 import PriorityBadge from "../../components/PriorityBadge";
 import StatusBadge from "../../components/StatusBadge";
 import AddIcon from "@mui/icons-material/Add";
 import HeaderActions from "../../components/HeaderActions";
-import { useDialog } from "../../utils/DialogContext";
+import {useDialog} from "../../utils/DialogContext";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ProfilesAPI from "../../api/profiles/profilesApi";
@@ -28,16 +28,17 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import {SentimentDissatisfiedOutlined} from "@mui/icons-material";
 
 const Tickets = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
 
-  const [tickets, setTickets] = useState([]);
-  const [experts, setExperts] = useState([]);
-  const [ticketUpdated, setTicketUpdated] = useState(false);
-  const [currentUser] = useAuth();
-  const navigate = useNavigate();
-  const {showDialog} = useDialog();
-  const [modify, setModify] = useState({id: '', active: false});
+    const [tickets, setTickets] = useState([]);
+    const [experts, setExperts] = useState([]);
+    const [ticketUpdated, setTicketUpdated] = useState(false);
+    const [currentUser] = useContext(AuthContext);
+    const navigate = useNavigate();
+    const {showDialog} = useDialog();
+    const [modify, setModify] = useState({id: '', active: false});
+
 
 
   useEffect(() => {
@@ -74,13 +75,14 @@ const Tickets = () => {
     showDialog,
   ]);
 
-  const handleExpertChange = (event, row) => {
-    const selectedExpertName = event.target.value;
-    const expertId = selectedExpertName.split("(")[1].split(")")[0];
 
-    const ticketId = row.id;
+    const handleExpertChange = (event, row) => {
+        const selectedExpertName = event.target.value;
+        const expertId = selectedExpertName.split("(")[1].split(")")[0];
 
-    TicketsAPI.updateTicketExpert(ticketId, expertId)
+        const ticketId = row.id;
+
+        TicketsAPI.updateTicketExpert(ticketId, expertId)
         .then((response) => {
           setTicketUpdated(() => !ticketUpdated);
           showDialog("Ticket Expert updated successfully", "success");

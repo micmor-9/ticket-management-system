@@ -10,7 +10,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import {AuthContext} from "../../utils/AuthContext";
+import {AuthContext, useAuth} from "../../utils/AuthContext";
 
 const MyAccount = () => {
     const theme = useTheme();
