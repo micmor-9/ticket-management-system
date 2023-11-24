@@ -337,7 +337,6 @@ class TicketServiceImpl(
             throw TicketStatusUpdateConflictException("Ticket Status update conflict!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
-
         when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
                 accessGrantedUpdateTicketStatus(ticket, status)
@@ -447,8 +446,5 @@ class TicketServiceImpl(
         log.info("Update expert successful (repository)")
         return ticketRepository.save(ticket).toDTO()
     }
-
-
-
 
 }

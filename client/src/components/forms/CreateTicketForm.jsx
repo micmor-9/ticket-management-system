@@ -34,59 +34,7 @@ const CreateTicketForm = () => {
   const [orders, setOrders] = useState([]);
   const [orderSelected, setOrderSelected] = useState("");
   const { showDialog } = useDialog();
-  const [ticket, setTicket] = useState({
-    orderId: "",
-    product: "",
-    name: "",
-    surname: "",
-  });
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        /* Coming from Orders, I have already an orderId */
-        if (orderId) {
-          const orderData = await OrdersAPI.getOrderByOrderId(orderId);
-          setOrder(orderData);
-        }
-        if (currentUser.role === "Client") {
-          const userOrders = await OrdersAPI.getOrdersByCustomerId(
-            currentUser.email
-          );
-          setOrders(userOrders);
-        } else if (currentUser.role === "Manager") {
-          const ord = await OrdersAPI.getAllOrders();
-          setOrders(ord);
-        }
-      } catch (error) {}
-    };
-    fetchOrder();
-  }, [orderId, currentUser.role, currentUser.id, currentUser.email]);
-  useEffect(() => {
-    if (orderSelected) {
-      const fetchOrder = async () => {
-        try {
-          const orderData = await OrdersAPI.getOrderByOrderId(orderSelected);
-          setOrderTemp(orderData);
-        } catch (error) {}
-      };
-      fetchOrder();
-    }
-  }, [orderSelected]);
-  const validateForm = () => {
-    const currentDate = new Date().toISOString();
-    let isValid = true;
-    if (!order) {
-      if (currentDate > orderTemp.warrantyDuration) {
-        setOrderError("Warranty expired");
-        isValid = false;
-      }
-    }
-    if (!description) {
-      setDescriptionError(true);
-      isValid = false;
-    } else {
-      setDescriptionError(false);
-    }
+
 
     const [ticket, setTicket] = useState({
       orderId: "",
@@ -403,7 +351,6 @@ const CreateTicketForm = () => {
         </Box>
       </Box>
     );
-  };
 };
 
 export default CreateTicketForm;
