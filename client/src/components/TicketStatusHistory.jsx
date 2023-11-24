@@ -1,37 +1,38 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import {Box, Typography, useTheme} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import LoopIcon from "@mui/icons-material/Loop";
 import BuildIcon from "@mui/icons-material/Build";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { tokens } from "../theme";
+import {tokens} from "../theme";
 import {
-  Timeline,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineItem,
-  TimelineOppositeContent,
-  TimelineSeparator,
+    Timeline,
+    TimelineConnector,
+    TimelineContent,
+    TimelineDot,
+    TimelineItem,
+    TimelineOppositeContent,
+    TimelineSeparator,
 } from "@mui/lab";
 
-const TicketStatusHistory = ({ history, expand }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+const TicketStatusHistory = ({history, expand}) => {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
 
-  const iconStyles = () => {
-    return {
-      fontSize: "x-large",
+    const iconStyles = () => {
+        return {
+            fontSize: "x-large",
+        };
     };
-  };
 
-  const icons = {
-    OPEN: <AddIcon sx={iconStyles("OPEN")} />,
-    IN_PROGRESS: <BuildIcon sx={iconStyles("IN_PROGRESS")} />,
-    CLOSED: <RemoveIcon sx={iconStyles("CLOSED")} />,
-    RESOLVED: <CheckIcon sx={iconStyles("RESOLVED")} />,
-    REOPENED: <LoopIcon sx={iconStyles("REOPENED")} />,
-  };
+    const icons = {
+        OPEN: <AddIcon sx={iconStyles("OPEN")}/>,
+        IN_PROGRESS: <BuildIcon sx={iconStyles("IN_PROGRESS")}/>,
+        CLOSED: <RemoveIcon sx={iconStyles("CLOSED")}/>,
+        RESOLVED: <CheckIcon sx={iconStyles("RESOLVED")}/>,
+        REOPENED: <LoopIcon sx={iconStyles("REOPENED")}/>,
+    };
+
 
     const getStatusChangeDescription = (currentStatus, previousStatus, currentExpert, previousExpert) => {
         if (!previousStatus && !previousExpert) {
@@ -74,7 +75,7 @@ const TicketStatusHistory = ({ history, expand }) => {
         return changeDescription
     };
 
-  return (
+return (
     <Box
       sx={{
         overflowY: "auto",

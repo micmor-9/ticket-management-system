@@ -3,13 +3,13 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import TicketsAPI from "../../api/tickets/ticketsApi";
 import {useNavigate, useParams} from "react-router-dom";
 import {useTheme} from "@emotion/react";
 import {tokens} from "../../theme";
 import OrdersAPI from "../../api/orders/ordersApi";
-import {useAuth} from "../../utils/AuthContext";
+import {AuthContext} from "../../utils/AuthContext";
 import {useDialog} from "../../utils/DialogContext";
 
 const CreateTicketForm = () => {
@@ -20,7 +20,7 @@ const CreateTicketForm = () => {
     const [ticketArea, setTicketArea] = useState("");
     const [descriptionError, setDescriptionError] = useState(false);
     const [categoryError, setCategoryError] = useState(false);
-    const [currentUser] = useAuth();
+    const [currentUser] = useContext(AuthContext);
     const {orderId} = useParams();
     const [order, setOrder] = useState();
     const [orderTemp, setOrderTemp] = useState(null);
