@@ -17,6 +17,7 @@ import CreateUser from "./views/users/create";
 import MyAccount from "./views/myaccount";
 
 import {NotificationsContext, useNotifications} from "./utils/NotificationsContext";
+import CreateProduct from "./views/products/create";
 
 
 function App() {
@@ -69,6 +70,7 @@ function App() {
                                     <Route path="/users" element={<Users/>}/>
                                     <Route path="/users/create" element={<CreateUser/>}/>
                                     <Route path="/products" element={<Products/>}/>
+                                    <Route path="/products/create" element={<CreateProduct/>}/>
                                     <Route path="/tickets" element={<Tickets/>}/>
                                     <Route path="/tickets/:ticketId" element={<Ticket/>}/>
                                     <Route path="/orders" element={<Orders/>}/>
