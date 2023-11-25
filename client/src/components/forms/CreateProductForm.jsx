@@ -11,24 +11,24 @@ import {useAuth} from "../../utils/AuthContext";
 import {useDialog} from "../../utils/DialogContext";
 import productsApi from "../../api/products/productsApi";
 
-const CreateProductForm = () => {
+const CreateProductForm = ({isUpdateMode, initialProductData}) => {
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [currentUser] = useAuth();
     const {showDialog} = useDialog();
-    const [product, setProduct] = useState({
+    const [product, setProduct] = useState( initialProductData ||{
         id: "",
-        category : "",
-        product: "",
+        description : "",
+        name: "",
         price: 0.0,
         quantity: 0,
         warrantyDuration: ""
     });
     const [errors, setErrors] = useState({
         id: "",
-        category : "",
-        product: "",
+        description : "",
+        name: "",
         price: "",
         quantity: "",
         warrantyDuration: ""
@@ -47,9 +47,9 @@ const CreateProductForm = () => {
         };
 
         validateLength("id", product.id, "Id", 1, 50);
-        validateLength("product", product.product, "Product", 2, 50);
-        if (product.category.length > 0) {
-            validateLength("category", product.category, "Category", 2, 50);
+        validateLength("name", product.name, "Product", 2, 50);
+        if (product.description.length > 0) {
+            validateLength("category", product.description, "Category", 2, 50);
         }
         if (product.price.length > 0) {
             validateLength("price", product.price, "Price", 1, 10);
@@ -60,7 +60,7 @@ const CreateProductForm = () => {
         if (product.warrantyDuration.length > 0) {
             const warranty = product.warrantyDuration.split(" ");
             if(!isNaN(parseInt(warranty[0]))){
-                if(warranty[1]!== "years" && warranty[1]!== "month"){
+                if(warranty[1]!== "years" && warranty[1]!== "months"){
                     newErrors["warrantyDuration"] = "Wrong format"
                 }
             }
@@ -72,25 +72,37 @@ const CreateProductForm = () => {
         if (Object.keys(newErrors).length === 0) {
             const productData = {
                 id: product.id ,
-                name: product.product,
-                description:  product.category ? product.category : "",
+                name: product.name,
+                description:  product.description ? product.description : "",
                 price: product.price ? parseFloat(product.price) : 0,
                 quantity: product.quantity ? parseInt(product.quantity) : 0,
                 warrantyDuration: product.warrantyDuration ? product.warrantyDuration : ""
             };
-
+            console.log(product.id);
             try {
-                const response = await productsApi.createProducts(productData);
-                console.log(response);
-                showDialog("Product created", "success");
-                navigate(-1);
+                if(isUpdateMode) {
+                    const response = await productsApi.updateProducts(product.id, productData);
+                    console.log(response);
+                    showDialog("Product updated", "success");
+                    navigate(-1);
+                }
+                else{
+                    const response = await productsApi.createProducts(productData);
+                    console.log(response);
+                    showDialog("Product created", "success");
+                    navigate(-1);
+                }
             } catch (error) {
                 console.error("An error occurred:", error);
-                if (error.response.data.status === 409) {
+                if (!isUpdateMode && error.response.data.status === 409) {
                     showDialog("Product creation error", "error");
                     setErrors({...errors, id: "Product with this ID already exists!"});
                     console.log("Product with this ID already exists!");
-                    // Handle the duplicate scenario on the client side
+                }
+                if (isUpdateMode && error.response.data.status === 404) {
+                    showDialog("Product update error", "error");
+                    setErrors({...errors, id: "Product with this ID doesn't exists!"});
+                    console.log("Product with this ID doesn't exists!");
                 }
             }
         }
@@ -137,22 +149,22 @@ const CreateProductForm = () => {
                 fullWidth
                 type="text"
                 label="Product"
-                value={product.product}
+                value={product.name}
                 required
-                error={Boolean(errors.product)}
-                helperText={errors.product}
+                error={Boolean(errors.name)}
+                helperText={errors.name}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("product", e.target.value)}
+                onChange={(e) => handleFieldChange("name", e.target.value)}
             />
             <TextField
                 fullWidth
                 type="text"
                 label="Category"
-                value={product.category}
-                error={Boolean(errors.category)}
-                helperText={errors.category}
+                value={product.description}
+                error={Boolean(errors.description)}
+                helperText={errors.description}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("category", e.target.value)}
+                onChange={(e) => handleFieldChange("description", e.target.value)}
             />
             <TextField
                 fullWidth
@@ -186,6 +198,7 @@ const CreateProductForm = () => {
                 label="Id"
                 value={product.id}
                 required
+                disabled={isUpdateMode}
                 error={Boolean(errors.id)}
                 helperText={errors.id}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
@@ -229,7 +242,7 @@ const CreateProductForm = () => {
                             }}
                             onClick={handleFormSubmit}
                     >
-                        Create New product
+                        {isUpdateMode? "Save" : "Create New product"}
                     </Button>)}
             </Box>
         </Box>)

@@ -40,7 +40,7 @@ const createProducts = async (productData) => {
 
 const updateProducts = async (id, productData) => {
     try {
-        const response = await api.put(`/products/{id}`, productData, {
+        const response = await api.put(`/products/${id}`, productData, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             }

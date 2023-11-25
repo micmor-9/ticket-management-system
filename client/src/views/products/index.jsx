@@ -97,8 +97,8 @@ const Products = () => {
 
     const columns = [
         {field: "id", headerName: "ID", flex: 1},
-        {field: "name", headerName: "Category", flex: 1},
-        {field: "description", headerName: "Product", flex: 1},
+        {field: "name", headerName: "Product", flex: 1},
+        {field: "description", headerName: "Category", flex: 1},
         {field: "price", headerName: "Price ($)", flex: 1},
         {field: "quantity", headerName: "Quantity", flex: 1},
         {field: "warrantyDuration", headerName: "Warranty Duration", flex: 1},
@@ -242,15 +242,14 @@ const Products = () => {
             cellClassName: "action-column--cell",
             renderCell: ({row}) => {
                 return (
-
-                            <Tooltip title="Modify Product"  sx={{ color: colors.greenAccent[400] }}>
-                                <CreateOutlinedIcon
-                                    fontSize="small"
-                                    onClick={() => {
-                                        navigate(`/products/create`)
-                                    }}
-                                />
-                            </Tooltip>
+                    <Tooltip title="Modify Product" sx={{color: colors.greenAccent[400]}}>
+                        <CreateOutlinedIcon
+                            fontSize="small"
+                            onClick={() => {
+                                navigate(`/products/create`, { state: { productData: row, isUpdateMode: true } })
+                            }}
+                        />
+                    </Tooltip>
                 )
             }
         })

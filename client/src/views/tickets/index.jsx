@@ -295,13 +295,13 @@ const Tickets = () => {
       field: "category",
       headerName: "Category",
       flex: 0.7,
-      cellClassName: "category-column--cell",
+      cellClassName: "description-column--cell",
     },
     {
       field: "order",
       headerName: "Product",
       flex: 1,
-      cellClassName: "product-column--cell",
+      cellClassName: "name-column--cell",
       valueGetter: ({ value }) => value && value.product.description,
     },
     {

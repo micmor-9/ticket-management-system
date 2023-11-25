@@ -114,7 +114,7 @@ const createUser = async (userData) => {
 
 const updateUser = async (email, userData) => {
     try {
-        const response = await api.put(`/customers/{email}`, userData, {
+        const response = await api.put(`/customers/${email}`, userData, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             }

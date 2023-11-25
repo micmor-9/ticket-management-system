@@ -7,6 +7,7 @@ import it.polito.wa2.g35.server.profiles.customer.Customer
 import it.polito.wa2.g35.server.profiles.customer.toDTO
 import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.ticket.TicketController
+import it.polito.wa2.g35.server.ticketing.ticket.toTicket
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
@@ -61,21 +62,23 @@ class ProductServiceImpl(
     }
     
     @Observed(
-        name = "/products",
+        name = "/products/{id}",
         contextualName = "put-product-request-service"
     )
     override fun updateProduct(product: ProductDTO?): ProductDTO? {
         return if(product != null) {
-            val checkIfProductExists = productRepository.findByIdOrNull(product.id)
-            if (checkIfProductExists != null) {
+            val currentTicket = getProductById(product.id)?.toProduct()
+            println(currentTicket)
+            //val checkIfProductExists = productRepository.findByIdOrNull(product.id)
+            if (currentTicket != null) {
                 val authentication = SecurityContextHolder.getContext().authentication
-                if(authentication.authorities.map { it.authority }[0] == SecurityConfig.CLIENT_ROLE){
+                if(authentication.authorities.map { it.authority }[0] == SecurityConfig.MANAGER_ROLE){
                     if (product.id != authentication.name) {
                         log.error("Update Product request failed by unauthorized access")
                         throw UnauthorizedProfileException("You can't access this product!")
                     }
                 }
-                log.info("Update Customer request successful (repository)")
+                log.info("Update Product request successful (repository)")
                 productRepository.save(Product(product.id, product.name, product.description,
                     product.price,product.quantity, product.warrantyDuration)).toDTO()
             } else {
