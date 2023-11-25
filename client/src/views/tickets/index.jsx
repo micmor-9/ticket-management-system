@@ -294,7 +294,7 @@ const Tickets = () => {
       flex: 1.2,
       cellClassName: "expert-column--cell",
       renderCell: ({ row }) => {
-        if (currentUser.role === "Manager" || currentUser.role === "Expert") {
+        if (currentUser.role === "Manager" ) {
           return (
             <FormControl
               fullWidth
