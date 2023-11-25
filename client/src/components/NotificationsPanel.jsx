@@ -45,6 +45,11 @@ const NotificationsPanel = ({open, anchorEl, setOpenNotifications, notifications
         };
     }, [popperRef]);
 
+    const removeNotification = (idx) => {
+        setNotifications(notifications.filter((notification, index) => index !== idx));
+    }
+
+
     return <Popper ref={popperRef} id="notifications-popper" open={open} placement={"bottom-end"}
                    anchorEl={anchorEl} transition>
         {({TransitionProps}) => (
@@ -61,6 +66,7 @@ const NotificationsPanel = ({open, anchorEl, setOpenNotifications, notifications
                                     <>
                                         <ListItem key={"notification-" + idx} onClick={() => {
                                             navigate(notification.url);
+                                            removeNotification(idx);
                                         }} sx={{"cursor": "pointer"}}>
                                             <ListItemAvatar>
                                                 <Avatar sx={{bgcolor: colors.greenAccent[600]}}>

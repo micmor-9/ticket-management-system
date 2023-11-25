@@ -31,7 +31,7 @@ import java.util.*
 class TicketServiceImpl(
     val ticketRepository: TicketRepository
 ) : TicketService {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     lateinit var expertService: ExpertService
@@ -423,7 +423,9 @@ class TicketServiceImpl(
         notificationService.send(
             Notification(
                 url = "/tickets/${ticket.id}",
-                description = "Ticket #${ticket.id} status has changed to ${ticket.status}.",
+                description = "Ticket #${ticket.id} status has changed to \"${
+                    ticket.status.toString().replace("_", " ")
+                }\".",
                 title = "Ticket status updated.",
                 recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id.toString()),
                 senderId = currentUserId,

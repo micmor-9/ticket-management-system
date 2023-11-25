@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = ["http://localhost:5000"])
-class   TicketStatusController(private val ticketStatusService: TicketStatusService){
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+class TicketStatusController(private val ticketStatusService: TicketStatusService) {
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
     /*@PostMapping("/status/")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('Manager')")
@@ -37,8 +37,8 @@ class   TicketStatusController(private val ticketStatusService: TicketStatusServ
     )
     fun getTicketStatusByTicketId(
         @PathVariable ticketId: Long
-    ) : List<TicketStatusDTO> {
+    ): List<TicketStatusDTO> {
         log.info("Get tickets status by Id successful")
-       return ticketStatusService.getTicketStatusesByTicketId(ticketId)
+        return ticketStatusService.getTicketStatusesByTicketId(ticketId)
     }
 }

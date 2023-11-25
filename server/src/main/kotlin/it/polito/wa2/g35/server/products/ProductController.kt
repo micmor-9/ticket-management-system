@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api")
 @CrossOrigin(origins = ["http://localhost:5000"])
 class ProductController(private val productService: ProductService) {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
+
     @GetMapping("/products/")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
@@ -52,12 +53,11 @@ class ProductController(private val productService: ProductService) {
     fun postProduct(
         @RequestBody @Valid p: ProductDTO,
         br: BindingResult
-    ) : ProductDTO? {
+    ): ProductDTO? {
         if (br.hasErrors()) {
             log.error("Create Product request failed by bad request format")
             throw BadRequestException("Bad request format!")
-        }
-        else {
+        } else {
             log.info("Create Product request successful")
             return productService.createProduct(p)
         }
@@ -74,12 +74,11 @@ class ProductController(private val productService: ProductService) {
         @PathVariable("id") id: String,
         @RequestBody @Valid p: ProductDTO,
         br: BindingResult
-    ) : ProductDTO? {
-        if (br.hasErrors()){
+    ): ProductDTO? {
+        if (br.hasErrors()) {
             log.error("Update Profile failed by bad request format")
             throw BadRequestException("Bad request format!")
-        }
-        else
+        } else
             if (id == p.id) {
                 log.info("Update Profile request successful")
                 return productService.updateProduct(p)

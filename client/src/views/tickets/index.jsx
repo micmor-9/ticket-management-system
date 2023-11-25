@@ -42,12 +42,6 @@ const Tickets = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 500)
-    }, []);
-
-    useEffect(() => {
         const fetchTickets = async () => {
             try {
                 let ticketsData = [];
@@ -72,7 +66,11 @@ const Tickets = () => {
                 showDialog("Error while fetching tickets", "error");
             }
         };
-        fetchTickets();
+        fetchTickets().then(() => {
+            setTimeout(() => {
+                setIsLoading(false)
+            }, 1000)
+        });
     }, [
         currentUser.id,
         currentUser.role,

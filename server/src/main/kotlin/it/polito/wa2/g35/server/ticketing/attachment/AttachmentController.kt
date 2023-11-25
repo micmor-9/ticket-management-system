@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api")
 @CrossOrigin(origins = ["http://localhost:5000"])
 class AttachmentController(private val attachmentService: AttachmentService) {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
 
     @GetMapping("/attachments/{attachmentId}")
@@ -22,7 +22,7 @@ class AttachmentController(private val attachmentService: AttachmentService) {
         name = "/attachments/{attachmentId}",
         contextualName = "get-attachment-request"
     )
-    fun getAttachment(@PathVariable attachmentId: Long?) : AttachmentDTO? {
+    fun getAttachment(@PathVariable attachmentId: Long?): AttachmentDTO? {
         log.info("Get attachments request successful")
         return attachmentService.getAttachmentById(attachmentId)
     }

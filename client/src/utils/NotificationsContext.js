@@ -2,6 +2,7 @@ import {createContext, useEffect, useRef, useState} from "react";
 import {useAuth} from "./AuthContext";
 import {useDialog} from "./DialogContext";
 import {Client} from "@stomp/stompjs";
+import {useLocation} from "react-router-dom";
 
 export const NotificationsContext = createContext();
 
@@ -12,6 +13,7 @@ export const useNotifications = () => {
     const clientRef = useRef(null);
     const subscriptionRef = useRef(null);
     const {showDialog} = useDialog();
+    const location = useLocation();
 
     const SOCKET_URL = "ws://localhost:8081/ws";
 
@@ -31,14 +33,18 @@ export const useNotifications = () => {
                     `/topic/notifications-${currentUser.id}`,
                     (message) => {
                         const notification = JSON.parse(message.body);
-                        showDialog(notification.description, "info");
-                        setNotifications((notifications) => [...notifications, notification]);
-                        const savedNotifications = sessionStorage.getItem("notifications");
-                        if (savedNotifications) {
-                            const decodedNotifications = JSON.parse(atob(savedNotifications));
-                            sessionStorage.setItem("notifications", btoa(JSON.stringify([...decodedNotifications, notification])));
-                        } else {
-                            sessionStorage.setItem("notifications", btoa(JSON.stringify([notification])));
+                        console.log(notification)
+                        console.log(location.pathname)
+                        if (!(notification.description.includes("new message") && location.pathname === notification.url)) {
+                            showDialog(notification.description, "info");
+                            setNotifications((notifications) => [...notifications, notification]);
+                            const savedNotifications = sessionStorage.getItem("notifications");
+                            if (savedNotifications) {
+                                const decodedNotifications = JSON.parse(atob(savedNotifications));
+                                sessionStorage.setItem("notifications", btoa(JSON.stringify([...decodedNotifications, notification])));
+                            } else {
+                                sessionStorage.setItem("notifications", btoa(JSON.stringify([notification])));
+                            }
                         }
                     }
                 );

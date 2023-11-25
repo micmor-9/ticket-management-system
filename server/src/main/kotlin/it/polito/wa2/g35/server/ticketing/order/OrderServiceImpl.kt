@@ -23,7 +23,7 @@ import java.util.*
 
 @Service
 class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderService {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     lateinit var customerService: CustomerService
@@ -138,17 +138,7 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
 
         val authentication = SecurityContextHolder.getContext().authentication
         val currentUserId = profileService.getUserIdByEmail(authentication.name)
-        notificationService.send(
-            Notification(
-                url = "/orders/${order.id}",
-                description = "New order #${order.id} has been created.",
-                title = "New Order created.",
-                recipientIds = managerService.getAllManagers().map { it.id },
-                senderId = currentUserId,
-                timestamp = Date()
-            )
-        )
-        return orderRepository.save(
+        val orderToSave = orderRepository.save(
             Order(
                 null,
                 order.date,
@@ -158,6 +148,17 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
                 order.quantity
             )
         ).toDTO()
+        notificationService.send(
+            Notification(
+                url = "/orders/${orderToSave.id}",
+                description = "New order #${orderToSave.id} has been created.",
+                title = "New Order created.",
+                recipientIds = managerService.getAllManagers().map { it.id },
+                senderId = currentUserId,
+                timestamp = Date()
+            )
+        )
+        return orderToSave
     }
 
 }

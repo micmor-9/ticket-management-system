@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api")
 @CrossOrigin(origins = ["http://localhost:5000"])
 class TicketController(private val ticketService: TicketService) {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @GetMapping("/tickets")
     @ResponseStatus(HttpStatus.OK)
@@ -35,7 +35,7 @@ class TicketController(private val ticketService: TicketService) {
         name = "tickets/{ticketId}",
         contextualName = "get-ticket-by-id-request"
     )
-    fun getTicketById(@PathVariable ticketId:Long): TicketDTO? {
+    fun getTicketById(@PathVariable ticketId: Long): TicketDTO? {
         log.info("Get ticket by id request successful")
         return ticketService.getTicketById(ticketId)
     }
@@ -47,7 +47,7 @@ class TicketController(private val ticketService: TicketService) {
         name = "tickets/status/{status}",
         contextualName = "get-tickets-by-status-request"
     )
-    fun getTicketsByStatus(@PathVariable status: String): List<TicketDTO>?{
+    fun getTicketsByStatus(@PathVariable status: String): List<TicketDTO>? {
         log.info("Get tickets by status request successful")
         return ticketService.getTicketsByStatus(status)
     }
@@ -59,7 +59,7 @@ class TicketController(private val ticketService: TicketService) {
         name = "tickets/expert/{expertId}",
         contextualName = "get-tickets-by-expert-request"
     )
-    fun getTicketsByExpert(@PathVariable expertId: String): List<TicketDTO>?{
+    fun getTicketsByExpert(@PathVariable expertId: String): List<TicketDTO>? {
         log.info("Get tickets by expert request successful")
         return ticketService.getTicketsByExpert(expertId)
     }
@@ -71,7 +71,7 @@ class TicketController(private val ticketService: TicketService) {
         name = "tickets/priority/{priority}",
         contextualName = "get-tickets-by-priority-request"
     )
-    fun getTicketsByPriority(@PathVariable priority: String): List<TicketDTO>?{
+    fun getTicketsByPriority(@PathVariable priority: String): List<TicketDTO>? {
         log.info("Get tickets by priority request successful")
         return ticketService.getTicketsByPriority(priority)
     }
@@ -83,7 +83,7 @@ class TicketController(private val ticketService: TicketService) {
         name = "tickets/customer/{customerId}",
         contextualName = "get-tickets-by-customer-request"
     )
-    fun getTicketsByCustomer(@PathVariable customerId: String): List<TicketDTO>?{
+    fun getTicketsByCustomer(@PathVariable customerId: String): List<TicketDTO>? {
         log.info("Get tickets by customer request successful")
         return ticketService.getTicketsByCustomer(customerId)
     }
@@ -97,7 +97,7 @@ class TicketController(private val ticketService: TicketService) {
     )
     fun postTicket(
         @RequestBody ts: TicketInputDTO
-    ) : TicketDTO? {
+    ): TicketDTO? {
         log.info("Create ticket successful")
         return ticketService.createTicket(ts)
     }
@@ -113,18 +113,17 @@ class TicketController(private val ticketService: TicketService) {
         @PathVariable("ticketId") ticketId: Long,
         @RequestBody p: TicketInputDTO,
         br: BindingResult
-    ) : TicketDTO? {
+    ): TicketDTO? {
         if (br.hasErrors()) {
             log.error("Update ticket failed by bad request format")
             throw BadRequestException("Bad request format!")
-        }
-        else
+        } else
             if (ticketId == p.id) {
                 log.info("Update ticket successful")
                 return ticketService.updateTicket(p)
             } else
                 log.error("Update ticket failed because id doesn't exists")
-                throw TicketConflictException("Ticket with given id doesn't exists!")
+        throw TicketConflictException("Ticket with given id doesn't exists!")
     }
 
     @PatchMapping("/tickets/{ticketId}/status/{status}")
@@ -161,12 +160,12 @@ class TicketController(private val ticketService: TicketService) {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager')")
     @Observed(
-            name = "tickets/{ticketId}/expert/{expertId}",
-            contextualName = "put-ticket-expert-request"
+        name = "tickets/{ticketId}/expert/{expertId}",
+        contextualName = "put-ticket-expert-request"
     )
     fun updateTicketExpert(
-            @PathVariable("ticketId") ticketId: Long,
-            @PathVariable("expertId") expertId: String
+        @PathVariable("ticketId") ticketId: Long,
+        @PathVariable("expertId") expertId: String
     ) {
 
         log.info("Update ticket expert successful")

@@ -9,16 +9,28 @@ import java.util.*
 
 
 @Service
-class TicketStatusServiceImpl(private val ticketStatusRepository: TicketStatusRepository) : TicketStatusService{
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+class TicketStatusServiceImpl(private val ticketStatusRepository: TicketStatusRepository) : TicketStatusService {
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
+
     @Observed(
         name = "status/",
         contextualName = "post-ticket-status-request-service"
     )
     override fun createTicketStatus(ticketStatus: TicketStatusDTO): TicketStatusDTO? {
         log.info("Create tickets status request successful (repository)")
-        return ticketStatusRepository.save(TicketStatus(ticketStatus.id, Date(), ticketStatus.status, ticketStatus.description, ticketStatus.ticket, ticketStatus.expert, ticketStatus.category)).toDTO()
+        return ticketStatusRepository.save(
+            TicketStatus(
+                ticketStatus.id,
+                Date(),
+                ticketStatus.status,
+                ticketStatus.description,
+                ticketStatus.ticket,
+                ticketStatus.expert,
+                ticketStatus.category
+            )
+        ).toDTO()
     }
+
     @Observed(
         name = "status/{ticketId}",
         contextualName = "get-ticket-status-request-service"
