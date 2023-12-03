@@ -5,7 +5,7 @@ import App from "./App";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Login from "./views/login";
 import {DialogProvider} from "./utils/DialogContext";
-import Signup from "./views/Signup";
+import Signup from "./views/signup";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

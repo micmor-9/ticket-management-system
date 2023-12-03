@@ -16,10 +16,8 @@ import CreateTicket from "./views/tickets/create";
 import CreateUser from "./views/users/create";
 import MyAccount from "./views/myaccount";
 
-import CreateUserForm from "./components/forms/CreateUserForm";
-import Signup from "./views/Signup";
-
 import {NotificationsContext, useNotifications} from "./utils/NotificationsContext";
+import CreateProduct from "./views/products/create";
 
 
 function App() {
@@ -33,11 +31,10 @@ function App() {
 
     useEffect(() => {
 
-        if (!token && window.location.pathname !== '/signup') {
-
+        if (!token && location.pathname !== '/signup') {
             navigate("/login");
         }
-    }, [token, navigate]);
+    }, [token, navigate, location.pathname]);
 
     return (
         <AuthContext.Provider value={[currentUser, setCurrentUser]}>
@@ -73,6 +70,7 @@ function App() {
                                     <Route path="/users" element={<Users/>}/>
                                     <Route path="/users/create" element={<CreateUser/>}/>
                                     <Route path="/products" element={<Products/>}/>
+                                    <Route path="/products/create" element={<CreateProduct/>}/>
                                     <Route path="/tickets" element={<Tickets/>}/>
                                     <Route path="/tickets/:ticketId" element={<Ticket/>}/>
                                     <Route path="/orders" element={<Orders/>}/>
