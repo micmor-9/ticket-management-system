@@ -263,10 +263,12 @@ class TicketServiceImpl(
         }
 
         val authentication = SecurityContextHolder.getContext().authentication
-        val ticketToUpdate: Ticket?
-        when (authentication.authorities.map { it.authority }[0]) {
+        val ticketToUpdate: Ticket = when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
-                ticketToUpdate = accessGrantedUpdateTicket(currentTicket, ticket, expert)
+                accessGrantedUpdateTicket(currentTicket, ticket, expert)
+            }
+            SecurityConfig.EXPERT_ROLE -> {
+                accessGrantedUpdateTicket(currentTicket, ticket, expert)
             }
             else -> {
                 log.error("Update ticket failed by unauthorized access")
@@ -316,7 +318,7 @@ class TicketServiceImpl(
         )
         return ticketToUpdate
     }
-    @Observed(
+    /*@Observed(
         name = "tickets/{ticketId}/status/{status}",
         contextualName = "put-ticket-status-request-service"
     )
@@ -387,7 +389,7 @@ class TicketServiceImpl(
                 timestamp = Date()
             )
         )
-    }
+    }*/
     @Observed(
         name = "tickets/{ticketId}/priority/{priority}",
         contextualName = "put-ticket-priority-request-service"
@@ -409,7 +411,7 @@ class TicketServiceImpl(
         return ticketRepository.save(ticket).toDTO()
     }
 
-    fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
+    /*fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
         val expert = expertService.getExpertById(expertId)?.toExpert()
         if (expert == null) {
             log.error("No Expert found with this ID: $expertId")
@@ -447,5 +449,5 @@ class TicketServiceImpl(
         log.info("Update expert successful (repository)")
         return ticketRepository.save(ticket).toDTO()
     }
-
+*/
 }
