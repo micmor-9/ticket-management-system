@@ -1,35 +1,35 @@
 import {
-    Box,
-    Typography,
-    useTheme,
-    Select,
-    MenuItem,
-    FormControl,
-    Tooltip,
+  Box,
+  Typography,
+  useTheme,
+  Select,
+  MenuItem,
+  FormControl,
+  Tooltip,
 } from "@mui/material";
-import {DataGrid, GridToolbar} from "@mui/x-data-grid";
-import {tokens} from "../../theme";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import TicketsAPI from "../../api/tickets/ticketsApi";
-import React, {useContext, useEffect, useState} from "react";
-import {AuthContext} from "../../utils/AuthContext";
-import {dataGridStyles} from "../../styles/dataGridStyles";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+import { dataGridStyles } from "../../styles/dataGridStyles";
 import PriorityBadge from "../../components/PriorityBadge";
 import StatusBadge from "../../components/StatusBadge";
 import AddIcon from "@mui/icons-material/Add";
 import HeaderActions from "../../components/HeaderActions";
-import {useDialog} from "../../utils/DialogContext";
+import { useDialog } from "../../utils/DialogContext";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import Button from "@mui/material/Button";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import {SentimentDissatisfiedOutlined} from "@mui/icons-material";
+import { SentimentDissatisfiedOutlined } from "@mui/icons-material";
 
 const Tickets = () => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
     const [tickets, setTickets] = useState([]);
     const [experts, setExperts] = useState([]);
@@ -38,6 +38,8 @@ const Tickets = () => {
     const navigate = useNavigate();
     const {showDialog} = useDialog();
     const [modify, setModify] = useState({id: "", active: false});
+  const [pendingChanges, setPendingChanges] = useState("");
+  const [pendingChanges2, setPendingChanges2] = useState("");
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -82,18 +84,101 @@ const Tickets = () => {
     const handleExpertChange = (event, row) => {
         const selectedExpertName = event.target.value;
         const expertId = selectedExpertName.split("(")[1].split(")")[0];
-
+    const expertName = selectedExpertName.split("(")[0].trim();
         const ticketId = row.id;
 
-        TicketsAPI.updateTicketExpert(ticketId, expertId)
-            .then((response) => {
+
+    event.target.name = ''
+        const updatedRow = {
+          ...row,
+          expert: {
+            id: expertId,
+            name: expertName.split(" ")[0],
+            surname: expertName.split(" ")[1]
+          },
+        };
+
+      setTickets((prevTickets) =>
+          prevTickets.map((prevRow) =>
+              prevRow.id === ticketId ? updatedRow : prevRow
+          )
+      );
+
+    setPendingChanges((prevChanges) => ({
+      ...prevChanges,
+      [ticketId]: {
+        expertId: expertId,
+      },
+    }))
+  };
+
+  const handleStatusChange = (event, ticketId) => {
+    const newStatus = event.target.value;
+    const checkTicket = tickets.find((ticket) => ticket.id === ticketId);
+    if (checkTicket.status !== newStatus) {
+      const updatedRow = {...checkTicket, status: newStatus};
+      setTickets((prevTickets) =>
+          prevTickets.map((prevRow) =>
+              prevRow.id === ticketId ? updatedRow : prevRow
+          )
+      );
+    }
+    if (checkTicket.expert) {
+      if(newStatus !== "") {
+        setPendingChanges2((prevChanges2) => ({
+          ...prevChanges2,
+          [ticketId]: {
+            status: newStatus,
+          },
+        }));
+      }
+    }
+  };
+
+  const handleChange = async (event, ticketId) => {
+    const checkTicket = tickets.find((ticket) => ticket.id === ticketId);
+    if (checkTicket.expert) {
+      // Ottieni le modifiche pendenti per il ticket corrente
+      const changesForTicket = pendingChanges[ticketId] || {};
+      const changesForTicket2 = pendingChanges2[ticketId] || {};
+
+      // Verifica se ci sono modifiche per lo stato
+      const statusChangeExists = Object.keys(changesForTicket2).length > 0;
+
+      // Verifica se ci sono modifiche per l'esperto
+      const expertChangeExists = Object.keys(changesForTicket).length > 0;
+
+      // Effettua l'aggiornamento solo se ci sono modifiche per lo stato o l'esperto
+      if (statusChangeExists || expertChangeExists) {
+        const updateData = {
+          id: ticketId,
+          creationTimestamp: checkTicket.creationTimestamp,
+          issueDescription: checkTicket.issueDescription,
+          priority: checkTicket.priority,
+          status: statusChangeExists ? changesForTicket2.status : checkTicket.status,
+          expertId: expertChangeExists ? changesForTicket.expertId : checkTicket.expert.id,
+          orderId: checkTicket.order.id,
+          customerId: checkTicket.customer.id,
+          category: checkTicket.category,
+        };
+            // Esegui l'aggiornamento nel database
+        await TicketsAPI.updateTicket(ticketId, updateData);
                 setTicketUpdated(() => !ticketUpdated);
-                showDialog("Ticket Expert updated successfully", "success");
-            })
-            .catch((error) => {
-                showDialog("Error while updating ticket", "error");
-            });
-    };
+                showDialog("Ticket  updated successfully", "success");
+            }
+
+                // Resetta le modifiche pendenti
+      setPendingChanges((prevChanges) => ({
+        ...prevChanges,
+        [ticketId]: {},
+      }));
+      setPendingChanges2((prevChanges2) => ({
+        ...prevChanges2,
+        [ticketId]: {},
+      }));
+    }
+            };
+
 
     const handlePriorityChange = async (event, ticketId) => {
         const newPriority = event.target.value;
@@ -108,20 +193,6 @@ const Tickets = () => {
             });
     };
 
-    const handleStatusChange = async (event, ticketId) => {
-        const newStatus = event.target.value;
-        const checkTicket = tickets.find((ticket) => ticket.id === ticketId);
-        if (checkTicket.expert) {
-            TicketsAPI.updateTicketStatus(ticketId, newStatus)
-                .then(() => {
-                    setTicketUpdated(() => !ticketUpdated);
-                    showDialog("Ticket Status updated successfully", "success");
-                })
-                .catch((error) => {
-                    showDialog("Error while updating ticket", "error");
-                });
-        }
-    };
 
     const columns = [
         {field: "id", headerName: "ID", flex: 0.2},
@@ -227,7 +298,7 @@ const Tickets = () => {
             flex: 1.2,
             cellClassName: "expert-column--cell",
             renderCell: ({row}) => {
-                if (currentUser.role === "Manager" || currentUser.role === "Expert") {
+                if (currentUser.role === "Manager" ) {
                     return (
                         <FormControl
                             fullWidth
@@ -362,7 +433,10 @@ const Tickets = () => {
                             <Tooltip title="Save Changes">
                                 <CheckCircleOutlineIcon
                                     fontSize="small"
-                                    onClick={() => setModify({id: "", active: !modify.active})}
+                                    onClick={(event) => {
+                    handleChange(event, row.id);
+                    setModify({id: "", active: !modify.active});
+                  }}
                                 />
                             </Tooltip>
                         )}
