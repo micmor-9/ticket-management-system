@@ -259,6 +259,7 @@ class TicketServiceImpl(
                     url = "/tickets/${ticketToSave.id}",
                     description = "New ticket #${ticket.id} has been created.",
                     title = "New Ticket created.",
+                    type = "TICKET_CREATE",
                     recipientIds = managerService.getAllManagers().map { it.id },
                     senderId = currentUserId,
                     timestamp = Date()
@@ -321,6 +322,7 @@ class TicketServiceImpl(
                 url = "/tickets/${ticketToUpdate.id}",
                 description = "Ticket #${ticketToUpdate.id} has been updated.",
                 title = "Ticket updated.",
+                type = "TICKET_UPDATE",
                 recipientIds = listOfNotNull(ticketToUpdate.expert?.id, ticketToUpdate.customer.id.toString()),
                 senderId = currentUserId,
                 timestamp = Date()
@@ -427,6 +429,7 @@ class TicketServiceImpl(
                     ticket.status.toString().replace("_", " ")
                 }\".",
                 title = "Ticket status updated.",
+                type = "TICKET_STATUS_UPDATE",
                 recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id.toString()),
                 senderId = currentUserId,
                 timestamp = Date()
@@ -459,6 +462,7 @@ class TicketServiceImpl(
                 url = "/tickets/${ticket.id}",
                 description = "Ticket #${ticket.id} priority has changed to ${ticket.priority}.",
                 title = "Ticket priority updated.",
+                type = "TICKET_PRIORITY_UPDATE",
                 recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id.toString()),
                 senderId = currentUserId,
                 timestamp = Date()
@@ -509,6 +513,7 @@ class TicketServiceImpl(
                 url = "/tickets/${ticket.id}",
                 description = "Ticket #${ticket.id} has been assigned to ${ticket.expert?.name} ${ticket.expert?.surname}.",
                 title = "Ticket expert updated.",
+                type = "TICKET_EXPERT_UPDATE",
                 recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id.toString()),
                 senderId = currentUserId,
                 timestamp = Date()

@@ -150,9 +150,10 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
         ).toDTO()
         notificationService.send(
             Notification(
-                url = "/orders/${orderToSave.id}",
+                url = "/orders",
                 description = "New order #${orderToSave.id} has been created.",
                 title = "New Order created.",
+                type = "ORDER_CREATE",
                 recipientIds = managerService.getAllManagers().map { it.id },
                 senderId = currentUserId,
                 timestamp = Date()

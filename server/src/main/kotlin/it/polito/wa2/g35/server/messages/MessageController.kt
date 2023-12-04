@@ -55,7 +55,7 @@ class MessageController(private val messageService: MessageService) {
             log.info("Create message request successful")
             val savedMessage = messageService.postMessage(message)
             if (savedMessage != null) {
-                simpMessagingTemplate.convertAndSend("/topic/${message.ticket}", savedMessage)
+                simpMessagingTemplate.convertAndSend("/topic/chat-${message.ticket}", savedMessage)
             }
             return savedMessage
         }

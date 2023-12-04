@@ -20,7 +20,7 @@ class NotificationListener {
         logger.info("Notification received {}", consumerRecord)
         val notification = consumerRecord.value()
         for (recipient in notification.recipientIds) {
-            if (recipient == notification.senderId) {
+            if (recipient != notification.senderId) {
                 template.convertAndSend("/topic/notifications-$recipient", notification)
             }
         }

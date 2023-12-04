@@ -19,7 +19,11 @@ export const useNotifications = () => {
 
     useEffect(() => {
         if (currentUser && currentUser.id) {
-            clientRef.current = null;
+            if (clientRef.current) {
+                clientRef.current.deactivate().then(() => {
+                    clientRef.current = null;
+                });
+            }
             const client = new Client({
                 brokerURL: SOCKET_URL,
                 reconnectDelay: 5000,
@@ -33,9 +37,7 @@ export const useNotifications = () => {
                     `/topic/notifications-${currentUser.id}`,
                     (message) => {
                         const notification = JSON.parse(message.body);
-                        console.log(notification)
-                        console.log(location.pathname)
-                        if (!(notification.description.includes("new message") && location.pathname === notification.url)) {
+                        if (!(notification.type === "MESSAGE" && location.pathname === notification.url)) {
                             showDialog(notification.description, "info");
                             setNotifications((notifications) => [...notifications, notification]);
                             const savedNotifications = sessionStorage.getItem("notifications");
@@ -59,6 +61,17 @@ export const useNotifications = () => {
             client.onWebSocketError = function (frame) {
                 console.log("WS reported error: ");
                 console.log(frame);
+                if (clientRef.current) {
+                    if (clientRef.current.active) {
+                        try {
+                            if (subscriptionRef.current)
+                                subscriptionRef.current.unsubscribe();
+                            clientRef.current.deactivate();
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }
+                }
             };
 
             client.onDisconnect = () => {
@@ -83,7 +96,7 @@ export const useNotifications = () => {
                 }
             };
         }
-    }, [currentUser]);
+    }, [currentUser.id]);
 
     return [notifications, setNotifications];
 };

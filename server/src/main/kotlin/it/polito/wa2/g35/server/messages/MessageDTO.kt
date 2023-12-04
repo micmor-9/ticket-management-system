@@ -9,19 +9,35 @@ data class MessageDTO(
     val messageTimestamp: Date?,
     val messageText: String,
     val ticket: Ticket?,
-    val sender: String?,
+    val senderEmail: String?,
+    val senderName: String?,
     val attachment: Attachment?
-)
-{
-    constructor() : this(null,null,"", null,"", null)
+) {
+    constructor() : this(null, null, "", null, "", "", null)
 }
 
-fun Message.toDTO() : MessageDTO {
-    return MessageDTO(this.id, this.messageTimestamp, this.messageText, this.ticket, this.sender, this.attachment)
+fun Message.toDTO(): MessageDTO {
+    return MessageDTO(
+        this.id,
+        this.messageTimestamp,
+        this.messageText,
+        this.ticket,
+        this.senderEmail,
+        this.senderName,
+        this.attachment
+    )
 }
 
-fun MessageDTO.toMessage() : Message {
-    return Message(this.id, this.messageTimestamp, this.messageText, this.ticket, this.sender, this.attachment)
+fun MessageDTO.toMessage(): Message {
+    return Message(
+        this.id,
+        this.messageTimestamp,
+        this.messageText,
+        this.ticket,
+        this.senderEmail,
+        this.senderName,
+        this.attachment
+    )
 }
 
 

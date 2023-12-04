@@ -8,6 +8,8 @@ data class Notification(
     val url: String,
     @JsonProperty("title")
     val title: String,
+    @JsonProperty("type")
+    val type: String,
     @JsonProperty("description")
     val description: String,
     @JsonProperty("recipientIds")

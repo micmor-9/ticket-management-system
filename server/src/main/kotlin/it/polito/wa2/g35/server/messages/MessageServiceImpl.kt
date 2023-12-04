@@ -4,6 +4,7 @@ import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.notifications.Notification
 import it.polito.wa2.g35.server.notifications.NotificationService
 import it.polito.wa2.g35.server.profiles.ProfileService
+import it.polito.wa2.g35.server.profiles.ProfileServiceImpl
 import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.attachment.*
 import it.polito.wa2.g35.server.ticketing.ticket.*
@@ -22,7 +23,7 @@ class MessageServiceImpl(private val messageRepository: MessageRepository) : Mes
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
-    lateinit var profileService: ProfileService
+    private lateinit var profileService: ProfileService
 
     @Autowired
     lateinit var notificationService: NotificationService
@@ -129,16 +130,19 @@ class MessageServiceImpl(private val messageRepository: MessageRepository) : Mes
     }
 
     private fun sendMessageNotification(message: Message) {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val currentUserId = profileService.getUserIdByEmail(authentication.name)
         notificationService.send(
             Notification(
                 url = "/tickets/${message.ticket?.id}",
-                description = "You have received a new message from ${message.sender} in ticket #${message.ticket?.id}.",
+                description = "You have received a new message from ${message.senderName} in ticket #${message.ticket?.id}.",
                 title = "New message in ticket #${message.ticket?.id}",
+                type = "MESSAGE",
                 recipientIds = listOfNotNull(
                     message.ticket?.expert?.id,
                     message.ticket?.customer?.id.toString()
-                ).filter { it != message.sender },
-                senderId = message.sender,
+                ),
+                senderId = currentUserId,
                 timestamp = Date()
             )
         )
@@ -158,7 +162,8 @@ class MessageServiceImpl(private val messageRepository: MessageRepository) : Mes
         when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
                 log.info("Create message request successful (repository)")
-                val messageToSave = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                val messageToSave =
+                    Message(null, Date(), message.messageText, ticket, message.senderEmail, message.senderName, null)
                 if (uploadedAttachment != null) {
                     val managedAttachment = entityManager.merge(uploadedAttachment)
                     messageToSave.attachment = managedAttachment
@@ -174,7 +179,15 @@ class MessageServiceImpl(private val messageRepository: MessageRepository) : Mes
                     throw UnauthorizedTicketException("You can't access this ticket's messages")
                 } else {
                     log.info("Create message request successful (repository)")
-                    val messageToSave = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                    val messageToSave = Message(
+                        null,
+                        Date(),
+                        message.messageText,
+                        ticket,
+                        message.senderEmail,
+                        message.senderName,
+                        null
+                    )
                     if (uploadedAttachment != null) {
                         val managedAttachment = entityManager.merge(uploadedAttachment)
                         messageToSave.attachment = managedAttachment
@@ -191,7 +204,15 @@ class MessageServiceImpl(private val messageRepository: MessageRepository) : Mes
                     throw UnauthorizedTicketException("You can't access this ticket's messages")
                 } else {
                     log.info("Create message request successful (repository)")
-                    val messageToSave = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                    val messageToSave = Message(
+                        null,
+                        Date(),
+                        message.messageText,
+                        ticket,
+                        message.senderEmail,
+                        message.senderName,
+                        null
+                    )
                     if (uploadedAttachment != null) {
                         val managedAttachment = entityManager.merge(uploadedAttachment)
                         messageToSave.attachment = managedAttachment

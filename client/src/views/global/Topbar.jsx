@@ -13,8 +13,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import {NotificationsContext} from "../../utils/NotificationsContext";
 import {AuthContext} from "../../utils/AuthContext";
 import NotificationsPanel from "../../components/NotificationsPanel";
-import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
-
 
 const Topbar = () => {
     const theme = useTheme();

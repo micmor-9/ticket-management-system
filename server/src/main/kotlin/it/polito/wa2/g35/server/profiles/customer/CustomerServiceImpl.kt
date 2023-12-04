@@ -18,19 +18,11 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
     private val log: Logger = LoggerFactory.getLogger(javaClass)
     override fun getCustomer(customerEmail: String): CustomerDTO? {
         val profile = profileRepository.findByEmail(customerEmail)?.toDTO()
-        if (profile != null) {
-            val authentication = SecurityContextHolder.getContext().authentication
-            if (authentication.authorities.map { it.authority }[0] == SecurityConfig.CLIENT_ROLE) {
-                if (profile.email != authentication.name) {
-                    log.error("Get Customer by Id from repository request failed by unauthorized access")
-                    throw UnauthorizedProfileException("You can't access this profile!")
-                }
-            }
+        return if (profile != null) {
             log.info("Get Customer by Id from repository request successful")
-            return profile
+            profile
         } else {
-            log.error("Profile with given id doesn't exist!")
-            throw ProfileNotFoundException("Profile with given id doesn't exist!")
+            null
         }
     }
 

@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service
 class ManagerServiceImpl(
     private val managerRepository: ManagerRepository
 ) : ManagerService {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
-
-    @Autowired
-    lateinit var expertService: ExpertService
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     lateinit var customerService: CustomerService
@@ -34,53 +31,13 @@ class ManagerServiceImpl(
         contextualName = "get-manager-id-request-service"
     )
     override fun getManager(managerEmail: String?): ManagerDTO? {
-        val authentication = SecurityContextHolder.getContext().authentication
         val manager = managerRepository.findByEmail(managerEmail)
-        if (manager == null) {
-            log.error("No manager found with this email: $managerEmail")
-            throw ProfileNotFoundException("Manager with given id doesn't exist!")
+        return if (manager == null) {
+            null
+        } else {
+            log.info("Get manager by id from repository request successful")
+            manager.toDTO()
         }
-
-        return when (authentication.authorities.map { it.authority }[0]) {
-            SecurityConfig.MANAGER_ROLE -> {
-                log.info("Get manager by id from repository request successful")
-                manager.toDTO()
-            }
-
-            SecurityConfig.EXPERT_ROLE -> {
-                log.error("Get manager Id request failed by unauthorized access")
-                throw UnauthorizedTicketException("You can't access this manager!")
-            }
-
-            else -> {
-                log.error("Get manager Id request failed by unauthorized access")
-                throw UnauthorizedTicketException("You can't access this manager!")
-            }
-        }
-    }
-
-    @Observed(
-        name = "/users/{email}",
-        contextualName = "get-username-by-email-request-service"
-    )
-    override fun getUsernameByEmail(email: String): String? {
-        val manager = managerRepository.findByEmail(email)
-        if (manager != null) {
-            return manager.name + " " + manager.surname
-        }
-
-        val expert = expertService.getExpert(email)?.toExpert()
-        if (expert != null) {
-            return expert.name + " " + expert.surname
-        }
-
-        val customer = customerService.getCustomer(email)?.toCustomer()
-        if (customer != null) {
-            return customer.name + " " + customer.surname
-        }
-
-        log.error("No user found with this email: $email")
-        throw ProfileNotFoundException("User with given email doesn't exist!")
     }
 
     @Observed(
