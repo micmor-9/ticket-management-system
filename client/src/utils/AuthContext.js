@@ -14,6 +14,7 @@ export const useAuth = () => {
 
     const logout = () => {
         localStorage.removeItem("token");
+        sessionStorage.removeItem("notifications");
         setCurrentUser({});
     };
 

@@ -21,7 +21,9 @@ class Message(
     @ManyToOne(fetch = FetchType.LAZY)
     var ticket: Ticket?,
 
-    var sender: String?,
+    var senderEmail: String?,
+
+    var senderName: String?,
 
     @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     @JoinColumn(name = "attachment_id", referencedColumnName = "id")

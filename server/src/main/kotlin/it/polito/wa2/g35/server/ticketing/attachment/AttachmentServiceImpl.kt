@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class AttachmentServiceImpl(private val attachmentRepository: AttachmentRepository) : AttachmentService {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     /*@Autowired
     lateinit var messageService: MessageService*/
@@ -74,30 +74,34 @@ class AttachmentServiceImpl(private val attachmentRepository: AttachmentReposito
                 log.info("Get attachment from repository request successful")
                 return attachment
             }
+
             SecurityConfig.EXPERT_ROLE -> {
                 //if(attachment?.message?.ticket?.expert?.email == authentication.name) {
-                    log.info("Get attachment from repository request successful")
-                    return attachment
+                log.info("Get attachment from repository request successful")
+                return attachment
                 /*} else {
                     log.error("Get attachment failed by unauthorized access")
                     throw UnauthorizedTicketException("You don't have access to this ticket's messages")
                 }*/
             }
+
             SecurityConfig.CLIENT_ROLE -> {
                 //if(attachment?.message?.ticket?.customer?.email == authentication.name) {
-                    log.info("Get attachment from repository request successful")
-                    return attachment
+                log.info("Get attachment from repository request successful")
+                return attachment
                 /*} else {
                     log.error("Get attachment request failed by unauthorized access")
                     throw UnauthorizedTicketException("You don't have access to this ticket's messages")
                 }*/
             }
+
             else -> {
-                    log.error("Get attachment request failed")
-                    return null
+                log.error("Get attachment request failed")
+                return null
             }
         }
     }
+
     @Observed(
         name = "/attachments",
         contextualName = "post-attachment-request-service"
@@ -108,16 +112,43 @@ class AttachmentServiceImpl(private val attachmentRepository: AttachmentReposito
         return when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
                 log.info("Create attachment request successful (repository)")
-                return attachmentRepository.save(Attachment(null, /*message,*/ attachment.fileName, attachment.fileType, attachment.fileSize, attachment.fileContent)).toDTO()
+                return attachmentRepository.save(
+                    Attachment(
+                        null, /*message,*/
+                        attachment.fileName,
+                        attachment.fileType,
+                        attachment.fileSize,
+                        attachment.fileContent
+                    )
+                ).toDTO()
             }
+
             SecurityConfig.EXPERT_ROLE -> {
-                    log.info("Create attachment request successful (repository)")
-                    return attachmentRepository.save(Attachment(null, /*message,*/ attachment.fileName, attachment.fileType, attachment.fileSize, attachment.fileContent)).toDTO()
+                log.info("Create attachment request successful (repository)")
+                return attachmentRepository.save(
+                    Attachment(
+                        null, /*message,*/
+                        attachment.fileName,
+                        attachment.fileType,
+                        attachment.fileSize,
+                        attachment.fileContent
+                    )
+                ).toDTO()
             }
+
             SecurityConfig.CLIENT_ROLE -> {
-                    log.info("Create attachment request successful (repository)")
-                    return attachmentRepository.save(Attachment(null, /*message,*/ attachment.fileName, attachment.fileType, attachment.fileSize, attachment.fileContent)).toDTO()
+                log.info("Create attachment request successful (repository)")
+                return attachmentRepository.save(
+                    Attachment(
+                        null, /*message,*/
+                        attachment.fileName,
+                        attachment.fileType,
+                        attachment.fileSize,
+                        attachment.fileContent
+                    )
+                ).toDTO()
             }
+
             else -> {
                 log.error("Create attachment request failed")
                 null

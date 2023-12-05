@@ -10,15 +10,16 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = ["http://localhost:5000"])
-class ManagerController(private val managerService: ManagerService){
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+class ManagerController(private val managerService: ManagerService) {
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
+
     @GetMapping("/managers/{managerEmail}")
     @PreAuthorize("hasAnyRole('Manager')")
     @Observed(
         name = "/managers/{managerEmail}",
         contextualName = "get-manager-id-request"
     )
-    fun getManager(@PathVariable managerEmail: String?) : ManagerDTO? {
+    fun getManager(@PathVariable managerEmail: String?): ManagerDTO? {
         log.info("Get manager Id request successful")
         return managerService.getManager(managerEmail)
     }
@@ -32,16 +33,5 @@ class ManagerController(private val managerService: ManagerService){
     fun getAllManagers(): List<ManagerDTO>? {
         log.info("Get managers request successful")
         return managerService.getAllManagers()
-    }
-
-    @GetMapping("/users/{email}")
-    @PreAuthorize("hasAnyRole('Client', 'Expert', 'Manager')")
-    @Observed(
-        name = "/users/{email}",
-        contextualName = "get-username-by-email-request"
-    )
-    fun getUsernameByEmail(@PathVariable email: String) : String? {
-        log.info("Get username by email request successful")
-        return managerService.getUsernameByEmail(email)
     }
 }

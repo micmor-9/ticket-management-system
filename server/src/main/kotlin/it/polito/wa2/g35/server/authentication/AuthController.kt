@@ -22,7 +22,7 @@ class AuthController {
     @Autowired
     lateinit var authService: AuthServiceImpl
 
-    private val log: Logger = LoggerFactory.getLogger(AuthController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
@@ -50,7 +50,17 @@ class AuthController {
     )
     fun signup(@RequestBody signupRequest: SignupCustomerRequest): ResponseEntity<String> {
         if (authService.signupCustomer(signupRequest) != null) {
-            customerService.createCustomer(Customer(null,signupRequest.email,signupRequest.name,signupRequest.surname,signupRequest.contact,signupRequest.address1,signupRequest.address2).toDTO())
+            customerService.createCustomer(
+                Customer(
+                    null,
+                    signupRequest.email,
+                    signupRequest.name,
+                    signupRequest.surname,
+                    signupRequest.contact,
+                    signupRequest.address1,
+                    signupRequest.address2
+                ).toDTO()
+            )
             log.info("Signup request successful of the user ${signupRequest.email}")
             return ResponseEntity.ok("User created!")
         } else {
@@ -66,7 +76,7 @@ class AuthController {
         name = "createExpert",
         contextualName = "create-expert-request"
     )
-    fun createExpert(@RequestBody signupRequest: SignupExpertRequest) : ResponseEntity<String> {
+    fun createExpert(@RequestBody signupRequest: SignupExpertRequest): ResponseEntity<String> {
         if (authService.signupExpert(signupRequest) != null) {
             log.info("Expert created: ${signupRequest.email}")
             return ResponseEntity.ok("Expert created!")
@@ -75,6 +85,6 @@ class AuthController {
             return ResponseEntity("Expert already exists", HttpStatus.CONFLICT)
         }
     }
-    
+
 
 }

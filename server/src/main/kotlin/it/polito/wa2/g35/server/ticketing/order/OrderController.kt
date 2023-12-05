@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api")
 @CrossOrigin(origins = ["http://localhost:5000"])
 class OrderController(private val orderService: OrderService) {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
     /*@GetMapping("/orders/{customerId}/{productId}")
     @PreAuthorize("hasAnyRole('Client', 'Manager')")
     @Observed(
@@ -53,7 +53,7 @@ class OrderController(private val orderService: OrderService) {
         name = "/orders/{customerId}",
         contextualName = "get-orders-by-customer-request"
     )
-    fun getOrdersByCustomer(@PathVariable customerId: String): List<OrderDTO>?{
+    fun getOrdersByCustomer(@PathVariable customerId: String): List<OrderDTO>? {
         log.info("Get orders by Customer request successful")
         return orderService.getOrdersByCustomer(customerId)
     }

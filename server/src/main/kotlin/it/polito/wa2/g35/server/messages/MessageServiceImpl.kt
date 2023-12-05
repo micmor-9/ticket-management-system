@@ -1,6 +1,10 @@
 package it.polito.wa2.g35.server.messages
 
 import io.micrometer.observation.annotation.Observed
+import it.polito.wa2.g35.server.notifications.Notification
+import it.polito.wa2.g35.server.notifications.NotificationService
+import it.polito.wa2.g35.server.profiles.ProfileService
+import it.polito.wa2.g35.server.profiles.ProfileServiceImpl
 import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.attachment.*
 import it.polito.wa2.g35.server.ticketing.ticket.*
@@ -15,12 +19,21 @@ import org.springframework.stereotype.Service
 import java.util.Date
 
 @Service
-class MessageServiceImpl (private val messageRepository: MessageRepository) : MessageService {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+class MessageServiceImpl(private val messageRepository: MessageRepository) : MessageService {
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
+
+    @Autowired
+    private lateinit var profileService: ProfileService
+
+    @Autowired
+    lateinit var notificationService: NotificationService
+
     @Autowired
     lateinit var ticketService: TicketService
+
     @Autowired
     lateinit var attachmentService: AttachmentService
+
     @PersistenceContext
     private lateinit var entityManager: EntityManager
 
@@ -28,39 +41,41 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
         name = "/messages/{ticketId}",
         contextualName = "get-messages-by-id-request-service"
     )
-    override fun getMessagesByTicket(ticketId : Long): List<MessageDTO> {
+    override fun getMessagesByTicket(ticketId: Long): List<MessageDTO> {
         val ticket = ticketService.getTicketById(ticketId)
-        if(ticket == null) {
+        if (ticket == null) {
             log.error("No Ticket found with this Id: $ticketId")
             throw TicketNotFoundException("Ticket not found with this ID!")
-        }
-        else {
+        } else {
             val authentication = SecurityContextHolder.getContext().authentication
-            when(authentication.authorities.map { it.authority }[0]){
+            when (authentication.authorities.map { it.authority }[0]) {
                 SecurityConfig.MANAGER_ROLE -> {
                     log.info("Get messages by Ticket from repository request successful")
                     return messageRepository.getMessagesByTicketIdOrderByMessageTimestamp(ticketId).map { it.toDTO() }
                 }
+
                 SecurityConfig.CLIENT_ROLE -> {
-                    if(ticket.customer.email != authentication.name) {
+                    if (ticket.customer.email != authentication.name) {
                         log.error("Get messages by Ticket from repository request failed by unauthorized access")
                         throw UnauthorizedTicketException("You can't access this ticket's messages")
-                    }
-                    else {
+                    } else {
                         log.info("Get messages by Ticket from repository request successful")
-                        return messageRepository.getMessagesByTicketIdOrderByMessageTimestamp(ticketId).map { it.toDTO() }
+                        return messageRepository.getMessagesByTicketIdOrderByMessageTimestamp(ticketId)
+                            .map { it.toDTO() }
                     }
                 }
+
                 SecurityConfig.EXPERT_ROLE -> {
-                    if(ticket.expert?.email != authentication.name) {
+                    if (ticket.expert?.email != authentication.name) {
                         log.error("Get messages by Ticket from repository request failed by unauthorized access")
                         throw UnauthorizedTicketException("You can't access this ticket's messages")
-                    }
-                    else {
+                    } else {
                         log.info("Get messages by Ticket from repository request successful")
-                        return messageRepository.getMessagesByTicketIdOrderByMessageTimestamp(ticketId).map { it.toDTO() }
+                        return messageRepository.getMessagesByTicketIdOrderByMessageTimestamp(ticketId)
+                            .map { it.toDTO() }
                     }
                 }
+
                 else -> {
                     log.info("Get messages by Ticket from repository request successful")
                     return emptyList<MessageDTO>()
@@ -68,6 +83,7 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
             }
         }
     }
+
     @Observed(
         name = "/messages/",
         contextualName = "get-message-by-id-request"
@@ -76,31 +92,32 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
         val message = messageRepository.findByIdOrNull(messageId)?.toDTO()
         if (message != null) {
             val authentication = SecurityContextHolder.getContext().authentication
-            when(authentication.authorities.map { it.authority }[0]){
+            when (authentication.authorities.map { it.authority }[0]) {
                 SecurityConfig.MANAGER_ROLE -> {
                     log.info("Get messages by Id from repository request successful")
                     return message
                 }
+
                 SecurityConfig.CLIENT_ROLE -> {
-                    if(message.ticket?.customer?.email != authentication.name) {
+                    if (message.ticket?.customer?.email != authentication.name) {
                         log.error("Get messages by Id from repository request failed by unauthorized access")
                         throw UnauthorizedTicketException("You can't access this ticket's messages")
-                    }
-                    else {
+                    } else {
                         log.info("Get messages by Id from repository request successful")
                         return message
                     }
                 }
+
                 SecurityConfig.EXPERT_ROLE -> {
-                    if(message.ticket?.expert?.email != authentication.name) {
+                    if (message.ticket?.expert?.email != authentication.name) {
                         log.error("Get messages by Id failed by unauthorized access")
                         throw UnauthorizedTicketException("You can't access this ticket's messages")
-                    }
-                    else {
+                    } else {
                         log.info("Get messages by Id from repository request successful")
                         return message
                     }
                 }
+
                 else -> {
                     log.info("Get messages by Id from repository request failed")
                     return null
@@ -112,58 +129,99 @@ class MessageServiceImpl (private val messageRepository: MessageRepository) : Me
         }
     }
 
+    private fun sendMessageNotification(message: Message) {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val currentUserId = profileService.getUserIdByEmail(authentication.name)
+        notificationService.send(
+            Notification(
+                url = "/tickets/${message.ticket?.id}",
+                description = "You have received a new message from ${message.senderName} in ticket #${message.ticket?.id}.",
+                title = "New message in ticket #${message.ticket?.id}",
+                type = "MESSAGE",
+                recipientIds = listOfNotNull(
+                    message.ticket?.expert?.id,
+                    message.ticket?.customer?.id.toString()
+                ),
+                senderId = currentUserId,
+                timestamp = Date()
+            )
+        )
+    }
+
     override fun postMessage(message: MessageInputDTO): MessageDTO? {
         val ticket = ticketService.getTicketById(message.ticket)?.toTicket()
-        if(ticket == null){
+        if (ticket == null) {
             log.error("No Ticket found with this Id: ${message.ticket}")
             throw TicketNotFoundException("Ticket not found with this ID!")
         }
 
-        val uploadedAttachment = if (message.attachment != null) attachmentService.postAttachment(message.attachment)?.toAttachment() else null
+        val uploadedAttachment = if (message.attachment != null) attachmentService.postAttachment(message.attachment)
+            ?.toAttachment() else null
 
         val authentication = SecurityContextHolder.getContext().authentication
-        when(authentication.authorities.map { it.authority }[0]){
+        when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
                 log.info("Create message request successful (repository)")
-                val messageToSave = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                val messageToSave =
+                    Message(null, Date(), message.messageText, ticket, message.senderEmail, message.senderName, null)
                 if (uploadedAttachment != null) {
                     val managedAttachment = entityManager.merge(uploadedAttachment)
                     messageToSave.attachment = managedAttachment
                 }
+                sendMessageNotification(messageToSave)
                 return messageRepository.save(messageToSave).toDTO()
 
             }
+
             SecurityConfig.CLIENT_ROLE -> {
-                if(ticket.customer.email != authentication.name) {
+                if (ticket.customer.email != authentication.name) {
                     log.error("Create request failed by unauthorized access")
                     throw UnauthorizedTicketException("You can't access this ticket's messages")
-                }
-                else {
+                } else {
                     log.info("Create message request successful (repository)")
-                    val messageToSave = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                    val messageToSave = Message(
+                        null,
+                        Date(),
+                        message.messageText,
+                        ticket,
+                        message.senderEmail,
+                        message.senderName,
+                        null
+                    )
                     if (uploadedAttachment != null) {
                         val managedAttachment = entityManager.merge(uploadedAttachment)
                         messageToSave.attachment = managedAttachment
                     }
+                    sendMessageNotification(messageToSave)
                     return messageRepository.save(messageToSave).toDTO()
 
                 }
             }
+
             SecurityConfig.EXPERT_ROLE -> {
-                if(ticket.expert?.email != authentication.name) {
+                if (ticket.expert?.email != authentication.name) {
                     log.error("Create message failed by unauthorized access")
                     throw UnauthorizedTicketException("You can't access this ticket's messages")
-                }
-                else {
+                } else {
                     log.info("Create message request successful (repository)")
-                    val messageToSave = Message(null, Date(), message.messageText, ticket, message.sender, null)
+                    val messageToSave = Message(
+                        null,
+                        Date(),
+                        message.messageText,
+                        ticket,
+                        message.senderEmail,
+                        message.senderName,
+                        null
+                    )
                     if (uploadedAttachment != null) {
                         val managedAttachment = entityManager.merge(uploadedAttachment)
                         messageToSave.attachment = managedAttachment
                     }
+                    sendMessageNotification(messageToSave)
                     return messageRepository.save(messageToSave).toDTO()
                 }
             }
+
             else -> {
                 log.info("Create message request failed (repository)")
                 return null

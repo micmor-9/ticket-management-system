@@ -2,6 +2,7 @@ import {createContext, useEffect, useRef, useState} from "react";
 import {useAuth} from "./AuthContext";
 import {useDialog} from "./DialogContext";
 import {Client} from "@stomp/stompjs";
+import {useLocation} from "react-router-dom";
 
 export const NotificationsContext = createContext();
 
@@ -12,12 +13,17 @@ export const useNotifications = () => {
     const clientRef = useRef(null);
     const subscriptionRef = useRef(null);
     const {showDialog} = useDialog();
+    const location = useLocation();
 
     const SOCKET_URL = "ws://localhost:8081/ws";
 
     useEffect(() => {
         if (currentUser && currentUser.id) {
-            clientRef.current = null;
+            if (clientRef.current) {
+                clientRef.current.deactivate().then(() => {
+                    clientRef.current = null;
+                });
+            }
             const client = new Client({
                 brokerURL: SOCKET_URL,
                 reconnectDelay: 5000,
@@ -26,18 +32,21 @@ export const useNotifications = () => {
             });
 
             client.onConnect = () => {
+                sessionStorage.setItem("notifications", notifications ? btoa(JSON.stringify(notifications)) : btoa(null));
                 subscriptionRef.current = client.subscribe(
                     `/topic/notifications-${currentUser.id}`,
                     (message) => {
                         const notification = JSON.parse(message.body);
-                        showDialog(notification.description, "info");
-                        setNotifications((notifications) => [...notifications, notification]);
-                        const savedNotifications = sessionStorage.getItem("notifications");
-                        if (savedNotifications) {
-                            const decodedNotifications = JSON.parse(atob(savedNotifications));
-                            sessionStorage.setItem("notifications", btoa(JSON.stringify([...decodedNotifications, notification])));
-                        } else {
-                            sessionStorage.setItem("notifications", btoa(JSON.stringify([notification])));
+                        if (!(notification.type === "MESSAGE" && location.pathname === notification.url)) {
+                            showDialog(notification.description, "info");
+                            setNotifications((notifications) => [...notifications, notification]);
+                            const savedNotifications = sessionStorage.getItem("notifications");
+                            if (savedNotifications) {
+                                const decodedNotifications = JSON.parse(atob(savedNotifications));
+                                sessionStorage.setItem("notifications", btoa(JSON.stringify([...decodedNotifications, notification])));
+                            } else {
+                                sessionStorage.setItem("notifications", btoa(JSON.stringify([notification])));
+                            }
                         }
                     }
                 );
@@ -52,6 +61,17 @@ export const useNotifications = () => {
             client.onWebSocketError = function (frame) {
                 console.log("WS reported error: ");
                 console.log(frame);
+                if (clientRef.current) {
+                    if (clientRef.current.active) {
+                        try {
+                            if (subscriptionRef.current)
+                                subscriptionRef.current.unsubscribe();
+                            clientRef.current.deactivate();
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }
+                }
             };
 
             client.onDisconnect = () => {
@@ -76,7 +96,7 @@ export const useNotifications = () => {
                 }
             };
         }
-    }, [currentUser]);
+    }, [currentUser.id]);
 
     return [notifications, setNotifications];
 };

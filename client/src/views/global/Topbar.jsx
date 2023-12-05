@@ -1,4 +1,4 @@
-import {Box, IconButton, useTheme} from "@mui/material";
+import {Badge, Box, IconButton, useTheme} from "@mui/material";
 import {useContext, useState} from "react";
 import {ColorModeContext, tokens} from "../../theme";
 import {InputBase} from "@mui/material";
@@ -13,7 +13,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import {NotificationsContext} from "../../utils/NotificationsContext";
 import {AuthContext} from "../../utils/AuthContext";
 import NotificationsPanel from "../../components/NotificationsPanel";
-
 
 const Topbar = () => {
     const theme = useTheme();
@@ -80,7 +79,9 @@ const Topbar = () => {
                             aria-haspopup="true"
                             aria-expanded={openNotifications ? "true" : undefined}
                             onClick={handleClickNotifications}>
-                    <NotificationsOutlinedIcon/>
+                    <Badge color="secondary" badgeContent={notifications.length} invisible={!notifications}>
+                        <NotificationsOutlinedIcon/>
+                    </Badge>
                 </IconButton>
                 <NotificationsPanel open={openNotifications} anchorEl={anchorElNotifications}
                                     setOpenNotifications={setOpenNotifications}

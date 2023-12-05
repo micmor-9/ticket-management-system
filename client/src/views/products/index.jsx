@@ -1,4 +1,4 @@
-import {Box, Button, MenuItem, Modal, Select, Stack, Typography, Tooltip, useTheme} from "@mui/material";
+import {Box, Button, Grid, MenuItem, Modal, Select, Stack, Tooltip, Typography, useTheme} from "@mui/material";
 import Header from "../../components/Header";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
 import React, {useEffect, useState, useContext} from "react";
@@ -10,7 +10,6 @@ import HeaderActions from "../../components/HeaderActions";
 import {tokens} from "../../theme";
 import {useDialog} from "../../utils/DialogContext";
 import OrdersAPI from "../../api/orders/ordersApi";
-import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";

@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = ["http://localhost:5000"])
-class MessageController (private val messageService: MessageService) {
+class MessageController(private val messageService: MessageService) {
     @Autowired
     lateinit var simpMessagingTemplate: SimpMessagingTemplate
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @GetMapping("/messages/{ticketId}")
     @ResponseStatus(HttpStatus.OK)
@@ -44,17 +44,18 @@ class MessageController (private val messageService: MessageService) {
         contextualName = "send-message-request"
     )
     @Transactional
-    fun postMessage(@RequestBody message: MessageInputDTO,
-                    br: BindingResult) : MessageDTO? {
-        if(br.hasErrors()) {
+    fun postMessage(
+        @RequestBody message: MessageInputDTO,
+        br: BindingResult
+    ): MessageDTO? {
+        if (br.hasErrors()) {
             log.error("Create message request failed by bad request format")
             throw BadRequestException("Bad request format!")
-        }
-        else {
+        } else {
             log.info("Create message request successful")
             val savedMessage = messageService.postMessage(message)
             if (savedMessage != null) {
-                simpMessagingTemplate.convertAndSend("/topic/${message.ticket}", savedMessage)
+                simpMessagingTemplate.convertAndSend("/topic/chat-${message.ticket}", savedMessage)
             }
             return savedMessage
         }

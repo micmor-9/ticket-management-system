@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service
 class ProductServiceImpl(
     private val productRepository: ProductRepository
 ) : ProductService {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
-
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
     @Observed(
         name = "/products/",
         contextualName = "get-products-request-service"
@@ -49,7 +48,16 @@ class ProductServiceImpl(
             val checkIfProductExists = productRepository.findByIdOrNull(product.id)
             if (checkIfProductExists == null) {
                 log.info("Create product request successful (repository)")
-                productRepository.save(Product(product.id, product.name, product.description, product.price, product.quantity, product.warrantyDuration)).toDTO()
+                productRepository.save(
+                    Product(
+                        product.id,
+                        product.name,
+                        product.description,
+                        product.price,
+                        product.quantity,
+                        product.warrantyDuration
+                    )
+                ).toDTO()
             } else {
                 log.error("Product with given id already exists!")
                 throw DuplicateProductException("Product with given id already exists!")

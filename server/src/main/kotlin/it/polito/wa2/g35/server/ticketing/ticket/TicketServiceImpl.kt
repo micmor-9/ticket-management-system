@@ -9,7 +9,9 @@ import it.polito.wa2.g35.server.products.toProduct
 import it.polito.wa2.g35.server.profiles.customer.CustomerService
 import it.polito.wa2.g35.server.profiles.customer.toCustomer
 import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
+import it.polito.wa2.g35.server.profiles.ProfileService
 import it.polito.wa2.g35.server.profiles.employee.expert.*
+import it.polito.wa2.g35.server.profiles.employee.manager.ManagerService
 import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.order.OrderNotFoundException
 import it.polito.wa2.g35.server.ticketing.order.OrderService
@@ -32,7 +34,7 @@ import java.util.*
 class TicketServiceImpl(
     val ticketRepository: TicketRepository
 ) : TicketService {
-    private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     lateinit var expertService: ExpertService
@@ -41,18 +43,21 @@ class TicketServiceImpl(
     lateinit var customerService: CustomerService
 
     @Autowired
-    lateinit var productService: ProductService
-
-    @Autowired
     lateinit var ticketStatusService: TicketStatusService
 
     @Autowired
     lateinit var orderService: OrderService
 
     @Autowired
+    lateinit var profileService: ProfileService
+
+    @Autowired
     lateinit var notificationService: NotificationService
 
-    private fun filterResultByRole(auth: Authentication, resultTicket: TicketDTO?) : TicketDTO? {
+    @Autowired
+    lateinit var managerService: ManagerService
+
+    private fun filterResultByRole(auth: Authentication, resultTicket: TicketDTO?): TicketDTO? {
         when (auth.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
                 return resultTicket
@@ -78,7 +83,7 @@ class TicketServiceImpl(
         }
     }
 
-    private fun filterListResultByRole(auth: Authentication, resultList: List<TicketDTO>?) : List<TicketDTO> {
+    private fun filterListResultByRole(auth: Authentication, resultList: List<TicketDTO>?): List<TicketDTO> {
         return when (auth.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
                 resultList ?: emptyList()
@@ -94,6 +99,7 @@ class TicketServiceImpl(
             }
         }
     }
+
     @Observed(
         name = "tickets",
         contextualName = "get-tickets-request-service"
@@ -102,6 +108,7 @@ class TicketServiceImpl(
         log.info("Get tickets request from repository successful")
         return ticketRepository.findAll().map { it.toDTO() }
     }
+
     @Observed(
         name = "tickets/{ticketId}",
         contextualName = "get-ticket-by-id-request-service"
@@ -112,6 +119,7 @@ class TicketServiceImpl(
         log.info("Get ticket by id request from repository successful")
         return filterResultByRole(authentication, ticket)
     }
+
     @Observed(
         name = "tickets/status/{status}",
         contextualName = "get-tickets-by-status-request-service"
@@ -140,6 +148,7 @@ class TicketServiceImpl(
         log.info("Get tickets by expert request from repository successful")
         return filterListResultByRole(authentication, listTicket) as? List<TicketDTO> ?: emptyList()
     }
+
     @Observed(
         name = "tickets/priority/{priority}",
         contextualName = "get-tickets-by-priority-request-service"
@@ -156,13 +165,14 @@ class TicketServiceImpl(
             throw TicketPriorityInvalidException("Ticket priority not valid!")
         }
     }
+
     @Observed(
         name = "tickets/customer/{customerId}",
         contextualName = "get-tickets-by-customer-request-service"
     )
     override fun getTicketsByCustomer(idCustomer: String): List<TicketDTO> {
         val customer = customerService.getCustomerByEmail(idCustomer)
-        if(customer == null) {
+        if (customer == null) {
             log.error("No Customer found with this Id: $idCustomer")
             throw ProfileNotFoundException("Customer not found with this Id!")
         }
@@ -179,22 +189,25 @@ class TicketServiceImpl(
     @Transactional
     override fun createTicket(ticket: TicketInputDTO): TicketDTO? {
         val customer = customerService.getCustomerByEmail(ticket.customerId)
-        if(customer == null) {
+        if (customer == null) {
             log.error("No Customer found with this Id: $ticket.customerId")
             throw ProfileNotFoundException("Customer not found with this id!")
         }
         val order = orderService.getOrderByOrderId(ticket.orderId)
 
-        if(order == null){
+        if (order == null) {
             log.error("No Order found with this Id: $ticket.orderId")
             throw OrderNotFoundException("Order not found with this id!")
         }
 
-        val tickets = customer.id?.let { order.id?.let { it1 ->
-            ticketRepository.getTicketsByCustomerIdAndOrderId(it,
-                it1
-            )
-        } }
+        val tickets = customer.id?.let {
+            order.id?.let { it1 ->
+                ticketRepository.getTicketsByCustomerIdAndOrderId(
+                    it,
+                    it1
+                )
+            }
+        }
 
         if (tickets != null) {
             if (tickets.isNotEmpty()) {
@@ -204,10 +217,10 @@ class TicketServiceImpl(
         }
 
         val warranty = orderService.getOrderByCustomerAndProduct(customer.email, order.product.id)
-            if(warranty == null){
-                log.error("No Warranty found with those Customer: $ticket.customerId and Product: $ticket.productId")
-                throw OrderNotFoundException("Order not found with this combination of product and customer!")
-            }
+        if (warranty == null) {
+            log.error("No Warranty found with those Customer: $ticket.customerId and Product: $ticket.productId")
+            throw OrderNotFoundException("Order not found with this combination of product and customer!")
+        }
         if (Date().after(warranty.warrantyDuration)) {
             log.error("Create ticket failed, order warranty expired")
             throw WarrantyExpiredException("Order warranty expired!")
@@ -236,6 +249,19 @@ class TicketServiceImpl(
                     category = ticketToSave.category
                 )
             )
+            val authentication = SecurityContextHolder.getContext().authentication
+            val currentUserId = profileService.getUserIdByEmail(authentication.name)
+            notificationService.send(
+                Notification(
+                    url = "/tickets/${ticketToSave.id}",
+                    description = "New ticket #${ticket.id} has been created.",
+                    title = "New Ticket created.",
+                    type = "TICKET_CREATE",
+                    recipientIds = managerService.getAllManagers().map { it.id },
+                    senderId = currentUserId,
+                    timestamp = Date()
+                )
+            )
             log.info("Create ticket successful (repository)")
             return ticketToSave.toDTO()
         }
@@ -248,26 +274,29 @@ class TicketServiceImpl(
     @Transactional
     override fun updateTicket(ticket: TicketInputDTO): TicketDTO? {
         val currentTicket = getTicketById(ticket.id!!)?.toTicket()
-        if(currentTicket == null) {
+        if (currentTicket == null) {
             log.error("No Ticket found with this Id: $ticket.id")
             throw TicketNotFoundException("Ticket not found with this id!")
         }
         val expert = expertService.getExpertById(ticket.expertId)?.toExpert()
-        if(expert == null){
+        if (expert == null) {
             log.error("No Expert found with this Id: ${ticket.expertId}")
             throw ProfileNotFoundException("Expert not found with this id!")
-            }
+        }
         if (!TicketStatusValues.checkStatusUpdateConsistency(currentTicket.status, ticket.status!!)) {
             log.error("Update Ticket failed by ticket status conflict")
             throw TicketStatusUpdateConflictException("Ticket Status update conflict!")
         }
 
         val authentication = SecurityContextHolder.getContext().authentication
-        val ticketToUpdate: Ticket?
-        when (authentication.authorities.map { it.authority }[0]) {
+        val ticketToUpdate: Ticket = when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
-                ticketToUpdate = accessGrantedUpdateTicket(currentTicket, ticket, expert)
+                accessGrantedUpdateTicket(currentTicket, ticket, expert)
             }
+            SecurityConfig.EXPERT_ROLE -> {
+                accessGrantedUpdateTicket(currentTicket, ticket, expert)
+            }
+
             else -> {
                 log.error("Update ticket failed by unauthorized access")
                 throw UnauthorizedTicketException("You can't access this ticket!")
@@ -286,11 +315,23 @@ class TicketServiceImpl(
                 )
             )
         }
+        val currentUserId = profileService.getUserIdByEmail(authentication.name)
+        notificationService.send(
+            Notification(
+                url = "/tickets/${ticketToUpdate.id}",
+                description = "Ticket #${ticketToUpdate.id} has been updated.",
+                title = "Ticket updated.",
+                type = "TICKET_UPDATE",
+                recipientIds = listOfNotNull(ticketToUpdate.expert?.id, ticketToUpdate.customer.id.toString()),
+                senderId = currentUserId,
+                timestamp = Date()
+            )
+        )
         log.info("Update ticket successful (repository)")
         return ticketToUpdate.toDTO()
     }
 
-    fun accessGrantedUpdateTicket(currentTicket: Ticket, ticket: TicketInputDTO, expert: Expert) : Ticket {
+    fun accessGrantedUpdateTicket(currentTicket: Ticket, ticket: TicketInputDTO, expert: Expert): Ticket {
         val ticketToUpdate = ticketRepository.save(
             Ticket(
                 currentTicket.id,
@@ -316,14 +357,15 @@ class TicketServiceImpl(
         )
         return ticketToUpdate
     }
-    @Observed(
+
+    /*@Observed(
         name = "tickets/{ticketId}/status/{status}",
         contextualName = "put-ticket-status-request-service"
     )
     @Transactional
     override fun updateTicketStatus(ticketId: Long, statusValue: String): TicketDTO? {
         val ticket = getTicketById(ticketId)?.toTicket()
-        if(ticket == null){
+        if (ticket == null) {
             log.error("No Ticket found with this Id: $ticketId")
             throw TicketNotFoundException("Ticket not found!")
         }
@@ -340,21 +382,22 @@ class TicketServiceImpl(
         val authentication = SecurityContextHolder.getContext().authentication
         when (authentication.authorities.map { it.authority }[0]) {
             SecurityConfig.MANAGER_ROLE -> {
-                accessGrantedUpdateTicketStatus(ticket, status)
+                accessGrantedUpdateTicketStatus(ticket, status, authentication)
                 log.info("Create ticket status successful (repository)")
                 return ticket.toDTO()
             }
+
             SecurityConfig.EXPERT_ROLE -> {
-                if(ticket.expert?.email == authentication.name){
-                    accessGrantedUpdateTicketStatus(ticket, status)
+                if (ticket.expert?.email == authentication.name) {
+                    accessGrantedUpdateTicketStatus(ticket, status, authentication)
                     log.info("Create ticket status successful (repository)")
                     return ticket.toDTO()
-                }
-                else {
+                } else {
                     log.error("Update ticket status failed by unauthorized access")
                     throw UnauthorizedTicketException("You can't access this ticket!")
                 }
             }
+
             else -> {
                 log.error("Update ticket status failed by unauthorized access")
                 throw UnauthorizedTicketException("You can't access this ticket!")
@@ -363,7 +406,7 @@ class TicketServiceImpl(
     }
 
 
-    fun accessGrantedUpdateTicketStatus(ticket: Ticket, status: TicketStatusValues) {
+    fun accessGrantedUpdateTicketStatus(ticket: Ticket, status: TicketStatusValues, authentication: Authentication) {
         ticket.status = status
         ticketRepository.save(ticket)
         ticketStatusService.createTicketStatus(
@@ -377,17 +420,22 @@ class TicketServiceImpl(
                 category = ticket.category
             )
         )
+        val currentUserId = profileService.getUserIdByEmail(authentication.name)
         notificationService.send(
             Notification(
                 url = "/tickets/${ticket.id}",
-                description = "Ticket ${ticket.id} status changed to ${ticket.status}",
-                title = "Ticket status changed",
-                recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id),
-                senderId = null,
+                description = "Ticket #${ticket.id} status has changed to \"${
+                    ticket.status.toString().replace("_", " ")
+                }\".",
+                title = "Ticket status updated.",
+                type = "TICKET_STATUS_UPDATE",
+                recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id.toString()),
+                senderId = currentUserId,
                 timestamp = Date()
             )
         )
     }
+*/
     @Observed(
         name = "tickets/{ticketId}/priority/{priority}",
         contextualName = "put-ticket-priority-request-service"
@@ -405,11 +453,25 @@ class TicketServiceImpl(
             throw TicketPriorityInvalidException("Ticket Priority not valid!")
         }
         ticket.priority = priority
+        val authentication = SecurityContextHolder.getContext().authentication
+        println(authentication.details)
+        val currentUserId = profileService.getUserIdByEmail(authentication.name)
+        notificationService.send(
+            Notification(
+                url = "/tickets/${ticket.id}",
+                description = "Ticket #${ticket.id} priority has changed to ${ticket.priority}.",
+                title = "Ticket priority updated.",
+                type = "TICKET_PRIORITY_UPDATE",
+                recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id.toString()),
+                senderId = currentUserId,
+                timestamp = Date()
+            )
+        )
         log.info("Update ticket priority successful (repository)")
         return ticketRepository.save(ticket).toDTO()
     }
 
-    fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
+    /*fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
         val expert = expertService.getExpertById(expertId)?.toExpert()
         if (expert == null) {
             log.error("No Expert found with this ID: $expertId")
@@ -432,8 +494,8 @@ class TicketServiceImpl(
     }
 
     @Observed(
-            name = "tickets/{ticketId}/expertId/{expertId}",
-            contextualName = "put-ticket-expertId-request-service"
+        name = "tickets/{ticketId}/expertId/{expertId}",
+        contextualName = "put-ticket-expertId-request-service"
     )
     override fun updateTicketExpert(ticketId: Long, expertId: String): TicketDTO? {
         val ticket = getTicketById(ticketId)?.toTicket()
@@ -443,9 +505,21 @@ class TicketServiceImpl(
         }
 
         accessGrantedUpdateTicketExpert(ticket, expertId)
-
+        val authentication = SecurityContextHolder.getContext().authentication
+        val currentUserId = profileService.getUserIdByEmail(authentication.name)
+        notificationService.send(
+            Notification(
+                url = "/tickets/${ticket.id}",
+                description = "Ticket #${ticket.id} has been assigned to ${ticket.expert?.name} ${ticket.expert?.surname}.",
+                title = "Ticket expert updated.",
+                type = "TICKET_EXPERT_UPDATE",
+                recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id.toString()),
+                senderId = currentUserId,
+                timestamp = Date()
+            )
+        )
         log.info("Update expert successful (repository)")
         return ticketRepository.save(ticket).toDTO()
     }
-
+*/
 }

@@ -8,12 +8,14 @@ data class Notification(
     val url: String,
     @JsonProperty("title")
     val title: String,
+    @JsonProperty("type")
+    val type: String,
     @JsonProperty("description")
     val description: String,
     @JsonProperty("recipientIds")
-    val recipientIds: List<Any>,
+    val recipientIds: List<String?>,
     @JsonProperty("senderId")
-    val senderId: Long?,
+    val senderId: String?,
     @JsonProperty("timestamp")
     val timestamp: Date
 )

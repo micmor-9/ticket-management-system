@@ -17,7 +17,7 @@ import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, Fragment} from "react";
 
 const NotificationsPanel = ({open, anchorEl, setOpenNotifications, notifications, setNotifications}) => {
     const theme = useTheme();
@@ -45,8 +45,12 @@ const NotificationsPanel = ({open, anchorEl, setOpenNotifications, notifications
         };
     }, [popperRef]);
 
-    return <Popper ref={popperRef} id="notifications-popper" open={open} placement={"bottom-end"}
-                   anchorEl={anchorEl} transition>
+    const removeNotification = (idx) => {
+        setNotifications(notifications.filter((notification, index) => index !== idx));
+    }
+
+    return (<Popper ref={popperRef} id="notifications-popper" open={open} placement={"bottom-end"}
+                    anchorEl={anchorEl} transition>
         {({TransitionProps}) => (
             <Grow {...TransitionProps} style={{transformOrigin: 'right'}} timeout={350}>
                 <Paper elevation={2} variant="elevation" square={false}
@@ -58,9 +62,13 @@ const NotificationsPanel = ({open, anchorEl, setOpenNotifications, notifications
                     <List>
                         {notifications && notifications.length > 0 ? (
                                 notifications.map((notification, idx) => (
-                                    <>
+                                    <Fragment key={idx}>
                                         <ListItem key={"notification-" + idx} onClick={() => {
                                             navigate(notification.url);
+                                            setTimeout(() => {
+                                                setOpenNotifications(false);
+                                                removeNotification(idx)
+                                            }, 500);
                                         }} sx={{"cursor": "pointer"}}>
                                             <ListItemAvatar>
                                                 <Avatar sx={{bgcolor: colors.greenAccent[600]}}>
@@ -72,7 +80,8 @@ const NotificationsPanel = ({open, anchorEl, setOpenNotifications, notifications
                                                 secondary={notification.description}
                                             />
                                         </ListItem>
-                                        {idx !== (notifications.length - 1) && <Divider/>}</>
+                                        {idx !== (notifications.length - 1) && <Divider/>}
+                                    </Fragment>
                                 ))) :
                             <ListItem><Typography variant={"h4"}>No notifications</Typography></ListItem>
                         }
@@ -80,7 +89,7 @@ const NotificationsPanel = ({open, anchorEl, setOpenNotifications, notifications
                 </Paper>
             </Grow>
         )}
-    </Popper>;
+    </Popper>);
 }
 
 export default NotificationsPanel;

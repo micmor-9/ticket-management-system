@@ -19,10 +19,10 @@ class NotificationListener {
     fun listenGroupFoo(consumerRecord: ConsumerRecord<String, Notification>, ack: Acknowledgment) {
         logger.info("Notification received {}", consumerRecord)
         val notification = consumerRecord.value()
-        println(notification);
-        for(recipient in notification.recipientIds) {
-            println(recipient);
-            template.convertAndSend("/topic/notifications-$recipient", notification)
+        for (recipient in notification.recipientIds) {
+            if (recipient != notification.senderId) {
+                template.convertAndSend("/topic/notifications-$recipient", notification)
+            }
         }
         ack.acknowledge()
     }

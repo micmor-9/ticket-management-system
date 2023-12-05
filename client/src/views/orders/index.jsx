@@ -24,12 +24,6 @@ const Orders = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 2000)
-    }, []);
-
-    useEffect(() => {
         const fetchOrders = async () => {
             try {
                 let ordersData = [];
@@ -42,7 +36,9 @@ const Orders = () => {
                 showDialog("Error while fetching orders", "error");
             }
         };
-        fetchOrders();
+        fetchOrders().then(() => setTimeout(() => {
+            setIsLoading(false)
+        }, 1000));
     }, [currentUser.id, currentUser.role, currentUser.email, showDialog]);
 
     const columns = [

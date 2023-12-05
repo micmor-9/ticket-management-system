@@ -21,7 +21,7 @@ import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 
 @Service
-class AuthServiceImpl() : AuthService  {
+class AuthServiceImpl() : AuthService {
 
     @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     lateinit var keycloakUrlIssuer: String
@@ -44,7 +44,7 @@ class AuthServiceImpl() : AuthService  {
     @Autowired
     lateinit var expertService: ExpertServiceImpl
 
-    private val log: Logger = LoggerFactory.getLogger(AuthController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @Observed(
         name = "signup",
