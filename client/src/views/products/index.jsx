@@ -10,7 +10,6 @@ import HeaderActions from "../../components/HeaderActions";
 import {tokens} from "../../theme";
 import {useDialog} from "../../utils/DialogContext";
 import OrdersAPI from "../../api/orders/ordersApi";
-import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";

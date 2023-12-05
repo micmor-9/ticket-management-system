@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from "react";
+import {useState, useEffect, Fragment} from "react";
 import {
     Button,
     Box,
@@ -9,70 +9,70 @@ import {
     Collapse,
     Divider,
 } from "@mui/material";
-import { tokens } from "../../../theme";
+import {tokens} from "../../../theme";
 import Header from "../../../components/Header";
 import TicketsAPI from "../../../api/tickets/ticketsApi";
-import { useParams } from "react-router-dom";
+import {useParams} from "react-router-dom";
 import Chat from "../../../components/Chat";
 import StatusBadge from "../../../components/StatusBadge";
 import PriorityBadge from "../../../components/PriorityBadge";
 import TicketStatusHistory from "../../../components/TicketStatusHistory";
-import { useDialog } from "../../../utils/DialogContext";
+import {useDialog} from "../../../utils/DialogContext";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 
 const Ticket = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const { showDialog } = useDialog();
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const {showDialog} = useDialog();
 
-  const { ticketId } = useParams();
-  const [ticket, setTicket] = useState(null);
-  const [ticketStatus, setTicketStatus] = useState(null);
-  const [historyExpanded, setHistoryExpanded] = useState(false);
+    const {ticketId} = useParams();
+    const [ticket, setTicket] = useState(null);
+    const [ticketStatus, setTicketStatus] = useState(null);
+    const [historyExpanded, setHistoryExpanded] = useState(false);
 
-  const handleHistoryExpand = () => {
-    setHistoryExpanded(!historyExpanded);
-  };
-
-  useEffect(() => {
-    const fetchTicket = async () => {
-      try {
-        const ticketData = await TicketsAPI.getTicketById(ticketId);
-        const ticketStatusData = await TicketsAPI.getTicketStatusByTicketId(
-          ticketId
-        );
-        setTicket(ticketData);
-        setTicketStatus(ticketStatusData);
-      } catch (error) {
-        showDialog("Error while fetching ticket", "error");
-      }
+    const handleHistoryExpand = () => {
+        setHistoryExpanded(!historyExpanded);
     };
 
-    fetchTicket();
-  }, [ticketId, showDialog]);
+    useEffect(() => {
+        const fetchTicket = async () => {
+            try {
+                const ticketData = await TicketsAPI.getTicketById(ticketId);
+                const ticketStatusData = await TicketsAPI.getTicketStatusByTicketId(
+                    ticketId
+                );
+                setTicket(ticketData);
+                setTicketStatus(ticketStatusData);
+            } catch (error) {
+                showDialog("Error while fetching ticket", "error");
+            }
+        };
 
-  const ticketPropertyNameStyles = {
-    fontWeight: "bold",
-    color: colors.primary[200],
-    textTransform: "uppercase",
-  };
+        fetchTicket();
+    }, [ticketId, showDialog]);
 
-  const ticketPropertyValueStyles = {
-    color: colors.primary[100],
-  };
+    const ticketPropertyNameStyles = {
+        fontWeight: "bold",
+        color: colors.primary[200],
+        textTransform: "uppercase",
+    };
 
-  const ticketPropertyOrder = [
-    "creationTimestamp",
-    "category",
-    "customer",
-    "expert",
-    "order",
-    "status",
-    "priority",
-    "issueDescription",
-    "id",
-  ];
+    const ticketPropertyValueStyles = {
+        color: colors.primary[100],
+    };
+
+    const ticketPropertyOrder = [
+        "creationTimestamp",
+        "category",
+        "customer",
+        "expert",
+        "order",
+        "status",
+        "priority",
+        "issueDescription",
+        "id",
+    ];
 
     return (
         <Box m="20px">
@@ -217,6 +217,7 @@ const Ticket = () => {
                                     )}
                                 </Button>
                             </Typography>
+                            <Divider/>
                             {ticket && ticketStatus && (
                                 <TicketStatusHistory
                                     history={ticketStatus}

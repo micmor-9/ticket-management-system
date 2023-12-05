@@ -23,7 +23,6 @@ import {tokens} from "../theme";
 import MessagesAPI from "../api/messages/messagesApi";
 import {AuthContext} from "../utils/AuthContext";
 import Lightbox from "./Lightbox";
-import ProfilesAPI from "../api/profiles/profilesApi";
 import {useDialog} from "../utils/DialogContext";
 
 const SOCKET_URL = "ws://localhost:8081/ws";

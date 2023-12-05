@@ -12,7 +12,6 @@ import it.polito.wa2.g35.server.profiles.customer.CustomerService
 import it.polito.wa2.g35.server.profiles.customer.toCustomer
 import it.polito.wa2.g35.server.profiles.employee.manager.ManagerService
 import it.polito.wa2.g35.server.security.SecurityConfig
-import it.polito.wa2.g35.server.ticketing.ticket.TicketController
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
