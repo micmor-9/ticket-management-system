@@ -143,141 +143,141 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
 
     return (
         currentUser.role==="Manager" && (
-        <Box
-            display="grid"
-            gap="30px"
-            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-            sx={{
-                backgroundColor: colors.primary[400],
-                color:
-                    theme.palette.mode === "dark"
-                        ? colors.primary[100]
-                        : colors.primary[500],
-                borderRadius: "10px",
-                padding: "20px",
-            }}
-            component="form"
-        >
-            <TextField
-                fullWidth
-                type="text"
-                label="Product"
-                value={product.name}
-                required
-                error={Boolean(errors.name)}
-                helperText={errors.name}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("name", e.target.value)}
-            />
-            <TextField
-                fullWidth
-                type="text"
-                label="Category"
-                value={product.description}
-                error={Boolean(errors.description)}
-                helperText={errors.description}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("description", e.target.value)}
-            />
-            <TextField
-                fullWidth
-                type="text"
-                label="Price"
-                value={product.price}
-                error={Boolean(errors.price)}
-                helperText={errors.price}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                InputLabelProps={{
-                    shrink: true,
+            <Box
+                display="grid"
+                gap="30px"
+                gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+                sx={{
+                    backgroundColor: colors.primary[400],
+                    color:
+                        theme.palette.mode === "dark"
+                            ? colors.primary[100]
+                            : colors.primary[500],
+                    borderRadius: "10px",
+                    padding: "20px",
                 }}
-                inputProps={{
-                    pattern: "^[0-9]*[.,]?[0-9]*$",
-                    inputMode: "numeric",
-                }}
-                onChange={(e) => {
-                    const value = e.target.value;
+                component="form"
+            >
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Product"
+                    value={product.name}
+                    required
+                    error={Boolean(errors.name)}
+                    helperText={errors.name}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => handleFieldChange("name", e.target.value)}
+                />
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Category"
+                    value={product.description}
+                    error={Boolean(errors.description)}
+                    helperText={errors.description}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => handleFieldChange("description", e.target.value)}
+                />
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Price"
+                    value={product.price}
+                    error={Boolean(errors.price)}
+                    helperText={errors.price}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    inputProps={{
+                        pattern: "^[0-9]*[.,]?[0-9]*$",
+                        inputMode: "numeric",
+                    }}
+                    onChange={(e) => {
+                        const value = e.target.value;
 
-                    if (/^[0-9]*[.,]?[0-9]*$/.test(value)) {
-                        handleFieldChange("price", value);
-                    }}}
-            />
-            <TextField
-                fullWidth
-                type="text"
-                label="Quantity"
-                value={product.quantity}
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                inputProps={{
-                    pattern: "[0-9]*",
-                    inputMode: "numeric",
-                }}
-                error={Boolean(errors.quantity)}
-                helperText={errors.quantity}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => {
-                    const value = e.target.value;
+                        if (/^[0-9]*[.,]?[0-9]*$/.test(value)) {
+                            handleFieldChange("price", value);
+                        }}}
+                />
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Quantity"
+                    value={product.quantity}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    inputProps={{
+                        pattern: "[0-9]*",
+                        inputMode: "numeric",
+                    }}
+                    error={Boolean(errors.quantity)}
+                    helperText={errors.quantity}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => {
+                        const value = e.target.value;
 
-                    if (/^[0-9]*$/.test(value)) {
-                        handleFieldChange("quantity", value);
-                    }
-                }}
-            />
-            <TextField
-                fullWidth
-                type="text"
-                label="Id"
-                value={product.id}
-                required
-                disabled={isUpdateMode}
-                error={Boolean(errors.id)}
-                helperText={errors.id}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("id", e.target.value)}
-            />
-            <TextField
-                fullWidth
-                type="text"
-                label="Warranty Duration"
-                value={product.warrantyDuration}
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                error={Boolean(errors.warrantyDuration)}
-                helperText={errors.warrantyDuration}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("warrantyDuration", e.target.value)}
-            />
-            <Box display="flex" justifyContent="flex-end" gridColumn="span 4">
-                <Button type="button" variant="contained" startIcon={<DeleteIcon/>}
-                        sx={{
-                            backgroundColor: colors.redAccent[600],
-                            margin: "0 20px 0 0",
-                            "&:hover": {
-                                backgroundColor: colors.redAccent[500],
-                            },
-                        }}
-                        onClick={() => {
-                            navigate(-1);
-                        }}>
-                    Cancel
-                </Button>
-                {currentUser.role === "Manager" && (
-                    <Button type="button" startIcon={<SendIcon/>} variant="contained"
+                        if (/^[0-9]*$/.test(value)) {
+                            handleFieldChange("quantity", value);
+                        }
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Id"
+                    value={product.id}
+                    required
+                    disabled={isUpdateMode}
+                    error={Boolean(errors.id)}
+                    helperText={errors.id}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => handleFieldChange("id", e.target.value)}
+                />
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Warranty Duration"
+                    value={product.warrantyDuration}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    error={Boolean(errors.warrantyDuration)}
+                    helperText={errors.warrantyDuration}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => handleFieldChange("warrantyDuration", e.target.value)}
+                />
+                <Box display="flex" justifyContent="flex-end" gridColumn="span 4">
+                    <Button type="button" variant="contained" startIcon={<DeleteIcon/>}
                             sx={{
-                                backgroundColor: colors.greenAccent[600],
-                                marginRight: "0px",
+                                backgroundColor: colors.redAccent[600],
+                                margin: "0 20px 0 0",
                                 "&:hover": {
-                                    backgroundColor: colors.greenAccent[400],
+                                    backgroundColor: colors.redAccent[500],
                                 },
                             }}
-                            onClick={handleFormSubmit}
-                    >
-                        {isUpdateMode? "Save" : "Create New product"}
-                    </Button>)}
-            </Box>
-        </Box>)
+                            onClick={() => {
+                                navigate(-1);
+                            }}>
+                        Cancel
+                    </Button>
+                    {currentUser.role === "Manager" && (
+                        <Button type="button" startIcon={<SendIcon/>} variant="contained"
+                                sx={{
+                                    backgroundColor: colors.greenAccent[600],
+                                    marginRight: "0px",
+                                    "&:hover": {
+                                        backgroundColor: colors.greenAccent[400],
+                                    },
+                                }}
+                                onClick={handleFormSubmit}
+                        >
+                            {isUpdateMode? "Save" : "Create New product"}
+                        </Button>)}
+                </Box>
+            </Box>)
     );
 
 }
