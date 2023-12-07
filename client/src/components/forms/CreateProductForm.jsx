@@ -21,8 +21,8 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
         id: "",
         description : "",
         name: "",
-        price: 0.0,
-        quantity: 0,
+        price: "",
+        quantity: "",
         warrantyDuration: ""
     });
     const [errors, setErrors] = useState({
@@ -45,6 +45,19 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                 newErrors[field] = `${name} is too long`;
             }
         };
+        const validatePrice = (field, value, name, maxDecimal) => {
+            if (value.length === 0) {
+                newErrors[field] = "Required";
+            } else {
+                value.replace(',', '.');
+                console.log("Value: " + parseFloat(value));
+
+                const decimalCount = (value.split('.')[1] || '').length;
+                if (decimalCount > maxDecimal) {
+                    newErrors[field] = `Wrong format`;
+                }
+            }
+        };
 
         validateLength("id", product.id, "Id", 1, 50);
         validateLength("name", product.name, "Product", 2, 50);
@@ -52,7 +65,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
             validateLength("category", product.description, "Category", 2, 50);
         }
         if (product.price.length > 0) {
-            validateLength("price", product.price, "Price", 1, 10);
+            validatePrice("price", product.price, "Price", 2);
         }
         if (product.quantity.length > 0) {
             validateLength("quantity", product.quantity, "Quantity", 1, 10);
@@ -69,6 +82,8 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
             }
         }
         setErrors(newErrors);
+        console.log("Price:" + product.price);
+        console.log("Price:" + parseFloat(product.price));
         if (Object.keys(newErrors).length === 0) {
             const productData = {
                 id: product.id ,
@@ -78,17 +93,15 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                 quantity: product.quantity ? parseInt(product.quantity) : 0,
                 warrantyDuration: product.warrantyDuration ? product.warrantyDuration : ""
             };
-            console.log(product.id);
+
             try {
                 if(isUpdateMode) {
                     const response = await productsApi.updateProducts(product.id, productData);
-                    console.log(response);
                     showDialog("Product updated", "success");
                     navigate(-1);
                 }
                 else{
                     const response = await productsApi.createProducts(productData);
-                    console.log(response);
                     showDialog("Product created", "success");
                     navigate(-1);
                 }
@@ -168,7 +181,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
             />
             <TextField
                 fullWidth
-                type="number"
+                type="text"
                 label="Price"
                 value={product.price}
                 error={Boolean(errors.price)}
@@ -177,20 +190,39 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                 InputLabelProps={{
                     shrink: true,
                 }}
-                onChange={(e) => handleFieldChange("price", e.target.value)}
+                inputProps={{
+                    pattern: "^[0-9]*[.,]?[0-9]*$",
+                    inputMode: "numeric",
+                }}
+                onChange={(e) => {
+                    const value = e.target.value;
+
+                    if (/^[0-9]*[.,]?[0-9]*$/.test(value)) {
+                        handleFieldChange("price", value);
+                    }}}
             />
             <TextField
                 fullWidth
-                type="number"
+                type="text"
                 label="Quantity"
                 value={product.quantity}
                 InputLabelProps={{
                     shrink: true,
                 }}
+                inputProps={{
+                    pattern: "[0-9]*",
+                    inputMode: "numeric",
+                }}
                 error={Boolean(errors.quantity)}
                 helperText={errors.quantity}
                 sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("quantity", e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value;
+
+                    if (/^[0-9]*$/.test(value)) {
+                        handleFieldChange("quantity", value);
+                    }
+                }}
             />
             <TextField
                 fullWidth
