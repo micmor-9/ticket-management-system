@@ -7,17 +7,15 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry
-import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.stereotype.Component
-import java.util.*
 
 
 @Component
@@ -39,6 +37,11 @@ class SecurityConfig() {
     }
 
     @Bean
+    fun bCryptPasswordEncoder(): BCryptPasswordEncoder {
+        return BCryptPasswordEncoder()
+    }
+
+    @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.csrf().disable()
         http.cors()
@@ -46,6 +49,7 @@ class SecurityConfig() {
             .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/profiles/").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/signup").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/resetPassword").permitAll()
             .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/ws/**").permitAll()
             .anyRequest().authenticated()

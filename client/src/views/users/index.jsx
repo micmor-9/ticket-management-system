@@ -28,7 +28,7 @@ const Users = () => {
         Expert: 1,
         Manager: 2,
     };
-
+    const [roleFilter, setRoleFilter] = useState(userRole.Customer);
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -50,7 +50,6 @@ const Users = () => {
         fetchUsers();
     }, [currentUser.role, currentUser.id]);
 
-    const [roleFilter, setRoleFilter] = useState(userRole.Customer);
 
     const columns = getUsersColumns(roleFilter, userRole);
 
@@ -67,10 +66,23 @@ const Users = () => {
                         color="secondary"
                         startIcon={<AddIcon/>}
                         onClick={() => {
-                            navigate(`/users/create`)
+
+                            switch (roleFilter) {
+                                case userRole.Customer:
+                                    navigate("/users/create");
+                                    break;
+                                case userRole.Expert:
+                                    navigate("/expert/create");
+                                    break;
+                                default:
+                                    break;
+                            }
                         }}
-                        sx={{marginLeft: "15px"}}
-                    >New User
+                        sx={{
+                            marginLeft: "15px",
+                    }}
+                    >
+                        {roleFilter === userRole.Expert ? "New Expert" : "New User"}
                     </Button>
                 </HeaderActions>
             </Header>

@@ -51,6 +51,9 @@ dependencies {
     implementation("io.zipkin.reporter2:zipkin-reporter-brave")
     // send logs by log Appender through URL
     implementation("com.github.loki4j:loki-logback-appender:1.4.0-rc2")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("com.sun.mail:javax.mail:1.6.2")
 }
 
 tasks.withType<KotlinCompile> {

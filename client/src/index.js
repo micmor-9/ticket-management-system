@@ -6,6 +6,7 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Login from "./views/login";
 import {DialogProvider} from "./utils/DialogContext";
 import Signup from "./views/signup";
+import ForgotPassword from "./views/ForgotPassword";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -16,6 +17,7 @@ root.render(
                     <Route path="/*" element={<App/>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/signup" element={<Signup/>}/>
+                    <Route path="/forgot-password" element={<ForgotPassword/>}/>
                 </Routes>
             </BrowserRouter>
         </DialogProvider>

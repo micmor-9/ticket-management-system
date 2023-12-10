@@ -89,7 +89,7 @@ class ExpertServiceImpl(private val expertRepository: ExpertRepository) : Expert
         contextualName = "post-expert-request-service"
     )
     override fun createExpert(expert: ExpertDTO): ExpertDTO? {
-        val checkIfProfileExists = expertRepository.findByIdOrNull(expert.id)
+        val checkIfProfileExists = expertRepository.findByEmail(expert.email)
         if (checkIfProfileExists == null) {
             log.info("Create expert request successful (repository)")
             return expertRepository.save(

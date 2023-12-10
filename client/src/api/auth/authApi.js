@@ -34,9 +34,57 @@ export const signup = async (signupRequest) => {
 
 export const createExpert = async (signupRequest) => {
   try {
-    const response = await api.post("/createExpert", signupRequest);
+    const response = await api.post("/createExpert", signupRequest, {
+        headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    });
     return response.data;
   } catch (error) {
     throw error;
   }
 };
+
+
+export const resetPassword = async (email) => {
+  try {
+    const response = await api.post("/resetPassword", null, {
+      params: { email },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const changePassword = async (email, oldPassword, newPassword) => {
+  try {
+    const response = await api.post(
+        `/changePassword`,
+        {
+          email: email,
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
+const authApi = {
+  login,
+  signup,
+  createExpert,
+  changePassword,
+  resetPassword
+}
+export default authApi;

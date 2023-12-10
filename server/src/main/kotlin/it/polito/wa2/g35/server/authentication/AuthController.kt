@@ -3,7 +3,12 @@ package it.polito.wa2.g35.server.authentication
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.profiles.customer.Customer
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
+
 import it.polito.wa2.g35.server.profiles.customer.toDTO
+import it.polito.wa2.g35.server.profiles.employee.expert.Expert
+import it.polito.wa2.g35.server.profiles.employee.expert.ExpertService
+import it.polito.wa2.g35.server.profiles.employee.expert.ExpertServiceImpl
+import it.polito.wa2.g35.server.profiles.employee.expert.toDTO
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +23,12 @@ import org.springframework.web.bind.annotation.*
 class AuthController {
     @Autowired
     lateinit var customerService: CustomerServiceImpl
+
+    @Autowired
+    lateinit var expertService: ExpertService
+
+    @Autowired
+    lateinit var expertServiceImpl: ExpertServiceImpl
 
     @Autowired
     lateinit var authService: AuthServiceImpl
@@ -78,6 +89,8 @@ class AuthController {
     )
     fun createExpert(@RequestBody signupRequest: SignupExpertRequest): ResponseEntity<String> {
         if (authService.signupExpert(signupRequest) != null) {
+            authService.signupExpert(signupRequest)
+
             log.info("Expert created: ${signupRequest.email}")
             return ResponseEntity.ok("Expert created!")
         } else {
@@ -85,6 +98,39 @@ class AuthController {
             return ResponseEntity("Expert already exists", HttpStatus.CONFLICT)
         }
     }
+
+    @PostMapping("/resetPassword")
+    @ResponseStatus(HttpStatus.OK)
+    @Observed(
+            name = "resetPassword",
+            contextualName = "reset-password-request"
+    )
+    fun resetPassw(@RequestParam("email") email: String): ResponseEntity<String> {
+        return if (authService.resetPassw(email)) {
+            log.info("Password reset request successful for email: $email")
+            ResponseEntity.ok("Password reset successful! Check your email for the new password.")
+        } else {
+            log.error("Password reset request failed for email: $email")
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with the given email address.")
+        }
+    }
+
+    @PostMapping("/changePassword")
+    @ResponseStatus(HttpStatus.OK)
+    @Observed(
+            name = "changePassword",
+            contextualName = "change-password-request"
+    )
+    fun changePassword(@RequestBody request: ChangePasswordRequest): ResponseEntity<String> {
+        return if (authService.changePassword(request)) {
+            log.info("Password change request successful for email: ${request.email}")
+            ResponseEntity.ok("Password change successful!")
+        } else {
+            log.error("Password change request failed for email: ${request.email}")
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password change failed. Please check your credentials.")
+        }
+    }
+
 
 
 }

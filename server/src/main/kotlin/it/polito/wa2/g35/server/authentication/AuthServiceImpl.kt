@@ -8,6 +8,8 @@ import it.polito.wa2.g35.server.profiles.employee.expert.ExpertDTO
 import it.polito.wa2.g35.server.profiles.employee.expert.ExpertServiceImpl
 import org.keycloak.admin.client.CreatedResponseUtil
 import org.keycloak.admin.client.Keycloak
+import org.keycloak.admin.client.resource.RealmResource
+import org.keycloak.admin.client.resource.UsersResource
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.slf4j.Logger
@@ -15,10 +17,21 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
+import java.util.*
+import javax.mail.Message
+import javax.mail.PasswordAuthentication
+import javax.mail.Session
+import javax.mail.Transport
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeMessage
+import kotlin.collections.ArrayList
+import kotlin.random.Random
 
 @Service
 class AuthServiceImpl() : AuthService {
@@ -44,7 +57,106 @@ class AuthServiceImpl() : AuthService {
     @Autowired
     lateinit var expertService: ExpertServiceImpl
 
+    @Autowired
+    lateinit var bCryptPasswordEncoder: BCryptPasswordEncoder
+
     private val log: Logger = LoggerFactory.getLogger(javaClass)
+
+
+    private fun getUserResource(): UsersResource {
+        val keycloak: Keycloak = Keycloak.getInstance(
+                "http://host.docker.internal:8080",
+                "master",
+                adminUsername,
+                adminPassword,
+                "admin-cli"
+        )
+        val realmResource: RealmResource = keycloak.realm(realmName)
+        return realmResource.users()
+    }
+
+
+    private fun sendPasswordEmail(email: String, password: String) {
+        val smtpProperties = Properties()
+        smtpProperties["mail.smtp.auth"] = "true"
+        smtpProperties["mail.smtp.starttls.enable"] = "true"
+        smtpProperties["mail.smtp.host"] = "smtp.gmail.com"
+        smtpProperties["mail.smtp.port"] = "587"
+
+        val session = Session.getInstance(smtpProperties, object : javax.mail.Authenticator() {
+            override fun getPasswordAuthentication(): PasswordAuthentication {
+                return PasswordAuthentication("frittycash@gmail.com", "ukpu nixg qrsn mvek")
+            }
+        })
+
+        try {
+            val message = MimeMessage(session)
+            message.setFrom(InternetAddress("no-reply-support@example.com"))
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email))
+            message.subject = "Your New Password"
+            message.setText("Dear User, the password associated to this email account: $email " + " is: " + "\n" +
+                    " $password")
+
+            Transport.send(message)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Gestisci l'eccezione in base alle tue esigenze
+        }
+    }
+
+    fun generateRandomPassword(length: Int): String {
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?"
+        return (1..length)
+                .map { chars[Random.nextInt(chars.length)] }
+                .joinToString("")
+    }
+
+    override fun changePassword(request: ChangePasswordRequest): Boolean {
+        println(request.newPassword)
+        val userResource = getUserResource()
+        val user = userResource.search(request.email).firstOrNull()
+        if (user != null) {
+            val authRequest = AuthRequest(
+                    username = request.email,
+                    password = request.oldPassword
+            )
+            val loginResult = login(authRequest)
+            if (loginResult != null) {
+                println(request.newPassword)
+
+                val credentialRepresentation = CredentialRepresentation().apply {
+                    type = CredentialRepresentation.PASSWORD
+                    value = request.newPassword
+                }
+
+                userResource.get(user.id).resetPassword(credentialRepresentation)
+
+                return true
+            }
+            return false
+        }
+        return false
+    }
+
+    override fun resetPassw(email: String): Boolean {
+        val userResource = getUserResource()
+        val user = userResource.search(email).firstOrNull()
+        if (user != null) {
+            val newPassword = generateRandomPassword(12)
+
+
+            val credentialRepresentation = CredentialRepresentation().apply {
+                type = CredentialRepresentation.PASSWORD
+                value = newPassword
+            }
+            userResource.get(user.id).resetPassword(credentialRepresentation)
+
+            sendPasswordEmail(email, newPassword)
+
+            return true
+        }
+        return false
+    }
 
     @Observed(
         name = "signup",
@@ -109,7 +221,9 @@ class AuthServiceImpl() : AuthService {
     }
 
     override fun signupExpert(signupRequest: SignupExpertRequest): ExpertDTO? {
+        val pwd = generateRandomPassword(10)
         val expertRepresentation = UserRepresentation().apply {
+
             firstName = signupRequest.name
             lastName = signupRequest.surname
             username = signupRequest.email
@@ -121,7 +235,7 @@ class AuthServiceImpl() : AuthService {
         val passwordCredentials = ArrayList<CredentialRepresentation>()
         val passwordCredential = CredentialRepresentation().apply {
             type = CredentialRepresentation.PASSWORD
-            value = signupRequest.password
+            value = pwd
             isTemporary = false
         }
         passwordCredentials.add(passwordCredential)
@@ -144,6 +258,7 @@ class AuthServiceImpl() : AuthService {
             signupRequest.email,
             signupRequest.specialization
         )
+        println(expertDTO)
 
         try {
             val expertResource = realmResource.users()
@@ -159,6 +274,12 @@ class AuthServiceImpl() : AuthService {
             val rolesResource = user.roles()
             roleRepresentation.attributes["specialization"] = listOf(signupRequest.specialization)
             rolesResource.realmLevel().add(listOf(roleRepresentation))
+            try {
+                // Invia l'email con la password al nuovo utente
+                sendPasswordEmail(signupRequest.email, pwd)
+            } catch (e: Exception) {
+                // Gestisci l'eccezione in base alle tue esigenze
+            }
         } catch (e: RuntimeException) {
             return null
         }

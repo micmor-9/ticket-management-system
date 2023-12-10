@@ -17,6 +17,11 @@ export default function Login() {
     const navigate = useNavigate();
     const { showDialog } = useDialog();
 
+    const handleForgotPasswordClick = () => {
+        navigate("/forgot-password");
+    };
+
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -97,7 +102,7 @@ export default function Login() {
 
                     <Grid container>
                         <Grid item xs>
-                            <Link href="#" variant="body2">
+                            <Link href="#" variant="body2" onClick={handleForgotPasswordClick}>
                                 Forgot password?
                             </Link>
                         </Grid>

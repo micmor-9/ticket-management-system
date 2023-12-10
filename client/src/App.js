@@ -13,11 +13,13 @@ import Ticket from "./views/tickets/[id]";
 import Products from "./views/products";
 import Orders from "./views/orders";
 import CreateTicket from "./views/tickets/create";
-import CreateUser from "./views/users/create";
+import { CreateUser, CreateExpert } from "./views/users/create";
 import MyAccount from "./views/myaccount";
+
 
 import {NotificationsContext, useNotifications} from "./utils/NotificationsContext";
 import CreateProduct from "./views/products/create";
+import ForgotPassword from "./views/ForgotPassword";
 
 
 function App() {
@@ -69,6 +71,7 @@ function App() {
                                     <Route path="/" element={<Dashboard/>}/>
                                     <Route path="/users" element={<Users/>}/>
                                     <Route path="/users/create" element={<CreateUser/>}/>
+                                    <Route path="/expert/create" element={<CreateExpert/>}/>
                                     <Route path="/products" element={<Products/>}/>
                                     <Route path="/products/create" element={<CreateProduct/>}/>
                                     <Route path="/tickets" element={<Tickets/>}/>
@@ -77,6 +80,7 @@ function App() {
                                     <Route path="/tickets/create/:orderId" element={<CreateTicket/>}/>
                                     <Route path="/tickets/create" element={<CreateTicket/>}/>
                                     <Route path="/myaccount" element={<MyAccount/>}/>
+                                    <Route path="/forgot-password" element={<ForgotPassword />} />
                                 </Routes>
                             </main>
                         </div>

@@ -64,7 +64,7 @@ class ExpertController(private val expertService: ExpertService){
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('Manager')")
     @Observed(
-        name = "/experts/specialization/{specialization}",
+        name = "/experts",
         contextualName = "post-expert-request"
     )
     fun createExpert(

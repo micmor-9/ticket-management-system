@@ -1,14 +1,16 @@
 package it.polito.wa2.g35.server.profiles.employee.expert
 
 import it.polito.wa2.g35.server.profiles.employee.Employee
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
+import jakarta.persistence.*
+
 
 @Entity
+@Table(name = "expert")
 class Expert(
-    id: String? = "",
-    name: String = "",
-    surname: String = "",
-    email: String = "",
-    var specialization: String = ""
-) : Employee(id, name, surname, email)
+        @Id
+        var id: String,
+        var name: String,
+        var surname: String,
+        var email: String,
+        var specialization: String,
+)

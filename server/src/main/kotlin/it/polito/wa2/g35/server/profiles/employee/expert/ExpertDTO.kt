@@ -2,7 +2,7 @@ package it.polito.wa2.g35.server.profiles.employee.expert
 
 
 data class ExpertDTO (
-    val id: String?,
+    val id: String,
     val name: String,
     val surname: String,
     val email: String,

@@ -112,6 +112,8 @@ const createUser = async (userData) => {
   }
 };
 
+
+
 const updateUser = async (email, userData) => {
     try {
         const response = await api.put(`/customers/{email}`, userData, {
@@ -124,6 +126,9 @@ const updateUser = async (email, userData) => {
         handleApiError(error);
     }
 };
+
+
+
 
 const ProfilesAPI = {
     getExpert,
