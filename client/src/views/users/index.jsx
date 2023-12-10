@@ -3,7 +3,7 @@ import {Box, Button, useTheme} from "@mui/material";
 import {StyledTabs, StyledTab} from "../../components/StyledTabs";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
 import Header from "../../components/Header";
-import {AuthContext, useAuth} from "../../utils/AuthContext";
+import {AuthContext} from "../../utils/AuthContext";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import {dataGridStyles} from "../../styles/dataGridStyles";
 import {useNavigate} from "react-router-dom";

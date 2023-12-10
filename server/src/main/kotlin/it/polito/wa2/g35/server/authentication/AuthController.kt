@@ -41,6 +41,23 @@ class AuthController {
         }
     }
 
+    @PostMapping("/refresh-token")
+    @ResponseStatus(HttpStatus.OK)
+    @Observed(
+        name = "refresh-token",
+        contextualName = "refresh-token-request"
+    )
+    fun refreshToken(@RequestBody refreshTokenRequest: RefreshTokenRequest): ResponseEntity<AuthResponse> {
+        val response = authService.refreshToken(refreshTokenRequest)
+        if (response != null) {
+            log.info("Refresh token request successful.")
+            return ResponseEntity.ok(response)
+        } else {
+            log.error("Wrong refresh token request.")
+            throw InvalidUserCredentialsException("Invalid refresh token!")
+        }
+    }
+
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)

@@ -7,8 +7,8 @@ import {
     ListItem,
     ListItemText,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { tokens } from "../../theme";
+import {useTheme} from "@mui/material/styles";
+import {tokens} from "../../theme";
 import Header from "../../components/Header";
 import {AuthContext, useAuth} from "../../utils/AuthContext";
 
@@ -19,7 +19,7 @@ const MyAccount = () => {
 
     return (
         <Box m="20px" sx={{position: "relative"}}>
-            <Header title="MY ACCOUNT" subtitle="Personal informations"/>
+            <Header title="MY ACCOUNT" subtitle="Personal information"/>
             <Paper
                 elevation={3}
                 sx={{
@@ -51,19 +51,19 @@ const MyAccount = () => {
                         />
                     </ListItem>
                     {currentUser.role === "Client" && (
-                    <ListItem>
-                        <ListItemText
-                            primary="Contact"
-                            secondary={currentUser.contact || "N/A"}
-                        />
-                    </ListItem> )}
+                        <ListItem>
+                            <ListItemText
+                                primary="Contact"
+                                secondary={currentUser.contact || "N/A"}
+                            />
+                        </ListItem>)}
                     {currentUser.role === "Client" && (
-                    <ListItem>
-                        <ListItemText
-                            primary="Address"
-                            secondary={currentUser.address || "N/A"}
-                        />
-                    </ListItem> )}
+                        <ListItem>
+                            <ListItemText
+                                primary="Address"
+                                secondary={currentUser.address || "N/A"}
+                            />
+                        </ListItem>)}
                 </List>
             </Paper>
         </Box>

@@ -192,4 +192,30 @@ class AuthServiceImpl() : AuthService {
             return null
         }
     }
+
+    override fun refreshToken(refreshTokenRequest: RefreshTokenRequest): AuthResponse? {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
+
+        val requestBody: MultiValueMap<String, String> = LinkedMultiValueMap()
+        requestBody.add("grant_type", "refresh_token")
+        requestBody.add("client_id", resourceId)
+        requestBody.add("refresh_token", refreshTokenRequest.refresh_token)
+
+        val requestEntity = HttpEntity(requestBody, headers)
+
+        val keycloakUrlTokenRequest = "$keycloakUrlIssuer/protocol/openid-connect/token"
+
+        try {
+            val tokenResponse: AuthResponse? = RestTemplate().exchange(
+                keycloakUrlTokenRequest,
+                HttpMethod.POST,
+                requestEntity,
+                AuthResponse::class.java
+            ).body
+            return tokenResponse
+        } catch (e: Exception) {
+            return null
+        }
+    }
 }

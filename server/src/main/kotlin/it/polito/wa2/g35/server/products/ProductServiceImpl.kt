@@ -102,8 +102,7 @@ class ProductServiceImpl(
             null
         }
     }
-
-
+    
     @Observed(
         name = "/products/{productId}",
         contextualName = "put-product-request-service"

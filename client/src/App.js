@@ -18,6 +18,7 @@ import MyAccount from "./views/myaccount";
 
 import {NotificationsContext, useNotifications} from "./utils/NotificationsContext";
 import CreateProduct from "./views/products/create";
+import Cookies from "js-cookie";
 
 
 function App() {
@@ -27,7 +28,8 @@ function App() {
     const location = useLocation();
     const [notifications, setNotifications] = useNotifications();
 
-    const token = localStorage.getItem("token");
+    //Get token from access_token field of base-64 encoded cookie "token"
+    const token = Cookies.get('token') ? JSON.parse(atob(Cookies.get('token'))).access_token : null;
 
     useEffect(() => {
 

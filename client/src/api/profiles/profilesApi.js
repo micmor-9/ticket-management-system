@@ -1,5 +1,6 @@
 import axios from "axios";
 import backendUrl from "../../config";
+import Cookies from "js-cookie";
 
 const api = axios.create({
     baseURL: `${backendUrl}`,
@@ -17,7 +18,7 @@ const getExpert = async (expertEmail) => {
     try {
         const response = await api.get(`/experts/id/${expertEmail}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -30,9 +31,9 @@ const getAllExperts = async () => {
     try {
         const response = await api.get(`/experts`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
-        }); 
+        });
         return response.data;
     } catch (error) {
         handleApiError(error);
@@ -43,7 +44,7 @@ const getCustomer = async (customerEmail) => {
     try {
         const response = await api.get(`/customers/id/${customerEmail}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -55,7 +56,7 @@ const getAllCustomers = async () => {
     try {
         const response = await api.get(`/customers`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -68,7 +69,7 @@ const getManager = async (managerEmail) => {
     try {
         const response = await api.get(`/managers/${managerEmail}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -80,7 +81,7 @@ const getAllManagers = async () => {
     try {
         const response = await api.get(`/managers/`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -94,7 +95,7 @@ const getUsernameByEmail = async (email) => {
     try {
         const response = await api.get(`/users/${email}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             }
         });
         return response.data;
@@ -104,19 +105,19 @@ const getUsernameByEmail = async (email) => {
 };
 
 const createUser = async (userData) => {
-  try {
-    const response = await api.post("/customers/", userData);
-    return response.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+    try {
+        const response = await api.post("/customers/", userData);
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
 };
 
 const updateUser = async (email, userData) => {
     try {
         const response = await api.put(`/customers/{email}`, userData, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             }
         });
         return response.data;
