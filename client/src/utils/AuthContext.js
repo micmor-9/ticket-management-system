@@ -36,7 +36,7 @@ export const useAuth = () => {
             Cookies.remove('token');
             Cookies.set('token', btoa(JSON.stringify(cookie)), {expires: 7, secure: true});
             console.log("Token refreshed successfully!");
-            fetchToken();
+            await fetchToken();
         } catch (error) {
             console.error("Error during token refresh:", error);
             logout();
@@ -45,39 +45,43 @@ export const useAuth = () => {
 
     const fetchToken = async () => {
         const token = Cookies.get('token') ? JSON.parse(atob(Cookies.get('token'))) : null;
-
         if (token) {
             if (!isTokenExpired(token)) {
-                const decodedToken = jwtDecode(token.access_token);
+                try {
+                    const decodedToken = jwtDecode(token.access_token);
 
-                const role =
-                    decodedToken.resource_access["springboot-keycloak-client"].roles[0];
-                let db_user = null;
-                if (role === "Manager") {
-                    db_user = await ProfilesAPI.getManager(decodedToken.email);
-                }
-                if (role === "Expert") {
-                    db_user = await ProfilesAPI.getExpert(decodedToken.email);
-                }
-                if (role === "Client") {
-                    db_user = await ProfilesAPI.getCustomer(decodedToken.email);
-                }
+                    const role =
+                        decodedToken.resource_access["springboot-keycloak-client"].roles[0];
+                    let db_user = null;
+                    if (role === "Manager") {
+                        db_user = await ProfilesAPI.getManager(decodedToken.email);
+                    }
+                    if (role === "Expert") {
+                        db_user = await ProfilesAPI.getExpert(decodedToken.email);
+                    }
+                    if (role === "Client") {
+                        db_user = await ProfilesAPI.getCustomer(decodedToken.email);
+                    }
 
-                setCurrentUser({
-                    email: decodedToken.email,
-                    name: db_user?.name,
-                    surname: db_user?.surname,
-                    username: decodedToken.preferred_username,
-                    role: decodedToken.resource_access["springboot-keycloak-client"]
-                        .roles[0],
-                    id: db_user?.id,
-                    address1: db_user?.address1,
-                    address2: db_user?.address2,
-                    contact: db_user?.contact,
-                    profile: db_user
-                });
+                    setCurrentUser({
+                        email: decodedToken.email,
+                        name: db_user?.name,
+                        surname: db_user?.surname,
+                        username: decodedToken.preferred_username,
+                        role: decodedToken.resource_access["springboot-keycloak-client"]
+                            .roles[0],
+                        id: db_user?.id,
+                        address1: db_user?.address1,
+                        address2: db_user?.address2,
+                        contact: db_user?.contact,
+                        profile: db_user
+                    });
+                } catch (error) {
+                    console.log("Error during token fetch:", error);
+                    logout();
+                }
             } else {
-                _refreshToken(token.refresh_token)
+                await _refreshToken(token.refresh_token)
             }
         }
     };

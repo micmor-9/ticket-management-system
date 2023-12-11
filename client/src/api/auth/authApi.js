@@ -33,11 +33,7 @@ export const login = async (loginRequest) => {
 
 export const refreshTokenApi = async (refreshTokenRequest) => {
     try {
-        const response = await api.post("/refresh-token", refreshTokenRequest, {
-            headers: {
-                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
-            },
-        });
+        const response = await api.post("/refresh-token", refreshTokenRequest);
         if (response.data) {
             let cookie = {
                 'access_token': response.data.access_token,

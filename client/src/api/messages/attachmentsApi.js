@@ -1,6 +1,7 @@
 import axios from "axios";
 import backendUrl from "../../config";
 import Cookies from "js-cookie";
+import {isTokenExpired, refreshToken} from "../init";
 
 const api = axios.create({
     baseURL: `${backendUrl}`,
@@ -10,6 +11,11 @@ const api = axios.create({
 });
 
 const getAttachmentsByMessageId = async (messageId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/attachments/message/${messageId}`, {
             headers: {
@@ -23,6 +29,11 @@ const getAttachmentsByMessageId = async (messageId) => {
 };
 
 const uploadAttachment = async (attachment) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.post("/attachments/upload", attachment, {
             headers: {

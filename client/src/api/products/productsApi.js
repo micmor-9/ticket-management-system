@@ -1,6 +1,7 @@
 import axios from "axios";
 import backendUrl from "../../config";
 import Cookies from "js-cookie";
+import {isTokenExpired, refreshToken} from "../init";
 
 const api = axios.create({
     baseURL: `${backendUrl}`,
@@ -15,6 +16,11 @@ const handleApiError = (error) => {
 };
 
 const getAllProducts = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/products/`, {
             headers: {
@@ -27,6 +33,11 @@ const getAllProducts = async () => {
     }
 };
 const createProducts = async (productData) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.post("/products", productData, {
             headers: {
@@ -40,6 +51,11 @@ const createProducts = async (productData) => {
 };
 
 const updateProducts = async (id, productData) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.put(`/products/{id}`, productData, {
             headers: {

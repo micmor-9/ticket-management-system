@@ -32,7 +32,6 @@ function App() {
     const token = Cookies.get('token') ? JSON.parse(atob(Cookies.get('token'))).access_token : null;
 
     useEffect(() => {
-
         if (!token && location.pathname !== '/signup') {
             navigate("/login");
         }

@@ -1,7 +1,6 @@
 import {Badge, Box, IconButton, useTheme} from "@mui/material";
 import {useContext, useState} from "react";
-import {ColorModeContext, tokens} from "../../theme";
-import {InputBase} from "@mui/material";
+import {ColorModeContext} from "../../theme";
 import {Menu, MenuItem} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -9,14 +8,12 @@ import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import {NotificationsContext} from "../../utils/NotificationsContext";
 import {AuthContext} from "../../utils/AuthContext";
 import NotificationsPanel from "../../components/NotificationsPanel";
 
 const Topbar = () => {
     const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
     const colorMode = useContext(ColorModeContext);
 
     const [, logout] = useContext(AuthContext);

@@ -1,6 +1,7 @@
 import axios from "axios";
 import backendUrl from "../../config";
 import Cookies from "js-cookie";
+import {isTokenExpired, refreshToken} from "../init";
 
 const api = axios.create({
     baseURL: `${backendUrl}`,
@@ -15,6 +16,11 @@ const handleApiError = (error) => {
 };
 
 const getAllOrders = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/orders`, {
             headers: {
@@ -28,6 +34,11 @@ const getAllOrders = async () => {
 };
 
 const getOrdersByCustomerId = async (customerId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/orders/${customerId}`, {
             headers: {
@@ -41,6 +52,11 @@ const getOrdersByCustomerId = async (customerId) => {
 };
 
 const getOrderByOrderId = async (orderId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/order/${orderId}`, {
             headers: {
@@ -54,6 +70,11 @@ const getOrderByOrderId = async (orderId) => {
 };
 
 const createOrder = async (order) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.post(`/orders/`, order, {
             headers: {

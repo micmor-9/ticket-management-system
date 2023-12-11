@@ -1,6 +1,7 @@
 import axios from "axios";
 import backendUrl from "../../config";
 import Cookies from "js-cookie";
+import {isTokenExpired, refreshToken} from "../init";
 
 const api = axios.create({
     baseURL: `${backendUrl}`,
@@ -15,6 +16,11 @@ const handleApiError = (error) => {
 };
 
 const getExpert = async (expertEmail) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/experts/id/${expertEmail}`, {
             headers: {
@@ -28,6 +34,11 @@ const getExpert = async (expertEmail) => {
 };
 
 const getAllExperts = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/experts`, {
             headers: {
@@ -41,6 +52,11 @@ const getAllExperts = async () => {
 };
 
 const getCustomer = async (customerEmail) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/customers/id/${customerEmail}`, {
             headers: {
@@ -53,6 +69,11 @@ const getCustomer = async (customerEmail) => {
     }
 };
 const getAllCustomers = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/customers`, {
             headers: {
@@ -66,6 +87,11 @@ const getAllCustomers = async () => {
 };
 
 const getManager = async (managerEmail) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/managers/${managerEmail}`, {
             headers: {
@@ -78,6 +104,11 @@ const getManager = async (managerEmail) => {
     }
 };
 const getAllManagers = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/managers/`, {
             headers: {
@@ -92,6 +123,11 @@ const getAllManagers = async () => {
 
 
 const getUsernameByEmail = async (email) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/users/${email}`, {
             headers: {
@@ -114,6 +150,11 @@ const createUser = async (userData) => {
 };
 
 const updateUser = async (email, userData) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.put(`/customers/{email}`, userData, {
             headers: {

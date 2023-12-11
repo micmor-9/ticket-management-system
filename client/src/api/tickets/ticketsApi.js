@@ -1,6 +1,7 @@
 import axios from "axios";
 import backendUrl from "../../config";
 import Cookies from "js-cookie";
+import {isTokenExpired, refreshToken} from "../init";
 
 const api = axios.create({
     baseURL: `${backendUrl}`,
@@ -15,6 +16,11 @@ const handleApiError = (error) => {
 };
 
 const getTickets = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get("/tickets", {
             headers: {
@@ -28,6 +34,11 @@ const getTickets = async () => {
 };
 
 const getTicketsByExpert = async (expertId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/tickets/expert/${expertId}`, {
             headers: {
@@ -41,6 +52,11 @@ const getTicketsByExpert = async (expertId) => {
 };
 
 const getTicketsByCustomer = async (customerId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/tickets/customer/${customerId}`, {
             headers: {
@@ -54,6 +70,11 @@ const getTicketsByCustomer = async (customerId) => {
 };
 
 const getTicketById = async (ticketId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/tickets/${ticketId}`, {
             headers: {
@@ -67,6 +88,11 @@ const getTicketById = async (ticketId) => {
 };
 
 const createTicket = async (ticketData) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.post("/tickets/", ticketData, {
             headers: {
@@ -80,6 +106,11 @@ const createTicket = async (ticketData) => {
 };
 
 const updateTicket = async (ticketId, ticketData) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.put(`/tickets/${ticketId}`, ticketData, {
             headers: {
@@ -93,6 +124,11 @@ const updateTicket = async (ticketId, ticketData) => {
 };
 
 const updateTicketStatus = async (ticketId, status) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.patch(`/tickets/${ticketId}/status/${status}`,
             null,
@@ -109,6 +145,11 @@ const updateTicketStatus = async (ticketId, status) => {
 };
 
 const updateTicketPriority = async (ticketId, priority) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.patch(
             `/tickets/${ticketId}/priority/${priority}`,
@@ -126,6 +167,11 @@ const updateTicketPriority = async (ticketId, priority) => {
 };
 
 const updateTicketExpert = async (ticketId, expertId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.patch(
             `/tickets/${ticketId}/expert/${expertId}`,
@@ -143,6 +189,11 @@ const updateTicketExpert = async (ticketId, expertId) => {
 }
 
 const getTicketStatusByTicketId = async (ticketId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/status/${ticketId}`, {
             headers: {
