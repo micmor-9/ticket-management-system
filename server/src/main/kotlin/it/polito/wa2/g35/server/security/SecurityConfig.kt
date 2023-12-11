@@ -44,6 +44,7 @@ class SecurityConfig() {
         http.cors()
         http.authorizeHttpRequests()
             .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/refresh-token").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/profiles/").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/signup").permitAll()
             .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
