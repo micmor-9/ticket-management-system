@@ -1,10 +1,7 @@
 package it.polito.wa2.g35.server.products
 
 import io.micrometer.observation.annotation.Observed
-import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
 import it.polito.wa2.g35.server.profiles.UnauthorizedProfileException
-import it.polito.wa2.g35.server.profiles.customer.Customer
-import it.polito.wa2.g35.server.profiles.customer.toDTO
 import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.ticket.TicketController
 import org.slf4j.Logger
@@ -18,7 +15,6 @@ class ProductServiceImpl(
     private val productRepository: ProductRepository
 ) : ProductService {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
-
     @Observed(
         name = "/products/",
         contextualName = "get-products-request-service"
@@ -72,27 +68,22 @@ class ProductServiceImpl(
     }
 
     @Observed(
-        name = "/products",
+        name = "/products/{id}",
         contextualName = "put-product-request-service"
     )
     override fun updateProduct(product: ProductDTO?): ProductDTO? {
         return if (product != null) {
-            val checkIfProductExists = productRepository.findByIdOrNull(product.id)
-            if (checkIfProductExists != null) {
+            val currentProduct = getProductById(product.id)?.toProduct()
+            if (currentProduct != null) {
                 val authentication = SecurityContextHolder.getContext().authentication
-                if (authentication.authorities.map { it.authority }[0] == SecurityConfig.CLIENT_ROLE) {
-                    if (product.id != authentication.name) {
-                        log.error("Update Product request failed by unauthorized access")
-                        throw UnauthorizedProfileException("You can't access this product!")
-                    }
+                if (authentication.authorities.map { it.authority }[0] == SecurityConfig.MANAGER_ROLE) {
+                    log.info("Update Product request successful (repository)")
+                    productRepository.save(Product(product.id, product.name, product.description,
+                        product.price, product.quantity, product.warrantyDuration)).toDTO()
+                } else {
+                    log.error("Update Product request failed by unauthorized access")
+                    throw UnauthorizedProfileException("You can't access this product!")
                 }
-                log.info("Update Customer request successful (repository)")
-                productRepository.save(
-                    Product(
-                        product.id, product.name, product.description,
-                        product.price, product.quantity, product.warrantyDuration
-                    )
-                ).toDTO()
             } else {
                 log.error("Product with given id doesn't exists!")
                 throw ProductNotFoundException("Product with given id doesn't exists!")

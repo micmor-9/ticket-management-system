@@ -57,7 +57,7 @@ const updateProducts = async (id, productData) => {
         refreshToken();
     }
     try {
-        const response = await api.put(`/products/{id}`, productData, {
+        const response = await api.put(`/products/${id}`, productData, {
             headers: {
                 Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             }

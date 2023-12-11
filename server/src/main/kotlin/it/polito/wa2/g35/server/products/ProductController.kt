@@ -67,24 +67,24 @@ class ProductController(private val productService: ProductService) {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('Manager')")
     @Observed(
-        name = "/customers/{email}",
-        contextualName = "put-profile-request"
+        name = "/products/{id}",
+        contextualName = "put-product-request"
     )
-    fun updateProfile(
+    fun updateProduct(
         @PathVariable("id") id: String,
         @RequestBody @Valid p: ProductDTO,
         br: BindingResult
     ): ProductDTO? {
         if (br.hasErrors()) {
-            log.error("Update Profile failed by bad request format")
+            log.error("Update Product failed by bad request format")
             throw BadRequestException("Bad request format!")
         } else
             if (id == p.id) {
-                log.info("Update Profile request successful")
+                log.info("Update Product request successful")
                 return productService.updateProduct(p)
             } else {
-                log.error("Profile with given email doesn't exists!")
-                throw ProfileNotFoundException("Profile with given email doesn't exists!")
+                log.error("Product with given id doesn't exists!")
+                throw ProfileNotFoundException("Product with given id doesn't exists!")
             }
     }
 }

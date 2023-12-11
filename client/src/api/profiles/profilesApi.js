@@ -156,7 +156,7 @@ const updateUser = async (email, userData) => {
         refreshToken();
     }
     try {
-        const response = await api.put(`/customers/{email}`, userData, {
+        const response = await api.put(`/customers/${email}`, userData, {
             headers: {
                 Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             }
