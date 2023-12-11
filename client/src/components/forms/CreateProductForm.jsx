@@ -45,19 +45,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                 newErrors[field] = `${name} is too long`;
             }
         };
-        const validatePrice = (field, value, name, maxDecimal) => {
-            if (value.length === 0) {
-                newErrors[field] = "Required";
-            } else {
-                value.replace(',', '.');
-                console.log("Value: " + parseFloat(value));
 
-                const decimalCount = (value.split('.')[1] || '').length;
-                if (decimalCount > maxDecimal) {
-                    newErrors[field] = `Wrong format`;
-                }
-            }
-        };
 
         validateLength("id", product.id, "Id", 1, 50);
         validateLength("name", product.name, "Product", 2, 50);
@@ -65,7 +53,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
             validateLength("category", product.description, "Category", 2, 50);
         }
         if (product.price.length > 0) {
-            validatePrice("price", product.price, "Price", 2);
+            validateLength("price", product.price, "Price", 1, 10);
         }
         if (product.quantity.length > 0) {
             validateLength("quantity", product.quantity, "Quantity", 1, 10);
@@ -82,8 +70,6 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
             }
         }
         setErrors(newErrors);
-        console.log("Price:" + product.price);
-        console.log("Price:" + parseFloat(product.price));
         if (Object.keys(newErrors).length === 0) {
             const productData = {
                 id: product.id ,
@@ -187,28 +173,41 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                     error={Boolean(errors.price)}
                     helperText={errors.price}
                     sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
                     inputProps={{
                         pattern: "^[0-9]*[.,]?[0-9]*$",
                         inputMode: "numeric",
                     }}
                     onChange={(e) => {
-                        const value = e.target.value;
+                        const value = e.target.value.replace(/,/, '.');
+                        //setPriceInput(value);
+                        if (/^[0-9]*[.]?[0-9]*$/.test(value)) {
+                            const decimalCount = (value.split(/[.]/)[1] || '').length;
 
-                        if (/^[0-9]*[.,]?[0-9]*$/.test(value)) {
-                            handleFieldChange("price", value);
-                        }}}
+                            if (decimalCount <= 2) {
+                                handleFieldChange("price", value);
+                                setErrors({
+                                    ...errors,
+                                    price: "",
+                                });
+                            } else {
+                                setErrors({
+                                    ...errors,
+                                    price: "Maximum two decimal places allowed",
+                                });
+                            }
+                        } else {
+                            setErrors({
+                                ...errors,
+                                price: "Invalid number format",
+                            });
+                        }
+                        }}
                 />
                 <TextField
                     fullWidth
                     type="text"
                     label="Quantity"
                     value={product.quantity}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
                     inputProps={{
                         pattern: "[0-9]*",
                         inputMode: "numeric",
@@ -218,7 +217,6 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                     sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                     onChange={(e) => {
                         const value = e.target.value;
-
                         if (/^[0-9]*$/.test(value)) {
                             handleFieldChange("quantity", value);
                         }
