@@ -34,7 +34,6 @@ const Ticket = () => {
   const [ticket, setTicket] = useState(null);
   const [ticketStatus, setTicketStatus] = useState(null);
   const [historyExpanded, setHistoryExpanded] = useState(false);
-  const [currentUser] = useContext(AuthContext);
 
   const handleHistoryExpand = () => {
     setHistoryExpanded(!historyExpanded);
