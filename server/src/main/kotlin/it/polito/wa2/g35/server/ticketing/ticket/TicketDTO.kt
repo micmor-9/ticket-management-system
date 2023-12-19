@@ -16,14 +16,15 @@ data class TicketDTO (
     val expert: Expert?,
     val order: Order,
     var customer: Customer,
-    val category: String
+    val category: String,
+    val rating: Int?
 )
 
 fun Ticket.toDTO(): TicketDTO {
-    return TicketDTO(this.id, this.creationTimestamp, this.issueDescription, this.priority, this.status, this.expert, this.order, this.customer, this.category)
+    return TicketDTO(this.id, this.creationTimestamp, this.issueDescription, this.priority, this.status, this.expert, this.order, this.customer, this.category, this.rating)
 }
 
 fun TicketDTO.toTicket(): Ticket {
-    return Ticket(this.id, this.creationTimestamp, this.issueDescription, this.priority, this.status, this.expert, this.order, this.customer, this.category)
+    return Ticket(this.id, this.creationTimestamp, this.issueDescription, this.priority, this.status, this.expert, this.order, this.customer, this.category, this.rating)
 }
 

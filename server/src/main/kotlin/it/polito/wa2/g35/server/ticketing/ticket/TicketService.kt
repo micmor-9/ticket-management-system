@@ -23,4 +23,5 @@ interface TicketService {
 
     //fun updateTicketExpert(ticketId: Long, expertId: String) : TicketDTO?
 
+    fun updateTicketRating(ticketId: Long, rating: Int) : TicketDTO?
 }
