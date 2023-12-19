@@ -249,9 +249,11 @@ const Ticket = () => {
                 <Typography variant="h3">Messages</Typography>
                 {ticket && <Chat ticket={ticket} />}
               </Paper>
-              {ticket && ticket.status === "RESOLVED" && (
-                <SupportEvaluation colors={colors} ticket={ticket} />
-              )}
+              {ticket &&
+                (ticket.status === "RESOLVED" ||
+                  ticket.status === "CLOSED") && (
+                  <SupportEvaluation colors={colors} ticket={ticket} />
+                )}
             </Box>
           </Grid>
         </Grid>
@@ -263,7 +265,7 @@ const Ticket = () => {
 const SupportEvaluation = (props) => {
   const { showDialog } = useDialog();
   const [currentUser] = useContext(AuthContext);
-  const [rated, setRated] = useState(false)
+  const [rated, setRated] = useState(false);
 
   const labels = {
     1: "Very Bad",
@@ -371,7 +373,7 @@ const SupportEvaluation = (props) => {
               <Typography variant="h4" mt={3}>
                 Review to customer service
               </Typography>
-              {(currentUser.role !== 'Client' && !props.ticket.rating) ? (
+              {currentUser.role !== "Client" && !props.ticket.rating ? (
                 <Typography variant="h3" fontWeight="bold" mt={2} mb={2}>
                   {" "}
                   Not present yet
@@ -391,54 +393,3 @@ const SupportEvaluation = (props) => {
 };
 
 export default Ticket;
-
-// {
-//   !props.ticket.rating ? (
-//     <Box>
-//       <Box my={2}>
-//         <Typography variant="h4">
-//           We would be very grateful if you could leave a review.
-//         </Typography>
-//       </Box>
-//       <Box
-//         my={2}
-//         sx={{
-//           display: "flex",
-//           alignItems: "center",
-//           justifyContent: "center",
-//           flexDirection: "column",
-//         }}
-//       >
-//         <Rating
-//           precision={1}
-//           value={value}
-//           getLabelText={getLabelText}
-//           onChange={(event, newValue) => {
-//             setValue(newValue);
-//             handleRatingChange(newValue);
-//           }}
-//           onChangeActive={(event, newHover) => {
-//             setHover(newHover);
-//           }}
-//           emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
-//           size="large"
-//         />
-//         {value !== null && (
-//           <Typography fontSize="30px" sx={{ ml: 2 }}>
-//             {labels[hover !== -1 ? hover : value]}
-//           </Typography>
-//         )}
-//       </Box>
-//     </Box>
-//   ) : (
-//     <Box>
-//       <Typography variant="h4" mt={3}>
-//         Your review to customer service:
-//       </Typography>
-//       <Typography variant="h3" fontWeight="bold" mt={2} mb={2}>
-//         {" "}
-//         {labels[value]}
-//       </Typography>
-//     </Box>
-//   );
-// }
