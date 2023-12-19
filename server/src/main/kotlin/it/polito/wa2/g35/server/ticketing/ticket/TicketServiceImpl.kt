@@ -235,7 +235,8 @@ class TicketServiceImpl(
                     null,
                     order.toOrder(),
                     customer.toCustomer(),
-                    ticket.category
+                    ticket.category,
+                    null
                 )
             )
             ticketStatusService.createTicketStatus(
@@ -352,7 +353,8 @@ class TicketServiceImpl(
                 expert,
                 currentTicket.order,
                 currentTicket.customer,
-                ticket.category
+                ticket.category,
+                currentTicket.rating
             )
         )
         return ticketToUpdate
@@ -470,6 +472,21 @@ class TicketServiceImpl(
         log.info("Update ticket priority successful (repository)")
         return ticketRepository.save(ticket).toDTO()
     }
+
+    @Observed(
+        name = "tickets/{ticketId}/rating/{rating}",
+        contextualName = "put-ticket-rating-request-service"
+    )
+    override fun updateTicketRating(ticketId: Long, rating: Int): TicketDTO? {
+        val ticket = getTicketById(ticketId)?.toTicket()
+        if(ticket == null){
+            log.error("No Ticket found with this Id: $ticketId")
+            throw TicketNotFoundException("Ticket not found!")
+        }
+        ticket.rating = rating
+        return ticketRepository.save(ticket).toDTO()
+    }
+
 
     /*fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
         val expert = expertService.getExpertById(expertId)?.toExpert()

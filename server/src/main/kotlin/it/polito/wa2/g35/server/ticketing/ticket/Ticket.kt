@@ -37,5 +37,7 @@ class Ticket(
     @ManyToOne(fetch = FetchType.LAZY)
     var customer: Customer,
 
-    val category: String
+    val category: String,
+
+    var rating: Int?
     )

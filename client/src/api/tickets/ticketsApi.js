@@ -166,6 +166,30 @@ const updateTicketPriority = async (ticketId, priority) => {
     }
 };
 
+const updateTicketRating = async (ticketId, rating) => {
+    const authToken = JSON.parse(atob(Cookies.get("token"))).access_token;
+    if (isTokenExpired(authToken)) {
+      console.log("Token expired, refreshing...");
+      refreshToken();
+    }
+    try {
+        const response = await api.patch(
+          `/tickets/${ticketId}/rating/${rating}`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${
+                JSON.parse(atob(Cookies.get("token"))).access_token
+              }`,
+            },
+          }
+        );
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
+}
+
 const updateTicketExpert = async (ticketId, expertId) => {
     const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
     if (isTokenExpired(authToken)) {
@@ -207,16 +231,17 @@ const getTicketStatusByTicketId = async (ticketId) => {
 };
 
 const TicketsAPI = {
-    getTickets,
-    getTicketsByExpert,
-    getTicketsByCustomer,
-    getTicketById,
-    createTicket,
-    updateTicket,
-    updateTicketStatus,
-    updateTicketPriority,
-    getTicketStatusByTicketId,
-    updateTicketExpert,
+  getTickets,
+  getTicketsByExpert,
+  getTicketsByCustomer,
+  getTicketById,
+  createTicket,
+  updateTicket,
+  updateTicketStatus,
+  updateTicketPriority,
+  getTicketStatusByTicketId,
+  updateTicketExpert,
+  updateTicketRating,
 };
 
 export default TicketsAPI;

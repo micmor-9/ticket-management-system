@@ -156,6 +156,22 @@ class TicketController(private val ticketService: TicketService) {
         ticketService.updateTicketPriority(ticketId, priority)
     }
 
+    @PatchMapping("/tickets/{ticketId}/rating/{rating}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('Client')")
+    @Observed(
+        name = "tickets/{ticketId}/rating/{rating}",
+        contextualName = "put-ticket-rating-request"
+    )
+    fun updateTicketRating(
+        @PathVariable("ticketId") ticketId: Long,
+        @PathVariable("rating") rating: Int
+    ) {
+        log.info("Update ticket rating successful")
+        ticketService.updateTicketRating(ticketId, rating)
+    }
+
+
    /* @PatchMapping("/tickets/{ticketId}/expert/{expertId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('Manager')")
