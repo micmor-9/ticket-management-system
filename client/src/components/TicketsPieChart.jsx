@@ -23,8 +23,7 @@ export default function TicketsPieChart({tickets}) {
                     faded: {innerRadius: 30, additionalRadius: -30, color: 'gray'},
                 }
             ]}
-            width={500}
-            height={250}
+            height={300}
         />
     );
 }
