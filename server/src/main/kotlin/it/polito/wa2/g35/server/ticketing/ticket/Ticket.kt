@@ -1,6 +1,5 @@
 package it.polito.wa2.g35.server.ticketing.ticket
 
-import it.polito.wa2.g35.server.products.Product
 import it.polito.wa2.g35.server.profiles.customer.Customer
 import it.polito.wa2.g35.server.profiles.employee.expert.Expert
 import it.polito.wa2.g35.server.ticketing.order.Order
@@ -37,5 +36,7 @@ class Ticket(
     @ManyToOne(fetch = FetchType.LAZY)
     var customer: Customer,
 
-    val category: String
-    )
+    val category: String,
+
+    var rating: Int?
+)

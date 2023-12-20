@@ -1,7 +1,6 @@
 package it.polito.wa2.g35.server.ticketing.ticket
 
 import io.micrometer.observation.annotation.Observed
-import it.polito.wa2.g35.server.authentication.AuthController
 import it.polito.wa2.g35.server.exceptions.BadRequestException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -126,20 +125,20 @@ class TicketController(private val ticketService: TicketService) {
         throw TicketConflictException("Ticket with given id doesn't exists!")
     }
 
-   /* @PatchMapping("/tickets/{ticketId}/status/{status}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('Manager','Expert')")
-    @Observed(
-        name = "tickets/{ticketId}/status/{status}",
-        contextualName = "put-ticket-status-request"
-    )
-    fun updateTicketStatus(
-        @PathVariable("ticketId") ticketId: Long,
-        @PathVariable("status") status: String
-    ) {
-        log.info("Update ticket status successful")
-        ticketService.updateTicketStatus(ticketId, status)
-    }*/
+    /* @PatchMapping("/tickets/{ticketId}/status/{status}")
+     @ResponseStatus(HttpStatus.OK)
+     @PreAuthorize("hasAnyRole('Manager','Expert')")
+     @Observed(
+         name = "tickets/{ticketId}/status/{status}",
+         contextualName = "put-ticket-status-request"
+     )
+     fun updateTicketStatus(
+         @PathVariable("ticketId") ticketId: Long,
+         @PathVariable("status") status: String
+     ) {
+         log.info("Update ticket status successful")
+         ticketService.updateTicketStatus(ticketId, status)
+     }*/
 
     @PatchMapping("/tickets/{ticketId}/priority/{priority}")
     @ResponseStatus(HttpStatus.OK)
@@ -156,19 +155,35 @@ class TicketController(private val ticketService: TicketService) {
         ticketService.updateTicketPriority(ticketId, priority)
     }
 
-   /* @PatchMapping("/tickets/{ticketId}/expert/{expertId}")
+    @PatchMapping("/tickets/{ticketId}/rating/{rating}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('Manager')")
+    @PreAuthorize("hasRole('Client')")
     @Observed(
-        name = "tickets/{ticketId}/expert/{expertId}",
-        contextualName = "put-ticket-expert-request"
+        name = "tickets/{ticketId}/rating/{rating}",
+        contextualName = "put-ticket-rating-request"
     )
-    fun updateTicketExpert(
+    fun updateTicketRating(
         @PathVariable("ticketId") ticketId: Long,
-        @PathVariable("expertId") expertId: String
+        @PathVariable("rating") rating: Int
     ) {
+        log.info("Update ticket rating successful")
+        ticketService.updateTicketRating(ticketId, rating)
+    }
 
-        log.info("Update ticket expert successful")
-        ticketService.updateTicketExpert(ticketId, expertId)
-    }*/
+
+    /* @PatchMapping("/tickets/{ticketId}/expert/{expertId}")
+     @ResponseStatus(HttpStatus.OK)
+     @PreAuthorize("hasAnyRole('Manager')")
+     @Observed(
+         name = "tickets/{ticketId}/expert/{expertId}",
+         contextualName = "put-ticket-expert-request"
+     )
+     fun updateTicketExpert(
+         @PathVariable("ticketId") ticketId: Long,
+         @PathVariable("expertId") expertId: String
+     ) {
+
+         log.info("Update ticket expert successful")
+         ticketService.updateTicketExpert(ticketId, expertId)
+     }*/
 }

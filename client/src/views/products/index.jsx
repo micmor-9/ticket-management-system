@@ -1,7 +1,7 @@
 import {Box, Button, Grid, MenuItem, Modal, Select, Stack, Tooltip, Typography, useTheme} from "@mui/material";
 import Header from "../../components/Header";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
-import React, {useEffect, useState, useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import ProductsAPI from "../../api/products/productsApi";
 import {AuthContext} from "../../utils/AuthContext";
 import {dataGridStyles} from "../../styles/dataGridStyles";
@@ -14,6 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import {useNavigate} from "react-router-dom";
+import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 
 const Products = () => {
     const theme = useTheme();
@@ -95,8 +96,8 @@ const Products = () => {
 
     const columns = [
         {field: "id", headerName: "ID", flex: 1},
-        {field: "name", headerName: "Category", flex: 1},
-        {field: "description", headerName: "Product", flex: 1},
+        {field: "name", headerName: "Product", flex: 1},
+        {field: "description", headerName: "Category", flex: 1},
         {field: "price", headerName: "Price ($)", flex: 1},
         {field: "quantity", headerName: "Quantity", flex: 1},
         {field: "warrantyDuration", headerName: "Warranty Duration", flex: 1},
@@ -232,21 +233,43 @@ const Products = () => {
         });
     }
 
+    if (currentUser.role === "Manager") {
+        columns.push({
+            field: "action",
+            headerName: "Action",
+            flex: 0.5,
+            cellClassName: "action-column--cell",
+            renderCell: ({row}) => {
+                return (
+                    <Tooltip title="Modify Product" sx={{color: colors.greenAccent[400]}}>
+                        <CreateOutlinedIcon
+                            fontSize="small"
+                            onClick={() => {
+                                navigate(`/products/create`, {state: {productData: row, isUpdateMode: true}})
+                            }}
+                        />
+                    </Tooltip>
+                )
+            }
+        })
+    }
+
     return (
         <Box m="20px">
             <Header title="PRODUCTS" subtitle="Products catalog">
-                <HeaderActions>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        startIcon={<AddIcon/>}
-                        onClick={() => {
-                            navigate(`/products/create`)
-                        }}
-                        sx={{marginLeft: "15px"}}
-                    >New Product
-                    </Button>
-                </HeaderActions>
+                {currentUser.role === "Manager" && (
+                    <HeaderActions>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            startIcon={<AddIcon/>}
+                            onClick={() => {
+                                navigate(`/products/create`)
+                            }}
+                            sx={{marginLeft: "15px"}}
+                        >New Product
+                        </Button>
+                    </HeaderActions>)}
             </Header>
             <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
                 <DataGrid

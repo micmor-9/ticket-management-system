@@ -11,7 +11,7 @@ import TicketsAPI from "../../api/tickets/ticketsApi";
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
+import EngineeringOutlinedIcon from "@mui/icons-material/EngineeringOutlined";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import TicketsPieChart from "../../components/TicketsPieChart";
 import ExpertsBarChart from "../../components/ExpertsBarChart";
@@ -34,13 +34,15 @@ const Dashboard = () => {
                     if (currentUser.role === "Manager")
                         ordersData = await OrdersAPI.getAllOrders();
                     if (currentUser.role === "Client")
-                        ordersData = await OrdersAPI.getOrdersByCustomerId(currentUser.email);
+                        ordersData = await OrdersAPI.getOrdersByCustomerId(
+                            currentUser.email
+                        );
                     setOrders(ordersData);
                 } catch (error) {
                     showDialog("Error while fetching orders", "error");
                 }
             };
-            fetchOrders()
+            fetchOrders();
 
             const fetchTickets = async () => {
                 try {
@@ -50,14 +52,15 @@ const Dashboard = () => {
                     if (currentUser.role === "Expert")
                         ticketsData = await TicketsAPI.getTicketsByExpert(currentUser.id);
                     if (currentUser.role === "Client")
-                        ticketsData = await TicketsAPI.getTicketsByCustomer(currentUser.email);
+                        ticketsData = await TicketsAPI.getTicketsByCustomer(
+                            currentUser.email
+                        );
                     setTickets(ticketsData);
                 } catch (error) {
                     showDialog("Error while fetching tickets", "error");
                 }
-            }
-            fetchTickets()
-
+            };
+            fetchTickets();
 
             const fetchCustomers = async () => {
                 try {
@@ -66,9 +69,9 @@ const Dashboard = () => {
                 } catch (error) {
                     showDialog("Error while fetching customers", "error");
                 }
-            }
+            };
             if (currentUser.role !== "Client") {
-                fetchCustomers()
+                fetchCustomers();
             }
 
             if (currentUser.role !== "Client") {
@@ -79,8 +82,8 @@ const Dashboard = () => {
                     } catch (error) {
                         showDialog("Error while fetching experts", "error");
                     }
-                }
-                fetchExperts()
+                };
+                fetchExperts();
             }
         }
     }, [currentUser, showDialog]);
@@ -107,7 +110,9 @@ const Dashboard = () => {
                         title={tickets && tickets.length}
                         subtitle={currentUser.role === "Client" ? "My Tickets" : "Tickets"}
                         icon={
-                            <SupportAgentOutlinedIcon sx={{color: colors.greenAccent[600], fontSize: "26px"}}/>
+                            <SupportAgentOutlinedIcon
+                                sx={{color: colors.greenAccent[600], fontSize: "26px"}}
+                            />
                         }
                     />
                 </Box>
@@ -119,70 +124,87 @@ const Dashboard = () => {
                     justifyContent="center"
                 >
                     <StatBox
-                        title={currentUser.role === "Client" ? orders.length : orders && orders.reduce((acc, order) => acc + (order.product.price * order.quantity), 0) + " $"}
-                        subtitle={currentUser.role === "Client" ? "My Orders" : "Sales Obtained"}
+                        title={currentUser.role === "Client" ? orders.length : orders && orders.reduce((acc, order) => acc + order.product.price * order.quantity,
+                            0
+                        ) + " $"
+                        }
+                        subtitle={
+                            currentUser.role === "Client" ? "My Orders" : "Sales Obtained"
+                        }
                         icon={
-                            <ShoppingCartOutlinedIcon sx={{color: colors.greenAccent[600], fontSize: "26px"}}/>
+                            <ShoppingCartOutlinedIcon
+                                sx={{color: colors.greenAccent[600], fontSize: "26px"}}
+                            />
                         }
                     />
                 </Box>}
-                {currentUser.role !== "Client" && <Box
-                    gridColumn="span 3"
-                    backgroundColor={colors.primary[400]}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                >
-                    <StatBox
-                        title={customers && customers.length}
-                        subtitle="Customers"
-                        icon={
-                            <ContactsOutlinedIcon sx={{color: colors.greenAccent[600], fontSize: "26px"}}/>
-                        }
-                    />
-                </Box>}
-                {currentUser.role !== "Client" && <Box
-                    gridColumn="span 3"
-                    backgroundColor={colors.primary[400]}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                >
-                    <StatBox
-                        title={experts && experts.length}
-                        subtitle="Experts"
-                        icon={
-                            <EngineeringOutlinedIcon sx={{color: colors.greenAccent[600], fontSize: "26px"}}/>
-                        }
-                    />
-                </Box>}
-
-                {currentUser.role !== "Client" && <Box
-                    gridColumn="span 4"
-                    gridRow="span 3"
-                    backgroundColor={colors.primary[400]}
-                >
+                {currentUser.role !== "Client" && (
                     <Box
-                        mt="25px"
-                        p="0 30px"
-                        display="flex "
-                        justifyContent="space-between"
+                        gridColumn="span 3"
+                        backgroundColor={colors.primary[400]}
+                        display="flex"
                         alignItems="center"
+                        justifyContent="center"
                     >
-                        <Box>
-                            <Typography
-                                variant="h5"
-                                fontWeight="600"
-                                color={colors.grey[100]}
-                            >
-                                {currentUser.role === "Manager" ? "Tickets By Status" : "My Tickets By Status"}
-                            </Typography>
+                        <StatBox
+                            title={customers && customers.length}
+                            subtitle="Customers"
+                            icon={
+                                <ContactsOutlinedIcon
+                                    sx={{color: colors.greenAccent[600], fontSize: "26px"}}
+                                />
+                            }
+                        />
+                    </Box>
+                )}
+                {currentUser.role !== "Client" && (
+                    <Box
+                        gridColumn="span 3"
+                        backgroundColor={colors.primary[400]}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                    >
+                        <StatBox
+                            title={experts && experts.length}
+                            subtitle="Experts"
+                            icon={
+                                <EngineeringOutlinedIcon
+                                    sx={{color: colors.greenAccent[600], fontSize: "26px"}}
+                                />
+                            }
+                        />
+                    </Box>
+                )}
+
+                {currentUser.role !== "Client" && (
+                    <Box
+                        gridColumn="span 4"
+                        gridRow="span 3"
+                        backgroundColor={colors.primary[400]}
+                    >
+                        <Box
+                            mt="25px"
+                            p="0 30px"
+                            display="flex "
+                            justifyContent="space-between"
+                            alignItems="center"
+                        >
+                            <Box>
+                                <Typography
+                                    variant="h5"
+                                    fontWeight="600"
+                                    color={colors.grey[100]}
+                                >
+                                    {currentUser.role === "Manager" ? "Tickets By Status" : "My Tickets By Status"}
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <Box height="300px" mt="30px" sx={{textAlign: "center"}}>
+                            {tickets.length ? <TicketsPieChart tickets={tickets}/> : "No tickets found"}
                         </Box>
                     </Box>
-                    <Box height="300px" mt="30px" sx={{textAlign: "center"}}>
-                        {tickets.length ? <TicketsPieChart tickets={tickets}/> : "No tickets found"}
-                    </Box>
-                </Box>}
+                )}
                 {currentUser.role != "Expert" && <Box
                     gridColumn="span 4"
                     gridRow="span 3"
@@ -193,7 +215,11 @@ const Dashboard = () => {
                         display="flex"
                         justifyContent="space-between"
                         alignItems="center"
-                        borderBottom={`4px solid ${theme.palette.mode === "dark" ? colors.primary[500] : colors.grey[700]}`}
+                        borderBottom={`4px solid ${
+                            theme.palette.mode === "dark"
+                                ? colors.primary[500]
+                                : colors.grey[700]
+                        }`}
                         colors={colors.grey[100]}
                         p="15px"
                     >
@@ -249,82 +275,10 @@ const Dashboard = () => {
                         Experts Workload
                     </Typography>
                     <Box mt={"10px"}>
-                        <ExpertsBarChart experts={experts} tickets={tickets}/>
-                    </Box>
+                        <ExpertsBarChart experts={experts} tickets={tickets}/></Box>
                 </Box>}
             </Box>
         </Box>
-        /*<Box m="20px">
-            <Header title="DASHBOARD" subtitle="Welcome to your dashboard"/>
-            <Box>
-                <Grid container spacing={2}>
-                    <Grid item xs={8}>
-                        <Paper
-                            sx={{
-                                backgroundColor: colors.primary[400],
-                                color:
-                                    theme.palette.mode === "dark"
-                                        ? colors.primary[100]
-                                        : colors.primary[500],
-                                padding: "20px",
-                                borderRadius: "10px",
-                                height: "35vh",
-                            }}
-                        >
-                            <Typography variant="h3">Tickets</Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Paper
-                            sx={{
-                                backgroundColor: colors.greenAccent[800],
-                                color:
-                                    theme.palette.mode === "dark"
-                                        ? colors.primary[100]
-                                        : colors.primary[500],
-                                padding: "20px",
-                                borderRadius: "10px",
-                                height: "35vh",
-                            }}
-                        >
-                            <Typography variant="h3">2nd Square</Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Paper
-                            sx={{
-                                backgroundColor: colors.blueAccent[600],
-                                color:
-                                    theme.palette.mode === "dark"
-                                        ? colors.primary[100]
-                                        : colors.primary[500],
-                                padding: "20px",
-                                borderRadius: "10px",
-                                height: "35vh",
-                            }}
-                        >
-                            <Typography variant="h3">3rd Square</Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Paper
-                            sx={{
-                                backgroundColor: colors.redAccent[800],
-                                color:
-                                    theme.palette.mode === "dark"
-                                        ? colors.primary[100]
-                                        : colors.primary[500],
-                                padding: "20px",
-                                borderRadius: "10px",
-                                height: "35vh",
-                            }}
-                        >
-                            <Typography variant="h3">4th Square</Typography>
-                        </Paper>
-                    </Grid>
-                </Grid>
-            </Box>
-        </Box>*/
     );
 };
 

@@ -1,14 +1,5 @@
-import {useState, useEffect, Fragment} from "react";
-import {
-    Button,
-    Box,
-    Grid,
-    useTheme,
-    Typography,
-    Paper,
-    Collapse,
-    Divider,
-} from "@mui/material";
+import {Fragment, useContext, useEffect, useState} from "react";
+import {Backdrop, Box, Button, Collapse, Divider, Grid, Paper, Rating, Typography, useTheme,} from "@mui/material";
 import {tokens} from "../../../theme";
 import Header from "../../../components/Header";
 import TicketsAPI from "../../../api/tickets/ticketsApi";
@@ -20,6 +11,8 @@ import TicketStatusHistory from "../../../components/TicketStatusHistory";
 import {useDialog} from "../../../utils/DialogContext";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
+import StarIcon from "@mui/icons-material/Star";
+import {AuthContext} from "../../../utils/AuthContext";
 
 const Ticket = () => {
     const theme = useTheme();
@@ -103,7 +96,7 @@ const Ticket = () => {
                                                 );
                                             })
                                             .map(([key, value]) =>
-                                                key !== "id" ? (
+                                                key !== "id" && key !== "rating" ? (
                                                     <Fragment key={key}>
                                                         <Grid
                                                             item
@@ -227,25 +220,164 @@ const Ticket = () => {
                         </Paper>
                     </Grid>
                     <Grid item xs={12} md>
-                        <Paper
-                            sx={{
-                                height: "75vh",
-                                backgroundColor: colors.greenAccent[800],
-                                color:
-                                    theme.palette.mode === "dark"
-                                        ? colors.primary[100]
-                                        : colors.primary[500],
-                                padding: "20px",
-                                borderRadius: "10px",
-                            }}
-                        >
-                            <Typography variant="h3">Messages</Typography>
-                            {ticket && <Chat ticket={ticket}/>}
-                        </Paper>
+                        <Box sx={{position: "relative", zIndex: 0}}>
+                            <Paper
+                                sx={{
+                                    height: "75vh",
+                                    backgroundColor: colors.greenAccent[800],
+                                    color:
+                                        theme.palette.mode === "dark"
+                                            ? colors.primary[100]
+                                            : colors.primary[500],
+                                    padding: "20px",
+                                    borderRadius: "10px",
+                                    position: "relative",
+                                    zIndex: 1,
+                                }}
+                            >
+                                <Typography variant="h3">Messages</Typography>
+                                {ticket && <Chat ticket={ticket}/>}
+                            </Paper>
+                            {ticket &&
+                                (ticket.status === "RESOLVED" ||
+                                    ticket.status === "CLOSED") && (
+                                    <SupportEvaluation colors={colors} ticket={ticket}/>
+                                )}
+                        </Box>
                     </Grid>
                 </Grid>
             </Box>
         </Box>
+    );
+};
+
+const SupportEvaluation = (props) => {
+    const {showDialog} = useDialog();
+    const [currentUser] = useContext(AuthContext);
+    const [rated, setRated] = useState(false);
+
+    const labels = {
+        1: "Very Bad",
+        2: "Bad",
+        3: "Okay",
+        4: "Good",
+        5: "Excellent",
+    };
+
+    function getLabelText(value) {
+        return `${value} Star${value !== 1 ? "s" : ""}, ${labels[value]}`;
+    }
+
+    const [value, setValue] = useState(
+        props.ticket.rating ? props.ticket.rating : 4
+    );
+    const [hover, setHover] = useState(-1);
+
+    const handleRatingChange = (newValue) => {
+        try {
+            TicketsAPI.updateTicketRating(props.ticket.id, newValue);
+            showDialog("Rating correctly updated!", "success");
+        } catch (error) {
+            console.log("Error");
+        }
+        setValue(newValue);
+        setRated(!rated);
+    };
+
+    return (
+        <Backdrop
+            sx={{
+                position: "absolute",
+                top: 0,
+                zIndex: 1,
+                color: "#fff",
+                backdropFilter: "blur(0.5px)",
+                borderRadius: "10px",
+            }}
+            open={true}
+        >
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexWrap: "wrap",
+
+                    height: "100%",
+                }}
+            >
+                <Paper
+                    sx={{
+                        padding: "20px",
+                        borderRadius: "10px",
+                        backgroundColor: props.colors.greenAccent[700],
+                        textAlign: "center",
+                        width: "400px",
+                    }}
+                >
+                    <Typography variant="h2" fontWeight="bold" sx={{color: "#FFA300"}}>
+                        Ticket Resolved!
+                    </Typography>
+
+                    {currentUser.role === "Client" && !rated && !props.ticket.rating ? (
+                        <Box>
+                            <Box my={2}>
+                                <Typography variant="h4">
+                                    We would be very grateful if you could leave a review.
+                                </Typography>
+                            </Box>
+                            <Box
+                                my={2}
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexDirection: "column",
+                                }}
+                            >
+                                <Rating
+                                    precision={1}
+                                    value={value}
+                                    getLabelText={getLabelText}
+                                    onChange={(event, newValue) => {
+                                        handleRatingChange(newValue);
+                                    }}
+                                    onChangeActive={(event, newHover) => {
+                                        setHover(newHover);
+                                    }}
+                                    emptyIcon={
+                                        <StarIcon style={{opacity: 0.55}} fontSize="inherit"/>
+                                    }
+                                    size="large"
+                                />
+                                {value !== null && (
+                                    <Typography fontSize="30px" sx={{ml: 2}}>
+                                        {labels[hover !== -1 ? hover : value]}
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Box>
+                    ) : (
+                        <Box>
+                            <Typography variant="h4" mt={3}>
+                                Review to customer service
+                            </Typography>
+                            {currentUser.role !== "Client" && !props.ticket.rating ? (
+                                <Typography variant="h3" fontWeight="bold" mt={2} mb={2}>
+                                    {" "}
+                                    Not present yet
+                                </Typography>
+                            ) : (
+                                <Typography variant="h3" fontWeight="bold" mt={2} mb={2}>
+                                    {" "}
+                                    {labels[value]}
+                                </Typography>
+                            )}
+                        </Box>
+                    )}
+                </Paper>
+            </Box>
+        </Backdrop>
     );
 };
 

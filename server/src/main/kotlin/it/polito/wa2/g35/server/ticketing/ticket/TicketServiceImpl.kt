@@ -3,14 +3,13 @@ package it.polito.wa2.g35.server.ticketing.ticket
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.notifications.Notification
 import it.polito.wa2.g35.server.notifications.NotificationService
-import it.polito.wa2.g35.server.products.ProductNotFoundException
-import it.polito.wa2.g35.server.products.ProductService
-import it.polito.wa2.g35.server.products.toProduct
-import it.polito.wa2.g35.server.profiles.customer.CustomerService
-import it.polito.wa2.g35.server.profiles.customer.toCustomer
 import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
 import it.polito.wa2.g35.server.profiles.ProfileService
-import it.polito.wa2.g35.server.profiles.employee.expert.*
+import it.polito.wa2.g35.server.profiles.customer.CustomerService
+import it.polito.wa2.g35.server.profiles.customer.toCustomer
+import it.polito.wa2.g35.server.profiles.employee.expert.Expert
+import it.polito.wa2.g35.server.profiles.employee.expert.ExpertService
+import it.polito.wa2.g35.server.profiles.employee.expert.toExpert
 import it.polito.wa2.g35.server.profiles.employee.manager.ManagerService
 import it.polito.wa2.g35.server.security.SecurityConfig
 import it.polito.wa2.g35.server.ticketing.order.OrderNotFoundException
@@ -88,12 +87,15 @@ class TicketServiceImpl(
             SecurityConfig.MANAGER_ROLE -> {
                 resultList ?: emptyList()
             }
+
             SecurityConfig.EXPERT_ROLE -> {
                 resultList?.filter { it.expert?.email == auth.name } ?: emptyList()
             }
+
             SecurityConfig.CLIENT_ROLE -> {
                 resultList?.filter { it.customer.email == auth.name } ?: emptyList()
             }
+
             else -> {
                 emptyList()
             }
@@ -128,7 +130,8 @@ class TicketServiceImpl(
         try {
             val statusValue = TicketStatusValues.valueOf(status.uppercase())
             val authentication = SecurityContextHolder.getContext().authentication
-            val listTicket = ticketRepository.getTicketsByStatusOrderByCreationTimestampAsc(statusValue)?.map { it.toDTO() }
+            val listTicket =
+                ticketRepository.getTicketsByStatusOrderByCreationTimestampAsc(statusValue)?.map { it.toDTO() }
             log.info("Get tickets by status request from repository successful")
             return filterListResultByRole(authentication, listTicket)
         } catch (e: IllegalArgumentException) {
@@ -157,7 +160,8 @@ class TicketServiceImpl(
         try {
             val priorityValue = TicketPriority.valueOf(priority.uppercase())
             val authentication = SecurityContextHolder.getContext().authentication
-            val listTicket = ticketRepository.getTicketsByPriorityOrderByCreationTimestampAsc(priorityValue)?.map { it.toDTO() }
+            val listTicket =
+                ticketRepository.getTicketsByPriorityOrderByCreationTimestampAsc(priorityValue)?.map { it.toDTO() }
             log.info("Get tickets by priority request from repository successful")
             return filterListResultByRole(authentication, listTicket)
         } catch (e: IllegalArgumentException) {
@@ -177,7 +181,8 @@ class TicketServiceImpl(
             throw ProfileNotFoundException("Customer not found with this Id!")
         }
         val authentication = SecurityContextHolder.getContext().authentication
-        val listTicket = ticketRepository.getTicketsByCustomerEmailOrderByCreationTimestampAsc(idCustomer)?.map { it.toDTO() }
+        val listTicket =
+            ticketRepository.getTicketsByCustomerEmailOrderByCreationTimestampAsc(idCustomer)?.map { it.toDTO() }
         log.info("Get tickets by customer request from repository successful")
         return filterListResultByRole(authentication, listTicket)
     }
@@ -235,7 +240,8 @@ class TicketServiceImpl(
                     null,
                     order.toOrder(),
                     customer.toCustomer(),
-                    ticket.category
+                    ticket.category,
+                    null
                 )
             )
             ticketStatusService.createTicketStatus(
@@ -293,6 +299,7 @@ class TicketServiceImpl(
             SecurityConfig.MANAGER_ROLE -> {
                 accessGrantedUpdateTicket(currentTicket, ticket, expert)
             }
+
             SecurityConfig.EXPERT_ROLE -> {
                 accessGrantedUpdateTicket(currentTicket, ticket, expert)
             }
@@ -352,7 +359,8 @@ class TicketServiceImpl(
                 expert,
                 currentTicket.order,
                 currentTicket.customer,
-                ticket.category
+                ticket.category,
+                currentTicket.rating
             )
         )
         return ticketToUpdate
@@ -470,6 +478,21 @@ class TicketServiceImpl(
         log.info("Update ticket priority successful (repository)")
         return ticketRepository.save(ticket).toDTO()
     }
+
+    @Observed(
+        name = "tickets/{ticketId}/rating/{rating}",
+        contextualName = "put-ticket-rating-request-service"
+    )
+    override fun updateTicketRating(ticketId: Long, rating: Int): TicketDTO? {
+        val ticket = getTicketById(ticketId)?.toTicket()
+        if (ticket == null) {
+            log.error("No Ticket found with this Id: $ticketId")
+            throw TicketNotFoundException("Ticket not found!")
+        }
+        ticket.rating = rating
+        return ticketRepository.save(ticket).toDTO()
+    }
+
 
     /*fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
         val expert = expertService.getExpertById(expertId)?.toExpert()
