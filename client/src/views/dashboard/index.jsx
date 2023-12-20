@@ -15,6 +15,7 @@ import EngineeringOutlinedIcon from "@mui/icons-material/EngineeringOutlined";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import TicketsPieChart from "../../components/TicketsPieChart";
 import ExpertsBarChart from "../../components/ExpertsBarChart";
+import {Link, useNavigate} from "react-router-dom";
 
 const Dashboard = () => {
     const theme = useTheme();
@@ -25,6 +26,7 @@ const Dashboard = () => {
     const [customers, setCustomers] = useState([]);
     const [experts, setExperts] = useState([]);
     const {showDialog} = useDialog();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (currentUser.role) {
@@ -157,7 +159,7 @@ const Dashboard = () => {
                         />
                     </Box>
                 )}
-                {currentUser.role !== "Client" && (
+                {currentUser.role !== "Client" ? (
                     <Box
                         gridColumn="span 3"
                         backgroundColor={colors.primary[400]}
@@ -175,7 +177,7 @@ const Dashboard = () => {
                             }
                         />
                     </Box>
-                )}
+                ) : <Box gridColumn="span 3"/>}
 
                 {currentUser.role !== "Client" && (
                     <Box
@@ -205,7 +207,7 @@ const Dashboard = () => {
                         </Box>
                     </Box>
                 )}
-                {currentUser.role != "Expert" && <Box
+                {currentUser.role !== "Expert" && <Box
                     gridColumn="span 4"
                     gridRow="span 3"
                     backgroundColor={colors.primary[400]}
@@ -246,7 +248,7 @@ const Dashboard = () => {
                                         #{order.id}
                                     </Typography>
                                     <Typography color={colors.grey[100]}>
-                                        {order.customer.name + " " + order.customer.surname}
+                                        {currentUser.role === "Client" ? order.product.description : order.customer.name + " " + order.customer.surname}
                                     </Typography>
                                 </Box>
                                 <Box color={colors.grey[100]}>{new Date(order.date).toDateString()}</Box>
@@ -256,6 +258,67 @@ const Dashboard = () => {
                                     borderRadius="4px"
                                 >
                                     ${order.product.price * order.quantity}
+                                </Box>
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>}
+
+                {currentUser.role !== "Manager" && <Box
+                    gridColumn="span 4"
+                    gridRow="span 3"
+                    backgroundColor={colors.primary[400]}
+                    overflow="auto"
+                >
+                    <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        borderBottom={`4px solid ${
+                            theme.palette.mode === "dark"
+                                ? colors.primary[500]
+                                : colors.grey[700]
+                        }`}
+                        colors={colors.grey[100]}
+                        p="15px"
+                    >
+                        <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
+                            Recent Tickets
+                        </Typography>
+                    </Box>
+                    <Box overflow="auto">
+                        {tickets && tickets.map((ticket, i) => (
+                            <Box
+                                key={`${ticket.id}-${i}`}
+                                display="flex"
+                                justifyContent="space-between"
+                                alignItems="center"
+                                borderBottom={`2px solid ${theme.palette.mode === "dark" ? colors.primary[500] : colors.grey[700]}`}
+                                p="15px"
+                                onClick={() => {
+                                    navigate(`/tickets/${ticket.id}`);
+                                }}
+                                style={{cursor: "pointer"}}
+                            >
+                                <Box>
+                                    <Typography
+                                        color={colors.greenAccent[500]}
+                                        variant="h5"
+                                        fontWeight="600"
+                                    >
+                                        #{ticket.id}
+                                    </Typography>
+                                    <Typography color={colors.grey[100]}>
+                                        {ticket.customer.name + " " + ticket.customer.surname}
+                                    </Typography>
+                                </Box>
+                                <Box color={colors.grey[100]}>{new Date(ticket.creationTimestamp).toDateString()}</Box>
+                                <Box
+                                    backgroundColor={colors.status[ticket.status]}
+                                    p="5px 10px"
+                                    borderRadius="4px"
+                                >
+                                    {ticket.status}
                                 </Box>
                             </Box>
                         ))}
