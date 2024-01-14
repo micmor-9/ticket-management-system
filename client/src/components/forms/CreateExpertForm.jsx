@@ -1,15 +1,22 @@
 import {Box, Button, TextField, useTheme} from "@mui/material";
 import profilesApi from "../../api/profiles/profilesApi";
 import {useNavigate} from "react-router-dom";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {tokens} from "../../theme";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
-import authApi  from "../../api/auth/authApi";
+import authApi from "../../api/auth/authApi";
+import Autocomplete, {createFilterOptions} from '@mui/material/Autocomplete';
+import TicketsAPI from "../../api/tickets/ticketsApi";
+import {useDialog} from "../../utils/DialogContext";
 
 const CreateExpertForm = () => {
     const navigate = useNavigate();
     const theme = useTheme();
+    const [ticketAreas, setTicketAreas] = useState([]);
+    const {showDialog} = useDialog();
+    const filter = createFilterOptions();
+
     const [profile, setProfile] = useState({
         id: "",
         firstName: "",
@@ -17,6 +24,11 @@ const CreateExpertForm = () => {
         email: "",
         specialization: "",
     });
+
+    const [specialization, setSpecialization] = useState(profile ? {
+        inputValue: profile.specialization,
+        title: profile.specialization
+    } : "");
     const colors = tokens(theme.palette.mode);
 
     const [errors, setErrors] = useState({
@@ -25,6 +37,19 @@ const CreateExpertForm = () => {
         email: "",
         specialization: "",
     });
+
+    useEffect(() => {
+        const fetchTicketAreas = async () => {
+            try {
+                const ticketAreasData = await TicketsAPI.getTicketAreas();
+                setTicketAreas(ticketAreasData);
+            } catch (error) {
+                showDialog("Error while fetching ticket areas", "error");
+            }
+        }
+        fetchTicketAreas();
+    }, []);
+
     const handleFormSubmit = async () => {
         const newErrors = {};
         const validateLength = (field, value, name, min, max) => {
@@ -57,6 +82,7 @@ const CreateExpertForm = () => {
         };
 
         try {
+            showDialog("Creating new expert", "info");
             const response = await authApi.createExpert(profileData);
             console.log(response);
             navigate(-1);
@@ -132,19 +158,28 @@ const CreateExpertForm = () => {
             component="form"
         >
             <TextField
-                fullWidth
                 type="text"
-                label="id"
+                label="Id"
                 value={profile.id}
                 name="id"
-                sx={disabledTextFieldStyle}
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 error={Boolean(errors.id)}
                 helperText={errors.id}
                 required
                 onChange={(e) => handleFieldChange("id", e.target.value)}
             />
             <TextField
-                fullWidth
+                type="text"
+                label="Email"
+                value={profile ? profile.email : ""}
+                name="email"
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                error={Boolean(errors.email)}
+                helperText={errors.email}
+                required
+                onChange={(e) => handleFieldChange("email", e.target.value)}
+            />
+            <TextField
                 type="text"
                 label="First Name"
                 value={profile.firstName}
@@ -155,19 +190,6 @@ const CreateExpertForm = () => {
                 onChange={(e) => handleFieldChange("firstName", e.target.value)}
             />
             <TextField
-                fullWidth
-                type="text"
-                label="Email"
-                value={profile ? profile.email : ""}
-                name="email"
-                sx={disabledTextFieldStyle}
-                error={Boolean(errors.email)}
-                helperText={errors.email}
-                required
-                onChange={(e) => handleFieldChange("email", e.target.value)}
-            />
-            <TextField
-                fullWidth
                 type="text"
                 label="Last Name"
                 value={profile.lastName}
@@ -178,17 +200,71 @@ const CreateExpertForm = () => {
                 required
                 onChange={(e) => handleFieldChange("lastName", e.target.value)}
             />
-            <TextField
-                fullWidth
-                type="text"
-                label="Specialization"
-                value={profile ? profile.specialization : ""}
-                name="specialization"
-                sx={disabledTextFieldStyle}
-                error={Boolean(errors.specialization)}
-                helperText={errors.specialization}
-                required
-                onChange={(e) => handleFieldChange("specialization", e.target.value)}
+            <Autocomplete
+                value={specialization}
+                onChange={(event, newValue) => {
+                    if (typeof newValue === 'string') {
+                        setSpecialization({
+                            title: newValue,
+                        });
+                        handleFieldChange("specialization", newValue)
+                    } else if (newValue && newValue.inputValue) {
+                        // Create a new value from the user input
+                        setSpecialization({
+                            title: newValue.inputValue,
+                        });
+                        handleFieldChange("specialization", newValue.inputValue)
+                    } else {
+                        setSpecialization(newValue);
+                        handleFieldChange("specialization", newValue)
+                    }
+                }}
+                filterOptions={(options, params) => {
+                    const filtered = filter(options, params);
+                    const {inputValue} = params;
+                    // Suggest the creation of a new value
+                    const isExisting = options.some((option) => inputValue === option.title);
+                    if (inputValue !== '' && !isExisting) {
+                        filtered.push({
+                            inputValue,
+                            title: `Add "${inputValue}"`,
+                        });
+                    }
+                    return filtered;
+                }}
+                selectOnFocus
+                clearOnBlur
+                handleHomeEndKeys
+                id="specialization"
+                options={ticketAreas.map((area) => {
+                    return {
+                        title: area,
+                        inputValue: area,
+                    };
+                })}
+                getOptionLabel={(option) => {
+                    // Value selected with enter, right from the input
+                    if (typeof option === 'string') {
+                        return option;
+                    }
+                    // Add "xxx" option created dynamically
+                    if (option.inputValue) {
+                        return option.inputValue;
+                    }
+                    // Regular option
+                    return option.title;
+                }}
+                renderOption={(props, option) => <li {...props}>{option.title}</li>}
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                freeSolo
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        required
+                        error={Boolean(errors.specialization)}
+                        label="Specialization"
+                    />
+                )}
             />
             <Box display="flex" justifyContent="flex-end" gridColumn="span 4">
                 <Button type="button" variant="contained" startIcon={<DeleteIcon/>}
@@ -224,26 +300,5 @@ const CreateExpertForm = () => {
 const phoneRegExp =
     /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 const emailRegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-/*
-const checkoutSchema = yup.object().shape({
-    firstName: yup.string()
-        .min(2, "First name is too short")
-        .max(50, "First name is too long"),
-    lastName: yup.string()
-        .min(2, "Last name is too short")
-        .max(50, "Last name is too long"),
-    email: yup.string()
-        .email("Invalid email format")
-        .min(2, "Email is too short")
-        .max(50, "Email is too long"),
-    contact: yup.string()
-        .matches(phoneRegExp, "Phone number is not valid"),
-    address1: yup.string()
-        .min(5, "Address 1 is too short")
-        .max(100, "Address 1 is too long"),
-    address2: yup.string()
-        .min(5, "Address 2 is too short")
-        .max(100, "Address 2 is too long"),
-});*/
 
 export default CreateExpertForm;

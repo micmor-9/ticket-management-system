@@ -83,8 +83,8 @@ const Users = () => {
                         }}
                     >
                         {roleFilter === userRole.Expert ? "New Expert" : "New User"}
-                        </Button>
-                    </HeaderActions>)
+                    </Button>
+                </HeaderActions>)
                 }
             </Header>
 
@@ -137,28 +137,29 @@ const getUsersColumns = (roleFilter, userRole) => {
             headerName: "Email",
             flex: 1,
             cellClassName: "email-column--cell",
-        },
-        {
+        }
+    ];
+    if (roleFilter === userRole.Customer) {
+        columns.push({
             field: "contact",
             headerName: "Contact",
             flex: 1,
             cellClassName: "contact-column--cell",
 
-        },
-        {
+        });
+        columns.push({
             field: "address",
             headerName: "Address",
             flex: 1,
             cellClassName: "address2-column--cell",
             valueGetter: (params) => {
-
                 if (params.row.address2) {
                     return `${params.row.address1}, ${params.row.address2}`;
                 }
                 return params.row.address1;
-            },
-        }
-    ];
+            }
+        });
+    }
     if (roleFilter === userRole.Manager) {
         columns.push({
             field: "managedArea",

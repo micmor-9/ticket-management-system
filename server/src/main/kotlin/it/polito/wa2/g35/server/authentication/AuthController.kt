@@ -119,11 +119,11 @@ class AuthController {
     @PostMapping("/resetPassword")
     @ResponseStatus(HttpStatus.OK)
     @Observed(
-            name = "resetPassword",
-            contextualName = "reset-password-request"
+        name = "resetPassword",
+        contextualName = "reset-password-request"
     )
     fun resetPassw(@RequestParam("email") email: String): ResponseEntity<String> {
-        return if (authService.resetPassw(email)) {
+        return if (authService.resetPassword(email)) {
             log.info("Password reset request successful for email: $email")
             ResponseEntity.ok("Password reset successful! Check your email for the new password.")
         } else {
@@ -135,8 +135,8 @@ class AuthController {
     @PostMapping("/changePassword")
     @ResponseStatus(HttpStatus.OK)
     @Observed(
-            name = "changePassword",
-            contextualName = "change-password-request"
+        name = "changePassword",
+        contextualName = "change-password-request"
     )
     fun changePassword(@RequestBody request: ChangePasswordRequest): ResponseEntity<String> {
         return if (authService.changePassword(request)) {
@@ -147,7 +147,6 @@ class AuthController {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password change failed. Please check your credentials.")
         }
     }
-
 
 
 }

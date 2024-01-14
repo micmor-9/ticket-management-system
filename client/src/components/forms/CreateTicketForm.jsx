@@ -24,6 +24,7 @@ const CreateTicketForm = () => {
     const navigate = useNavigate();
     const [description, setDescription] = useState("");
     const [ticketArea, setTicketArea] = useState("");
+    const [ticketAreas, setTicketAreas] = useState([]);
     const [descriptionError, setDescriptionError] = useState(false);
     const [categoryError, setCategoryError] = useState(false);
     const [currentUser] = useContext(AuthContext);
@@ -60,9 +61,19 @@ const CreateTicketForm = () => {
                     setOrders(ord);
                 }
             } catch (error) {
+                showDialog("Error while fetching orders", "error");
             }
         };
+        const fetchTicketAreas = async () => {
+            try {
+                const ticketAreasData = await TicketsAPI.getTicketAreas();
+                setTicketAreas(ticketAreasData);
+            } catch (error) {
+                showDialog("Error while fetching ticket areas", "error");
+            }
+        }
         fetchOrder();
+        fetchTicketAreas();
     }, [orderId, currentUser.role, currentUser.id, currentUser.email]);
     useEffect(() => {
         if (orderSelected) {
@@ -148,13 +159,13 @@ const CreateTicketForm = () => {
         gridColumn: "span 2",
     };
 
-    const ticketAreas = [
+    /*const ticketAreas = [
         "Battery",
         "Display",
         "Keyboard",
         "Mouse",
         "Power Supply",
-    ];
+    ];*/
 
     const handleFieldChange = (fieldName, value) => {
         setTicket({...ticket, [fieldName]: value});

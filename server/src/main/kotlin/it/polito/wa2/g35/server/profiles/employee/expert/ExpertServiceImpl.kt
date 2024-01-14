@@ -107,4 +107,13 @@ class ExpertServiceImpl(private val expertRepository: ExpertRepository) : Expert
         }
 
     }
+
+    @Observed(
+        name = "/experts/specializations/",
+        contextualName = "get-expert-specializations-request-service"
+    )
+    override fun getExpertsSpecializations(): List<String> {
+        log.info("Get experts specializations from repository request successful")
+        return expertRepository.findAll().map { it.specialization }.distinct()
+    }
 }

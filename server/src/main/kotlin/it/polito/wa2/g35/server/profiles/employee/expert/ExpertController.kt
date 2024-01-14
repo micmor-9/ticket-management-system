@@ -14,15 +14,16 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = ["http://localhost:5000"])
-class ExpertController(private val expertService: ExpertService){
+class ExpertController(private val expertService: ExpertService) {
     private val log: Logger = LoggerFactory.getLogger(TicketController::class.java)
+
     @GetMapping("/experts/{expertId}")
     @PreAuthorize("hasAnyRole('Manager', 'Expert')")
     @Observed(
         name = "/experts/{expertId}",
         contextualName = "get-expert-by-id-request"
     )
-    fun getExpertById(@PathVariable expertId: String?) : ExpertDTO? {
+    fun getExpertById(@PathVariable expertId: String?): ExpertDTO? {
         log.info("Get expert by Id request successful")
         return expertService.getExpertById(expertId)
     }
@@ -33,7 +34,7 @@ class ExpertController(private val expertService: ExpertService){
         name = "/experts/id/{expertEmail}",
         contextualName = "get-expert-id-by-email-request"
     )
-    fun getExpert(@PathVariable expertEmail: String?) : ExpertDTO? {
+    fun getExpert(@PathVariable expertEmail: String?): ExpertDTO? {
         log.info("Get expert Id request successful")
         return expertService.getExpert(expertEmail)
     }
@@ -44,7 +45,7 @@ class ExpertController(private val expertService: ExpertService){
         name = "/experts",
         contextualName = "get-all-expert-request"
     )
-    fun getAllExperts() : List<ExpertDTO>? {
+    fun getAllExperts(): List<ExpertDTO>? {
         log.info("Get expert Id request successful")
         return expertService.getAll()
     }
@@ -55,9 +56,19 @@ class ExpertController(private val expertService: ExpertService){
         name = "/experts/specialization/{specialization}",
         contextualName = "get-expert-by-specialization-request"
     )
-    fun getExpertBySpecialization(@PathVariable specialization: String?) : List<ExpertDTO> {
+    fun getExpertBySpecialization(@PathVariable specialization: String?): List<ExpertDTO> {
         log.info("Get expert by Specialization request successful")
         return expertService.getExpertBySpecialization(specialization)
+    }
+
+    @GetMapping("/experts/specializations/")
+    @Observed(
+        name = "/experts/specializations/",
+        contextualName = "get-expert-specializations-request"
+    )
+    fun getExpertsSpecializations(): List<String> {
+        log.info("Get experts Specializations request successful")
+        return expertService.getExpertsSpecializations()
     }
 
     @PostMapping("/experts")
@@ -70,12 +81,11 @@ class ExpertController(private val expertService: ExpertService){
     fun createExpert(
         @RequestBody @Valid p: ExpertDTO,
         br: BindingResult
-    ) : ExpertDTO? {
+    ): ExpertDTO? {
         if (br.hasErrors()) {
             log.error("Create expert request failed by bad request format")
             throw BadRequestException("Bad request format!")
-        }
-        else {
+        } else {
             log.info("Create expert request successful")
             return expertService.createExpert(p)
         }

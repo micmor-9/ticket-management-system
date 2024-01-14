@@ -219,6 +219,10 @@ class AuthServiceImpl() : AuthService {
         return customerDTO
     }
 
+    @Observed(
+        name = "create-expert",
+        contextualName = "create-expert-request"
+    )
     override fun signupExpert(signupRequest: SignupExpertRequest): ExpertDTO? {
         val pwd = generateRandomPassword(10)
         val expertRepresentation = UserRepresentation().apply {

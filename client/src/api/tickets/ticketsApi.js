@@ -230,6 +230,24 @@ const getTicketStatusByTicketId = async (ticketId) => {
     }
 };
 
+const getTicketAreas = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
+    try {
+        const response = await api.get("/experts/specializations/", {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
+}
+
 const TicketsAPI = {
     getTickets,
     getTicketsByExpert,
@@ -242,6 +260,7 @@ const TicketsAPI = {
     getTicketStatusByTicketId,
     updateTicketExpert,
     updateTicketRating,
+    getTicketAreas
 };
 
 export default TicketsAPI;

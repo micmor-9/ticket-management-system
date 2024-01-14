@@ -81,7 +81,7 @@ const CreateUserForm = () => {
                 surname: profile.lastName,
                 contact: profile.contact,
                 address1: profile.address1,
-                address2: profile.address2? profile.address2:null,
+                address2: profile.address2 ? profile.address2 : null,
             };
 
             try {
@@ -131,7 +131,6 @@ const CreateUserForm = () => {
             component="form"
         >
             <TextField
-                fullWidth
                 type="text"
                 label="First Name"
                 value={profile.firstName}
@@ -142,7 +141,6 @@ const CreateUserForm = () => {
                 onChange={(e) => handleFieldChange("firstName", e.target.value)}
             />
             <TextField
-                fullWidth
                 type="text"
                 label="Last Name"
                 value={profile.lastName}
@@ -159,7 +157,7 @@ const CreateUserForm = () => {
                 label="Email"
                 value={profile ? profile.email : ""}
                 name="email"
-                sx={disabledTextFieldStyle}
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 error={Boolean(errors.email)}
                 helperText={errors.email}
                 required
@@ -171,7 +169,7 @@ const CreateUserForm = () => {
                 label="Contact Number"
                 value={profile ? profile.contact : ""}
                 name="contact"
-                sx={disabledTextFieldStyle}
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 error={Boolean(errors.contact)}
                 helperText={errors.contact}
                 required
@@ -183,7 +181,7 @@ const CreateUserForm = () => {
                 label="Address 1"
                 value={profile ? profile.address1 : ""}
                 name="address1"
-                sx={disabledTextFieldStyle}
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 error={Boolean(errors.address1)}
                 helperText={errors.address1}
                 required
@@ -195,7 +193,7 @@ const CreateUserForm = () => {
                 label="Address 2"
                 value={profile ? profile.address2 : ""}
                 name="address2"
-                sx={disabledTextFieldStyle}
+                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                 error={Boolean(errors.address2)}
                 helperText={errors.address2}
                 onChange={(e) => handleFieldChange("address2", e.target.value)}
