@@ -221,12 +221,7 @@ class TicketServiceImpl(
             }
         }
 
-        val warranty = orderService.getOrderByCustomerAndProduct(customer.email, order.product.id)
-        if (warranty == null) {
-            log.error("No Warranty found with those Customer: $ticket.customerId and Product: $ticket.productId")
-            throw OrderNotFoundException("Order not found with this combination of product and customer!")
-        }
-        if (Date().after(warranty.warrantyDuration)) {
+        if (Date().after(order.warrantyDuration)) {
             log.error("Create ticket failed, order warranty expired")
             throw WarrantyExpiredException("Order warranty expired!")
         } else {

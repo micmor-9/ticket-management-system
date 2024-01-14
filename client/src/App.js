@@ -40,7 +40,6 @@ function App() {
     return (
         <AuthContext.Provider value={[currentUser, setCurrentUser]}>
             <ColorModeContext.Provider value={colorMode}>
-
                 <NotificationsContext.Provider value={[notifications, setNotifications]}>
                     <ThemeProvider theme={theme}>
                         <CssBaseline/>
@@ -62,7 +61,7 @@ function App() {
                                 backgroundColor: "rgba(0, 0, 0, 0.4)",
                             },
                         }}/>
-                        <div className="app">
+                        <div className={"app theme-" + theme.palette.mode}>
                             <Sidebar/>
                             <main className="content">
                                 <Topbar/>

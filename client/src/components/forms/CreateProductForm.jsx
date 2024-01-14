@@ -56,7 +56,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
         if (product.quantity.length > 0) {
             validateLength("quantity", product.quantity, "Quantity", 1, 10);
         }
-        if (product.warrantyDuration.length > 0) {
+        /*if (product.warrantyDuration.length > 0) {
             const warranty = product.warrantyDuration.split(" ");
             if (!isNaN(parseInt(warranty[0]))) {
                 if (warranty[1] !== "years" && warranty[1] !== "months") {
@@ -65,7 +65,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
             } else {
                 newErrors["warrantyDuration"] = "Wrong format"
             }
-        }
+        }*/
         setErrors(newErrors);
         if (Object.keys(newErrors).length === 0) {
             const productData = {
@@ -74,7 +74,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                 description: product.description ? product.description : "",
                 price: product.price ? parseFloat(product.price) : 0,
                 quantity: product.quantity ? parseInt(product.quantity) : 0,
-                warrantyDuration: product.warrantyDuration ? product.warrantyDuration : ""
+                warrantyDuration: product.warrantyDuration ? product.warrantyDuration : 0
             };
 
             try {
@@ -232,8 +232,8 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                 />
                 <TextField
                     fullWidth
-                    type="text"
-                    label="Warranty Duration"
+                    type="number"
+                    label="Warranty Duration (months)"
                     value={product.warrantyDuration}
                     InputLabelProps={{
                         shrink: true,

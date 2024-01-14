@@ -5,11 +5,10 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-interface OrderRepository: JpaRepository<Order, Long> {
+interface OrderRepository : JpaRepository<Order, Long> {
 
     fun getOrdersByCustomerEmail(idCustomer: String): List<Order>
 
-    @Query("SELECT t FROM Order t WHERE t.customer.email = :idCustomer AND t.product.id = :idProduct")
-    fun getOrdersByCustomerAndProduct(idCustomer: String, idProduct: String): Order?
-
+    //@Query("SELECT t FROM Order t WHERE t.customer.email = :idCustomer AND t.product.id = :idProduct")
+    //fun getOrdersByCustomerAndProduct(idCustomer: String, idProduct: String): List<Order>?
 }

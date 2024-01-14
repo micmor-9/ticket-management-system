@@ -129,17 +129,13 @@ const Tickets = () => {
     const handleChange = async (event, ticketId) => {
         const checkTicket = tickets.find((ticket) => ticket.id === ticketId);
         if (checkTicket.expert) {
-            // Ottieni le modifiche pendenti per il ticket corrente
             const changesForTicket = pendingChanges[ticketId] || {};
             const changesForTicket2 = pendingChanges2[ticketId] || {};
 
-            // Verifica se ci sono modifiche per lo stato
             const statusChangeExists = Object.keys(changesForTicket2).length > 0;
 
-            // Verifica se ci sono modifiche per l'esperto
             const expertChangeExists = Object.keys(changesForTicket).length > 0;
 
-            // Effettua l'aggiornamento solo se ci sono modifiche per lo stato o l'esperto
             if (statusChangeExists || expertChangeExists) {
                 const updateData = {
                     id: ticketId,
@@ -156,13 +152,11 @@ const Tickets = () => {
                     customerId: checkTicket.customer.id,
                     category: checkTicket.category,
                 };
-                // Esegui l'aggiornamento nel database
                 await TicketsAPI.updateTicket(ticketId, updateData);
                 setTicketUpdated(() => !ticketUpdated);
                 showDialog("Ticket  updated successfully", "success");
             }
 
-            // Resetta le modifiche pendenti
             setPendingChanges((prevChanges) => ({
                 ...prevChanges,
                 [ticketId]: {},
@@ -372,7 +366,7 @@ const Tickets = () => {
             headerName: "Product",
             flex: 1,
             cellClassName: "name-column--cell",
-            valueGetter: ({value}) => value && value.product.description,
+            valueGetter: ({value}) => value && value.product.name,
         },
         {
             field: "customer",

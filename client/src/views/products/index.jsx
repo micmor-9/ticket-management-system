@@ -26,6 +26,7 @@ const Products = () => {
     const [productId, setProductId] = useState(null);
     const [maxQuantity, setMaxQuantity] = useState(0);
     const [productName, setProductName] = useState("");
+    const [warrantyDuration, setWarrantyDuration] = useState(0);
     const [productPrice, setProductPrice] = useState(0);
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
@@ -42,26 +43,21 @@ const Products = () => {
         fetchProducts();
     }, [currentUser.role, currentUser.id, showDialog]);
 
-    const handleBuyNow = (event, row) => {
+    const handleBuyNow = (event, warrantyDuration) => {
         event.preventDefault();
-        const warranty = row.warrantyDuration.split(" ");
-        let warrantyDuration = new Date();
-        if (warranty[1] === "years") {
-            warrantyDuration.setFullYear(
-                warrantyDuration.getFullYear() + parseInt(warranty[0])
-            );
-        } else if (warranty[1] === "months") {
-            warrantyDuration.setMonth(
-                warrantyDuration.getMonth() + parseInt(warranty[0])
-            );
-        }
+        let increasedDate = new Date();
+        console.log(increasedDate);
+        let yearsToAdd = Math.floor(warrantyDuration / 12);
+        let monthsToAdd = warrantyDuration % 12;
+        increasedDate.setFullYear(increasedDate.getFullYear() + yearsToAdd);
+        increasedDate.setMonth(increasedDate.getMonth() + monthsToAdd);
         const productToOrder = {
             id: null,
             customerId: currentUser.email,
             productId: productId,
             quantity: quantity,
             date: new Date(),
-            warrantyDuration: warrantyDuration,
+            warrantyDuration: increasedDate,
         };
 
         OrdersAPI.createOrder(productToOrder)
@@ -100,7 +96,25 @@ const Products = () => {
         {field: "description", headerName: "Category", flex: 1},
         {field: "price", headerName: "Price ($)", flex: 1},
         {field: "quantity", headerName: "Quantity", flex: 1},
-        {field: "warrantyDuration", headerName: "Warranty Duration", flex: 1},
+        {
+            field: "warrantyDuration", headerName: "Warranty Duration", flex: 1,
+            renderCell: ({row}) => {
+                if (row.warrantyDuration === 0) {
+                    return (
+                        <Typography variant="h5">No warranty</Typography>
+                    )
+                }
+                if (row.warrantyDuration < 12) {
+                    return (
+                        <>{row.warrantyDuration} months</>
+                    )
+                } else {
+                    return (
+                        <>{Math.floor(row.warrantyDuration / 12)} years {(row.warrantyDuration % 12 !== 0) ? "and " + (row.warrantyDuration % 12) + " months" : null} </>
+                    )
+                }
+            }
+        },
     ];
 
     if (currentUser.role === "Client") {
@@ -187,7 +201,7 @@ const Products = () => {
                                                     },
                                                 }}
                                                 onClick={(event) => {
-                                                    handleBuyNow(event, row);
+                                                    handleBuyNow(event, warrantyDuration);
                                                     handleModalClose();
                                                     setQuantity(1);
                                                 }}
@@ -214,6 +228,7 @@ const Products = () => {
                                             setMaxQuantity(row.quantity);
                                             setProductName(row.description);
                                             setProductPrice(row.price);
+                                            setWarrantyDuration(row.warrantyDuration);
                                         }}
                                     />
                                 ) : (

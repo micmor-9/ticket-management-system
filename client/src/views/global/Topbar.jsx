@@ -71,9 +71,6 @@ const Topbar = () => {
                 <NotificationsPanel open={openNotifications} anchorEl={anchorElNotifications}
                                     setOpenNotifications={setOpenNotifications}
                                     notifications={notifications} setNotifications={setNotifications}/>
-                <IconButton>
-                    <SettingsOutlinedIcon/>
-                </IconButton>
                 <IconButton
                     aria-controls={openMenu ? "basic-menu" : undefined}
                     aria-haspopup="true"

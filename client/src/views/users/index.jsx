@@ -61,18 +61,20 @@ const Users = () => {
     return (
         <Box m="20px" sx={{position: "relative"}}>
             <Header title="USERS" subtitle="Manage users">
-                <HeaderActions>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        startIcon={<AddIcon/>}
-                        onClick={() => {
-                            navigate(`/users/create`)
-                        }}
-                        sx={{marginLeft: "15px"}}
-                    >New User
-                    </Button>
-                </HeaderActions>
+                {currentUser.role === "Manager" && (
+                    <HeaderActions>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            startIcon={<AddIcon/>}
+                            onClick={() => {
+                                navigate(`/users/create`)
+                            }}
+                            sx={{marginLeft: "15px"}}
+                        >New User
+                        </Button>
+                    </HeaderActions>)
+                }
             </Header>
 
             <Box height="70vh" sx={dataGridStyles(theme)}>

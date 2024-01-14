@@ -9,9 +9,9 @@ interface OrderService {
 
     fun getOrdersByCustomer(idCustomer: String): List<OrderDTO>
 
-    fun getOrderByCustomerAndProduct(idCustomer: String, idProduct: String): OrderDTO?
+    //fun getOrderByCustomerAndProduct(idCustomer: String, idProduct: String): OrderDTO?
 
-    fun getOrderByOrderId(orderId: String) : OrderDTO?
+    fun getOrderByOrderId(orderId: String): OrderDTO?
 
     fun createOrder(order: OrderInputDTO): OrderDTO?
 
