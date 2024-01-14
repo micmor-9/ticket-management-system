@@ -1,7 +1,7 @@
 import {Box, Button, Grid, MenuItem, Modal, Select, Stack, Tooltip, Typography, useTheme} from "@mui/material";
 import Header from "../../components/Header";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
-import React, {useEffect, useState, useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import ProductsAPI from "../../api/products/productsApi";
 import {AuthContext} from "../../utils/AuthContext";
 import {dataGridStyles} from "../../styles/dataGridStyles";
@@ -14,6 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import {useNavigate} from "react-router-dom";
+import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 
 const Products = () => {
     const theme = useTheme();
@@ -25,6 +26,7 @@ const Products = () => {
     const [productId, setProductId] = useState(null);
     const [maxQuantity, setMaxQuantity] = useState(0);
     const [productName, setProductName] = useState("");
+    const [warrantyDuration, setWarrantyDuration] = useState(0);
     const [productPrice, setProductPrice] = useState(0);
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
@@ -41,26 +43,21 @@ const Products = () => {
         fetchProducts();
     }, [currentUser.role, currentUser.id, showDialog]);
 
-    const handleBuyNow = (event, row) => {
+    const handleBuyNow = (event, warrantyDuration) => {
         event.preventDefault();
-        const warranty = row.warrantyDuration.split(" ");
-        let warrantyDuration = new Date();
-        if (warranty[1] === "years") {
-            warrantyDuration.setFullYear(
-                warrantyDuration.getFullYear() + parseInt(warranty[0])
-            );
-        } else if (warranty[1] === "months") {
-            warrantyDuration.setMonth(
-                warrantyDuration.getMonth() + parseInt(warranty[0])
-            );
-        }
+        let increasedDate = new Date();
+        console.log(increasedDate);
+        let yearsToAdd = Math.floor(warrantyDuration / 12);
+        let monthsToAdd = warrantyDuration % 12;
+        increasedDate.setFullYear(increasedDate.getFullYear() + yearsToAdd);
+        increasedDate.setMonth(increasedDate.getMonth() + monthsToAdd);
         const productToOrder = {
             id: null,
             customerId: currentUser.email,
             productId: productId,
             quantity: quantity,
             date: new Date(),
-            warrantyDuration: warrantyDuration,
+            warrantyDuration: increasedDate,
         };
 
         OrdersAPI.createOrder(productToOrder)
@@ -95,11 +92,29 @@ const Products = () => {
 
     const columns = [
         {field: "id", headerName: "ID", flex: 1},
-        {field: "name", headerName: "Category", flex: 1},
-        {field: "description", headerName: "Product", flex: 1},
+        {field: "name", headerName: "Product", flex: 1},
+        {field: "description", headerName: "Category", flex: 1},
         {field: "price", headerName: "Price ($)", flex: 1},
         {field: "quantity", headerName: "Quantity", flex: 1},
-        {field: "warrantyDuration", headerName: "Warranty Duration", flex: 1},
+        {
+            field: "warrantyDuration", headerName: "Warranty Duration", flex: 1,
+            renderCell: ({row}) => {
+                if (row.warrantyDuration === 0) {
+                    return (
+                        <Typography variant="h5">No warranty</Typography>
+                    )
+                }
+                if (row.warrantyDuration < 12) {
+                    return (
+                        <>{row.warrantyDuration} months</>
+                    )
+                } else {
+                    return (
+                        <>{Math.floor(row.warrantyDuration / 12)} years {(row.warrantyDuration % 12 !== 0) ? "and " + (row.warrantyDuration % 12) + " months" : null} </>
+                    )
+                }
+            }
+        },
     ];
 
     if (currentUser.role === "Client") {
@@ -186,7 +201,7 @@ const Products = () => {
                                                     },
                                                 }}
                                                 onClick={(event) => {
-                                                    handleBuyNow(event, row);
+                                                    handleBuyNow(event, warrantyDuration);
                                                     handleModalClose();
                                                     setQuantity(1);
                                                 }}
@@ -213,6 +228,7 @@ const Products = () => {
                                             setMaxQuantity(row.quantity);
                                             setProductName(row.description);
                                             setProductPrice(row.price);
+                                            setWarrantyDuration(row.warrantyDuration);
                                         }}
                                     />
                                 ) : (
@@ -232,21 +248,43 @@ const Products = () => {
         });
     }
 
+    if (currentUser.role === "Manager") {
+        columns.push({
+            field: "action",
+            headerName: "Action",
+            flex: 0.5,
+            cellClassName: "action-column--cell",
+            renderCell: ({row}) => {
+                return (
+                    <Tooltip title="Modify Product" sx={{color: colors.greenAccent[400]}}>
+                        <CreateOutlinedIcon
+                            fontSize="small"
+                            onClick={() => {
+                                navigate(`/products/create`, {state: {productData: row, isUpdateMode: true}})
+                            }}
+                        />
+                    </Tooltip>
+                )
+            }
+        })
+    }
+
     return (
         <Box m="20px">
             <Header title="PRODUCTS" subtitle="Products catalog">
-                <HeaderActions>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        startIcon={<AddIcon/>}
-                        onClick={() => {
-                            navigate(`/products/create`)
-                        }}
-                        sx={{marginLeft: "15px"}}
-                    >New Product
-                    </Button>
-                </HeaderActions>
+                {currentUser.role === "Manager" && (
+                    <HeaderActions>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            startIcon={<AddIcon/>}
+                            onClick={() => {
+                                navigate(`/products/create`)
+                            }}
+                            sx={{marginLeft: "15px"}}
+                        >New Product
+                        </Button>
+                    </HeaderActions>)}
             </Header>
             <Box m="40px 0 0 0" sx={dataGridStyles(theme)}>
                 <DataGrid

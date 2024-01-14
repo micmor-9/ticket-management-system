@@ -1,5 +1,7 @@
 import axios from "axios";
 import backendUrl from "../../config";
+import Cookies from "js-cookie";
+import {isTokenExpired, refreshToken} from "../init";
 
 const api = axios.create({
     baseURL: `${backendUrl}`,
@@ -14,10 +16,15 @@ const handleApiError = (error) => {
 };
 
 const getTickets = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get("/tickets", {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -27,10 +34,15 @@ const getTickets = async () => {
 };
 
 const getTicketsByExpert = async (expertId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/tickets/expert/${expertId}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -40,10 +52,15 @@ const getTicketsByExpert = async (expertId) => {
 };
 
 const getTicketsByCustomer = async (customerId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/tickets/customer/${customerId}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -53,10 +70,15 @@ const getTicketsByCustomer = async (customerId) => {
 };
 
 const getTicketById = async (ticketId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/tickets/${ticketId}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -66,23 +88,33 @@ const getTicketById = async (ticketId) => {
 };
 
 const createTicket = async (ticketData) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
-    const response = await api.post("/tickets/", ticketData, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+        const response = await api.post("/tickets/", ticketData, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
 };
 
 const updateTicket = async (ticketId, ticketData) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.put(`/tickets/${ticketId}`, ticketData, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             }
         });
         return response.data;
@@ -92,46 +124,85 @@ const updateTicket = async (ticketId, ticketData) => {
 };
 
 const updateTicketStatus = async (ticketId, status) => {
-  try {
-    const response = await api.patch(`/tickets/${ticketId}/status/${status}`,
-        null,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-    );
-    return response.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
+    try {
+        const response = await api.patch(`/tickets/${ticketId}/status/${status}`,
+            null,
+            {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
 };
 
 const updateTicketPriority = async (ticketId, priority) => {
-  try {
-    const response = await api.patch(
-        `/tickets/${ticketId}/priority/${priority}`,
-        null,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-    );
-    return response.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
+    try {
+        const response = await api.patch(
+            `/tickets/${ticketId}/priority/${priority}`,
+            null,
+            {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
 };
 
+const updateTicketRating = async (ticketId, rating) => {
+    const authToken = JSON.parse(atob(Cookies.get("token"))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
+    try {
+        const response = await api.patch(
+            `/tickets/${ticketId}/rating/${rating}`,
+            null,
+            {
+                headers: {
+                    Authorization: `Bearer ${
+                        JSON.parse(atob(Cookies.get("token"))).access_token
+                    }`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
+}
+
 const updateTicketExpert = async (ticketId, expertId) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.patch(
             `/tickets/${ticketId}/expert/${expertId}`,
             null,
             {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
                 }
             }
         );
@@ -142,29 +213,35 @@ const updateTicketExpert = async (ticketId, expertId) => {
 }
 
 const getTicketStatusByTicketId = async (ticketId) => {
-  try {
-    const response = await api.get(`/status/${ticketId}`,{
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
+    try {
+        const response = await api.get(`/status/${ticketId}`, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
 };
 
 const TicketsAPI = {
-  getTickets,
-  getTicketsByExpert,
-  getTicketsByCustomer,
-  getTicketById,
-  createTicket,
-  updateTicket,
-  updateTicketStatus,
-  updateTicketPriority,
-  getTicketStatusByTicketId,
-  updateTicketExpert,
+    getTickets,
+    getTicketsByExpert,
+    getTicketsByCustomer,
+    getTicketById,
+    createTicket,
+    updateTicket,
+    updateTicketStatus,
+    updateTicketPriority,
+    getTicketStatusByTicketId,
+    updateTicketExpert,
+    updateTicketRating,
 };
 
 export default TicketsAPI;

@@ -1,5 +1,7 @@
 import axios from "axios";
 import backendUrl from "../../config";
+import Cookies from "js-cookie";
+import {isTokenExpired, refreshToken} from "../init";
 
 const api = axios.create({
     baseURL: `${backendUrl}`,
@@ -14,10 +16,15 @@ const handleApiError = (error) => {
 };
 
 const getExpert = async (expertEmail) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/experts/id/${expertEmail}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -27,12 +34,17 @@ const getExpert = async (expertEmail) => {
 };
 
 const getAllExperts = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/experts`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
-        }); 
+        });
         return response.data;
     } catch (error) {
         handleApiError(error);
@@ -40,10 +52,15 @@ const getAllExperts = async () => {
 };
 
 const getCustomer = async (customerEmail) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/customers/id/${customerEmail}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -52,10 +69,15 @@ const getCustomer = async (customerEmail) => {
     }
 };
 const getAllCustomers = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/customers`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -65,10 +87,15 @@ const getAllCustomers = async () => {
 };
 
 const getManager = async (managerEmail) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/managers/${managerEmail}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -77,10 +104,15 @@ const getManager = async (managerEmail) => {
     }
 };
 const getAllManagers = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/managers/`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             },
         });
         return response.data;
@@ -91,10 +123,15 @@ const getAllManagers = async () => {
 
 
 const getUsernameByEmail = async (email) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
         const response = await api.get(`/users/${email}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             }
         });
         return response.data;
@@ -104,21 +141,26 @@ const getUsernameByEmail = async (email) => {
 };
 
 const createUser = async (userData) => {
-  try {
-    const response = await api.post("/customers/", userData);
-    return response.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+    try {
+        const response = await api.post("/customers/", userData);
+        return response.data;
+    } catch (error) {
+        handleApiError(error);
+    }
 };
 
 
 
 const updateUser = async (email, userData) => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
     try {
-        const response = await api.put(`/customers/{email}`, userData, {
+        const response = await api.put(`/customers/${email}`, userData, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
             }
         });
         return response.data;

@@ -33,3 +33,19 @@ body,
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+.theme-dark .Mui-focused {
+    color: #70d8bd !important;
+}
+
+.theme-light .Mui-focused {
+    color: #3da58a !important;
+}
+
+.theme-dark .Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #70d8bd !important;
+}
+
+.theme-light .Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #3da58a !important;
+}

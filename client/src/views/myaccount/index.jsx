@@ -9,8 +9,8 @@ import {
     Button,
     TextField,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { tokens } from "../../theme";
+import {useTheme} from "@mui/material/styles";
+import {tokens} from "../../theme";
 import Header from "../../components/Header";
 import { AuthContext, useAuth } from "../../utils/AuthContext";
 import authApi from "../../api/auth/authApi";
@@ -42,7 +42,7 @@ const MyAccount = () => {
     };
     return (
         <Box m="20px" sx={{ position: "relative" }}>
-            <Header title="MY ACCOUNT" subtitle="Personal informations" />
+            <Header title="MY ACCOUNT" subtitle="Personal information" />
             <Paper
                 elevation={3}
                 sx={{
@@ -115,7 +115,6 @@ const MyAccount = () => {
                             <Button onClick={handleSavePasswordClick}>Save Password</Button>
                         </ListItem>
                     )}
-
                 </List>
             </Paper>
         </Box>

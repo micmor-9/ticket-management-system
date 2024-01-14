@@ -3,7 +3,7 @@ import {Box, Button, useTheme} from "@mui/material";
 import {StyledTabs, StyledTab} from "../../components/StyledTabs";
 import {DataGrid, GridToolbar} from "@mui/x-data-grid";
 import Header from "../../components/Header";
-import {AuthContext, useAuth} from "../../utils/AuthContext";
+import {AuthContext} from "../../utils/AuthContext";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import {dataGridStyles} from "../../styles/dataGridStyles";
 import {useNavigate} from "react-router-dom";
@@ -60,7 +60,7 @@ const Users = () => {
     return (
         <Box m="20px" sx={{position: "relative"}}>
             <Header title="USERS" subtitle="Manage users">
-                <HeaderActions>
+                {currentUser.role === "Manager" && (<HeaderActions>
                     <Button
                         variant="contained"
                         color="secondary"
@@ -72,7 +72,7 @@ const Users = () => {
                                     navigate("/users/create");
                                     break;
                                 case userRole.Expert:
-                                    navigate("/expert/create");
+                                    navigate("/experts/create");
                                     break;
                                 default:
                                     break;
@@ -80,11 +80,12 @@ const Users = () => {
                         }}
                         sx={{
                             marginLeft: "15px",
-                    }}
+                        }}
                     >
                         {roleFilter === userRole.Expert ? "New Expert" : "New User"}
-                    </Button>
-                </HeaderActions>
+                        </Button>
+                    </HeaderActions>)
+                }
             </Header>
 
             <Box height="70vh" sx={dataGridStyles(theme)}>

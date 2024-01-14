@@ -16,10 +16,10 @@ import CreateTicket from "./views/tickets/create";
 import { CreateUser, CreateExpert } from "./views/users/create";
 import MyAccount from "./views/myaccount";
 
-
 import {NotificationsContext, useNotifications} from "./utils/NotificationsContext";
 import CreateProduct from "./views/products/create";
 import ForgotPassword from "./views/ForgotPassword";
+import Cookies from "js-cookie";
 
 
 function App() {
@@ -29,10 +29,10 @@ function App() {
     const location = useLocation();
     const [notifications, setNotifications] = useNotifications();
 
-    const token = localStorage.getItem("token");
+    //Get token from access_token field of base-64 encoded cookie "token"
+    const token = Cookies.get('token') ? JSON.parse(atob(Cookies.get('token'))).access_token : null;
 
     useEffect(() => {
-
         if (!token && location.pathname !== '/signup') {
             navigate("/login");
         }
@@ -41,7 +41,6 @@ function App() {
     return (
         <AuthContext.Provider value={[currentUser, setCurrentUser]}>
             <ColorModeContext.Provider value={colorMode}>
-
                 <NotificationsContext.Provider value={[notifications, setNotifications]}>
                     <ThemeProvider theme={theme}>
                         <CssBaseline/>
@@ -63,7 +62,7 @@ function App() {
                                 backgroundColor: "rgba(0, 0, 0, 0.4)",
                             },
                         }}/>
-                        <div className="app">
+                        <div className={"app theme-" + theme.palette.mode}>
                             <Sidebar/>
                             <main className="content">
                                 <Topbar/>
@@ -71,7 +70,7 @@ function App() {
                                     <Route path="/" element={<Dashboard/>}/>
                                     <Route path="/users" element={<Users/>}/>
                                     <Route path="/users/create" element={<CreateUser/>}/>
-                                    <Route path="/expert/create" element={<CreateExpert/>}/>
+                                    <Route path="/experts/create" element={<CreateExpert/>}/>
                                     <Route path="/products" element={<Products/>}/>
                                     <Route path="/products/create" element={<CreateProduct/>}/>
                                     <Route path="/tickets" element={<Tickets/>}/>

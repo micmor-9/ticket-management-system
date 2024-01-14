@@ -1,34 +1,32 @@
-import {
-    Box, Button, FormControl, InputLabel, MenuItem, Select, TextField,
-} from "@mui/material";
+import {Box, Button, TextField,} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
-import React, {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import React, {useState} from "react";
+import {useNavigate} from "react-router-dom";
 import {useTheme} from "@emotion/react";
 import {tokens} from "../../theme";
 import {useAuth} from "../../utils/AuthContext";
 import {useDialog} from "../../utils/DialogContext";
 import productsApi from "../../api/products/productsApi";
 
-const CreateProductForm = () => {
+const CreateProductForm = ({isUpdateMode, initialProductData}) => {
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [currentUser] = useAuth();
     const {showDialog} = useDialog();
-    const [product, setProduct] = useState({
+    const [product, setProduct] = useState(initialProductData || {
         id: "",
-        category : "",
-        product: "",
-        price: 0.0,
-        quantity: 0,
+        description: "",
+        name: "",
+        price: "",
+        quantity: "",
         warrantyDuration: ""
     });
     const [errors, setErrors] = useState({
         id: "",
-        category : "",
-        product: "",
+        description: "",
+        name: "",
         price: "",
         quantity: "",
         warrantyDuration: ""
@@ -46,10 +44,11 @@ const CreateProductForm = () => {
             }
         };
 
+
         validateLength("id", product.id, "Id", 1, 50);
-        validateLength("product", product.product, "Product", 2, 50);
-        if (product.category.length > 0) {
-            validateLength("category", product.category, "Category", 2, 50);
+        validateLength("name", product.name, "Product", 2, 50);
+        if (product.description.length > 0) {
+            validateLength("category", product.description, "Category", 2, 50);
         }
         if (product.price.length > 0) {
             validateLength("price", product.price, "Price", 1, 10);
@@ -57,40 +56,48 @@ const CreateProductForm = () => {
         if (product.quantity.length > 0) {
             validateLength("quantity", product.quantity, "Quantity", 1, 10);
         }
-        if (product.warrantyDuration.length > 0) {
+        /*if (product.warrantyDuration.length > 0) {
             const warranty = product.warrantyDuration.split(" ");
-            if(!isNaN(parseInt(warranty[0]))){
-                if(warranty[1]!== "years" && warranty[1]!== "month"){
+            if (!isNaN(parseInt(warranty[0]))) {
+                if (warranty[1] !== "years" && warranty[1] !== "months") {
                     newErrors["warrantyDuration"] = "Wrong format"
                 }
-            }
-            else {
+            } else {
                 newErrors["warrantyDuration"] = "Wrong format"
             }
-        }
+        }*/
         setErrors(newErrors);
         if (Object.keys(newErrors).length === 0) {
             const productData = {
-                id: product.id ,
-                name: product.product,
-                description:  product.category ? product.category : "",
+                id: product.id,
+                name: product.name,
+                description: product.description ? product.description : "",
                 price: product.price ? parseFloat(product.price) : 0,
                 quantity: product.quantity ? parseInt(product.quantity) : 0,
-                warrantyDuration: product.warrantyDuration ? product.warrantyDuration : ""
+                warrantyDuration: product.warrantyDuration ? product.warrantyDuration : 0
             };
 
             try {
-                const response = await productsApi.createProducts(productData);
-                console.log(response);
-                showDialog("Product created", "success");
-                navigate(-1);
+                if (isUpdateMode) {
+                    const response = await productsApi.updateProducts(product.id, productData);
+                    showDialog("Product updated", "success");
+                    navigate(-1);
+                } else {
+                    const response = await productsApi.createProducts(productData);
+                    showDialog("Product created", "success");
+                    navigate(-1);
+                }
             } catch (error) {
                 console.error("An error occurred:", error);
-                if (error.response.data.status === 409) {
+                if (!isUpdateMode && error.response.data.status === 409) {
                     showDialog("Product creation error", "error");
                     setErrors({...errors, id: "Product with this ID already exists!"});
                     console.log("Product with this ID already exists!");
-                    // Handle the duplicate scenario on the client side
+                }
+                if (isUpdateMode && error.response.data.status === 404) {
+                    showDialog("Product update error", "error");
+                    setErrors({...errors, id: "Product with this ID doesn't exists!"});
+                    console.log("Product with this ID doesn't exists!");
                 }
             }
         }
@@ -117,123 +124,154 @@ const CreateProductForm = () => {
     };
 
     return (
-        currentUser.role==="Manager" && (
-        <Box
-            display="grid"
-            gap="30px"
-            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-            sx={{
-                backgroundColor: colors.primary[400],
-                color:
-                    theme.palette.mode === "dark"
-                        ? colors.primary[100]
-                        : colors.primary[500],
-                borderRadius: "10px",
-                padding: "20px",
-            }}
-            component="form"
-        >
+        currentUser.role === "Manager" && (
+            <Box
+                display="grid"
+                gap="30px"
+                gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+                sx={{
+                    backgroundColor: colors.primary[400],
+                    color:
+                        theme.palette.mode === "dark"
+                            ? colors.primary[100]
+                            : colors.primary[500],
+                    borderRadius: "10px",
+                    padding: "20px",
+                }}
+                component="form"
+            >
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Product"
+                    value={product.name}
+                    required
+                    error={Boolean(errors.name)}
+                    helperText={errors.name}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => handleFieldChange("name", e.target.value)}
+                />
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Category"
+                    value={product.description}
+                    error={Boolean(errors.description)}
+                    helperText={errors.description}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => handleFieldChange("description", e.target.value)}
+                />
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Price"
+                    value={product.price}
+                    error={Boolean(errors.price)}
+                    helperText={errors.price}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    inputProps={{
+                        pattern: "^[0-9]*[.,]?[0-9]*$",
+                        inputMode: "numeric",
+                    }}
+                    onChange={(e) => {
+                        const value = e.target.value.replace(/,/, '.');
+                        //setPriceInput(value);
+                        if (/^[0-9]*[.]?[0-9]*$/.test(value)) {
+                            const decimalCount = (value.split(/[.]/)[1] || '').length;
 
-            <TextField
-                fullWidth
-                type="text"
-                label="Product"
-                value={product.product}
-                required
-                error={Boolean(errors.product)}
-                helperText={errors.product}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("product", e.target.value)}
-            />
-            <TextField
-                fullWidth
-                type="text"
-                label="Category"
-                value={product.category}
-                error={Boolean(errors.category)}
-                helperText={errors.category}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("category", e.target.value)}
-            />
-            <TextField
-                fullWidth
-                type="number"
-                label="Price"
-                value={product.price}
-                error={Boolean(errors.price)}
-                helperText={errors.price}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                onChange={(e) => handleFieldChange("price", e.target.value)}
-            />
-            <TextField
-                fullWidth
-                type="number"
-                label="Quantity"
-                value={product.quantity}
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                error={Boolean(errors.quantity)}
-                helperText={errors.quantity}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("quantity", e.target.value)}
-            />
-            <TextField
-                fullWidth
-                type="text"
-                label="Id"
-                value={product.id}
-                required
-                error={Boolean(errors.id)}
-                helperText={errors.id}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("id", e.target.value)}
-            />
-            <TextField
-                fullWidth
-                type="text"
-                label="Warranty Duration"
-                value={product.warrantyDuration}
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                error={Boolean(errors.warrantyDuration)}
-                helperText={errors.warrantyDuration}
-                sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                onChange={(e) => handleFieldChange("warrantyDuration", e.target.value)}
-            />
-            <Box display="flex" justifyContent="flex-end" gridColumn="span 4">
-                <Button type="button" variant="contained" startIcon={<DeleteIcon/>}
-                        sx={{
-                            backgroundColor: colors.redAccent[600],
-                            margin: "0 20px 0 0",
-                            "&:hover": {
-                                backgroundColor: colors.redAccent[500],
-                            },
-                        }}
-                        onClick={() => {
-                            navigate(-1);
-                        }}>
-                    Cancel
-                </Button>
-                {currentUser.role === "Manager" && (
-                    <Button type="button" startIcon={<SendIcon/>} variant="contained"
+                            if (decimalCount <= 2) {
+                                handleFieldChange("price", value);
+                                setErrors({
+                                    ...errors,
+                                    price: "",
+                                });
+                            } else {
+                                setErrors({
+                                    ...errors,
+                                    price: "Maximum two decimal places allowed",
+                                });
+                            }
+                        } else {
+                            setErrors({
+                                ...errors,
+                                price: "Invalid number format",
+                            });
+                        }
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Quantity"
+                    value={product.quantity}
+                    inputProps={{
+                        pattern: "[0-9]*",
+                        inputMode: "numeric",
+                    }}
+                    error={Boolean(errors.quantity)}
+                    helperText={errors.quantity}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^[0-9]*$/.test(value)) {
+                            handleFieldChange("quantity", value);
+                        }
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    type="text"
+                    label="Id"
+                    value={product.id}
+                    required
+                    disabled={isUpdateMode}
+                    error={Boolean(errors.id)}
+                    helperText={errors.id}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => handleFieldChange("id", e.target.value)}
+                />
+                <TextField
+                    fullWidth
+                    type="number"
+                    label="Warranty Duration (months)"
+                    value={product.warrantyDuration}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    error={Boolean(errors.warrantyDuration)}
+                    helperText={errors.warrantyDuration}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    onChange={(e) => handleFieldChange("warrantyDuration", e.target.value)}
+                />
+                <Box display="flex" justifyContent="flex-end" gridColumn="span 4">
+                    <Button type="button" variant="contained" startIcon={<DeleteIcon/>}
                             sx={{
-                                backgroundColor: colors.greenAccent[600],
-                                marginRight: "0px",
+                                backgroundColor: colors.redAccent[600],
+                                margin: "0 20px 0 0",
                                 "&:hover": {
-                                    backgroundColor: colors.greenAccent[400],
+                                    backgroundColor: colors.redAccent[500],
                                 },
                             }}
-                            onClick={handleFormSubmit}
-                    >
-                        Create New product
-                    </Button>)}
-            </Box>
-        </Box>)
+                            onClick={() => {
+                                navigate(-1);
+                            }}>
+                        Cancel
+                    </Button>
+                    {currentUser.role === "Manager" && (
+                        <Button type="button" startIcon={<SendIcon/>} variant="contained"
+                                sx={{
+                                    backgroundColor: colors.greenAccent[600],
+                                    marginRight: "0px",
+                                    "&:hover": {
+                                        backgroundColor: colors.greenAccent[400],
+                                    },
+                                }}
+                                onClick={handleFormSubmit}
+                        >
+                            {isUpdateMode ? "Save" : "Create New product"}
+                        </Button>)}
+                </Box>
+            </Box>)
     );
 
 }

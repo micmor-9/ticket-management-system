@@ -57,19 +57,16 @@ class AuthServiceImpl() : AuthService {
     @Autowired
     lateinit var expertService: ExpertServiceImpl
 
-    @Autowired
-    lateinit var bCryptPasswordEncoder: BCryptPasswordEncoder
-
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
 
     private fun getUserResource(): UsersResource {
         val keycloak: Keycloak = Keycloak.getInstance(
-                "http://host.docker.internal:8080",
-                "master",
-                adminUsername,
-                adminPassword,
-                "admin-cli"
+            "http://host.docker.internal:8080",
+            "master",
+            adminUsername,
+            adminPassword,
+            "admin-cli"
         )
         val realmResource: RealmResource = keycloak.realm(realmName)
         return realmResource.users()
@@ -94,8 +91,10 @@ class AuthServiceImpl() : AuthService {
             message.setFrom(InternetAddress("no-reply-support@example.com"))
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email))
             message.subject = "Your New Password"
-            message.setText("Dear User, the password associated to this email account: $email " + " is: " + "\n" +
-                    " $password")
+            message.setText(
+                "Dear User, the password associated to this email account: $email " + " is: " + "\n" +
+                        " $password"
+            )
 
             Transport.send(message)
         } catch (e: Exception) {
@@ -107,8 +106,8 @@ class AuthServiceImpl() : AuthService {
     fun generateRandomPassword(length: Int): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?"
         return (1..length)
-                .map { chars[Random.nextInt(chars.length)] }
-                .joinToString("")
+            .map { chars[Random.nextInt(chars.length)] }
+            .joinToString("")
     }
 
     override fun changePassword(request: ChangePasswordRequest): Boolean {
@@ -117,8 +116,8 @@ class AuthServiceImpl() : AuthService {
         val user = userResource.search(request.email).firstOrNull()
         if (user != null) {
             val authRequest = AuthRequest(
-                    username = request.email,
-                    password = request.oldPassword
+                username = request.email,
+                password = request.oldPassword
             )
             val loginResult = login(authRequest)
             if (loginResult != null) {
@@ -138,7 +137,7 @@ class AuthServiceImpl() : AuthService {
         return false
     }
 
-    override fun resetPassw(email: String): Boolean {
+    override fun resetPassword(email: String): Boolean {
         val userResource = getUserResource()
         val user = userResource.search(email).firstOrNull()
         if (user != null) {
@@ -296,6 +295,32 @@ class AuthServiceImpl() : AuthService {
         requestBody.add("client_id", resourceId)
         requestBody.add("username", loginRequest.username)
         requestBody.add("password", loginRequest.password)
+
+        val requestEntity = HttpEntity(requestBody, headers)
+
+        val keycloakUrlTokenRequest = "$keycloakUrlIssuer/protocol/openid-connect/token"
+
+        try {
+            val tokenResponse: AuthResponse? = RestTemplate().exchange(
+                keycloakUrlTokenRequest,
+                HttpMethod.POST,
+                requestEntity,
+                AuthResponse::class.java
+            ).body
+            return tokenResponse
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
+    override fun refreshToken(refreshTokenRequest: RefreshTokenRequest): AuthResponse? {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
+
+        val requestBody: MultiValueMap<String, String> = LinkedMultiValueMap()
+        requestBody.add("grant_type", "refresh_token")
+        requestBody.add("client_id", resourceId)
+        requestBody.add("refresh_token", refreshTokenRequest.refresh_token)
 
         val requestEntity = HttpEntity(requestBody, headers)
 

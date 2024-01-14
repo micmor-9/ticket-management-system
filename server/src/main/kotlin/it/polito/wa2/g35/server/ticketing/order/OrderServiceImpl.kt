@@ -110,12 +110,12 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
         return filterListResultByRole(authentication, orders)
     }
 
-    override fun getOrderByCustomerAndProduct(idCustomer: String, idProduct: String): OrderDTO? {
+    /*override fun getOrderByCustomerAndProduct(idCustomer: String, idProduct: String): OrderDTO? {
         val authentication = SecurityContextHolder.getContext().authentication
         val order = orderRepository.getOrdersByCustomerAndProduct(idCustomer, idProduct)?.toDTO()
         log.info("Get order by Customer and Product request from repository successful")
         return filterResultByRole(authentication, order)
-    }
+    }*/
 
     @Observed(
         name = "/orders/",

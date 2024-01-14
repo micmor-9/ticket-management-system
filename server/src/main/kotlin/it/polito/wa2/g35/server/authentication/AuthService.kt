@@ -8,8 +8,7 @@ interface AuthService {
     fun signupCustomer(signupRequest: SignupCustomerRequest) : CustomerDTO?
     fun signupExpert(signupRequest: SignupExpertRequest) : ExpertDTO?
     fun login(loginRequest: AuthRequest) : AuthResponse?
-
-    fun resetPassw(email: String) : Boolean
-
+    fun resetPassword(email: String) : Boolean
     fun changePassword(request: ChangePasswordRequest): Boolean
+    fun refreshToken(refreshTokenRequest: RefreshTokenRequest): AuthResponse?
 }
