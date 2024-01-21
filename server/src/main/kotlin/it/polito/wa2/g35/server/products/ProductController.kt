@@ -29,6 +29,18 @@ class ProductController(private val productService: ProductService) {
         return productService.getAll()
     }
 
+    @GetMapping("/categories/")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
+    @Observed(
+        name = "/categories/",
+        contextualName = "get-product-categories-request"
+    )
+    fun getAllCategories(): List<String?> {
+        log.info("Get product categories request successful")
+        return productService.getAllCategories()
+    }
+
     @GetMapping("/products/{productId}")
     @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
     @ResponseStatus(HttpStatus.OK)

@@ -25,6 +25,15 @@ class ProductServiceImpl(
     }
 
     @Observed(
+        name = "/categories/",
+        contextualName = "get-product-categories-request-service"
+    )
+    override fun getAllCategories(): List<String?> {
+        log.info("Get products from repository request successful")
+        return productRepository.findAll().map { it.description }.distinct()
+    }
+
+    @Observed(
         name = "/products/{productId}",
         contextualName = "get-product-by-id-request-service"
     )

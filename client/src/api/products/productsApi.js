@@ -32,6 +32,24 @@ const getAllProducts = async () => {
         handleApiError(error);
     }
 };
+
+const getAllCategories = async () => {
+    const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
+    if (isTokenExpired(authToken)) {
+        console.log("Token expired, refreshing...");
+        refreshToken();
+    }
+    try {
+        const response = await api.get(`/categories/`, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        handleApiError(error);
+    }
+};
 const createProducts = async (productData) => {
     const authToken = JSON.parse(atob(Cookies.get('token'))).access_token;
     if (isTokenExpired(authToken)) {
@@ -68,7 +86,7 @@ const updateProducts = async (id, productData) => {
     }
 };
 const ProductsAPI = {
-    getAllProducts, createProducts, updateProducts
+    getAllProducts, createProducts, updateProducts, getAllCategories
 };
 
 export default ProductsAPI;

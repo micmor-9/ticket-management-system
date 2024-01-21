@@ -1,13 +1,14 @@
 import {Box, Button, TextField,} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useTheme} from "@emotion/react";
 import {tokens} from "../../theme";
 import {useAuth} from "../../utils/AuthContext";
 import {useDialog} from "../../utils/DialogContext";
 import productsApi from "../../api/products/productsApi";
+import Autocomplete, {createFilterOptions} from "@mui/material/Autocomplete";
 
 const CreateProductForm = ({isUpdateMode, initialProductData}) => {
     const navigate = useNavigate();
@@ -15,6 +16,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
     const colors = tokens(theme.palette.mode);
     const [currentUser] = useAuth();
     const {showDialog} = useDialog();
+    const filter = createFilterOptions();
     const [product, setProduct] = useState(initialProductData || {
         id: "",
         description: "",
@@ -31,6 +33,23 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
         quantity: "",
         warrantyDuration: ""
     });
+    const [category, setCategory] = useState(product ? {
+        inputValue: product.specialization,
+        title: product.specialization
+    } : "");
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await productsApi.getAllCategories();
+                setCategories(response.data);
+            } catch (error) {
+                console.error("An error occurred:", error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const handleFormSubmit = async () => {
         const newErrors = {};
@@ -79,11 +98,11 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
 
             try {
                 if (isUpdateMode) {
-                    const response = await productsApi.updateProducts(product.id, productData);
+                    await productsApi.updateProducts(product.id, productData);
                     showDialog("Product updated", "success");
                     navigate(-1);
                 } else {
-                    const response = await productsApi.createProducts(productData);
+                    await productsApi.createProducts(productData);
                     showDialog("Product created", "success");
                     navigate(-1);
                 }
@@ -151,7 +170,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                     sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                     onChange={(e) => handleFieldChange("name", e.target.value)}
                 />
-                <TextField
+                {/*<TextField
                     fullWidth
                     type="text"
                     label="Category"
@@ -160,6 +179,73 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                     helperText={errors.description}
                     sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                     onChange={(e) => handleFieldChange("description", e.target.value)}
+                />*/}
+                <Autocomplete
+                    value={category}
+                    onChange={(event, newValue) => {
+                        if (typeof newValue === 'string') {
+                            setCategory({
+                                title: newValue,
+                            });
+                            handleFieldChange("description", newValue)
+                        } else if (newValue && newValue.inputValue) {
+                            // Create a new value from the user input
+                            setCategory({
+                                title: newValue.inputValue,
+                            });
+                            handleFieldChange("description", newValue.inputValue)
+                        } else {
+                            setCategory(newValue);
+                            handleFieldChange("description", newValue)
+                        }
+                    }}
+                    filterOptions={(options, params) => {
+                        const filtered = filter(options, params);
+                        const {inputValue} = params;
+                        // Suggest the creation of a new value
+                        const isExisting = options.some((option) => inputValue === option.title);
+                        if (inputValue !== '' && !isExisting) {
+                            filtered.push({
+                                inputValue,
+                                title: `Add "${inputValue}"`,
+                            });
+                        }
+                        return filtered;
+                    }}
+                    selectOnFocus
+                    clearOnBlur
+                    handleHomeEndKeys
+                    id="description"
+                    options={categories && categories.map((cat) => {
+                        return {
+                            title: cat,
+                            inputValue: cat,
+                        };
+                    })}
+                    getOptionLabel={(option) => {
+                        // Value selected with enter, right from the input
+                        if (typeof option === 'string') {
+                            return option;
+                        }
+                        // Add "xxx" option created dynamically
+                        if (option.inputValue) {
+                            return option.inputValue;
+                        }
+                        // Regular option
+                        return option.title ? option.title : "";
+                    }}
+                    renderOption={(props, option) => <li {...props}>{option.title}</li>}
+                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
+                    freeSolo
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            required
+                            error={Boolean(errors.description)}
+                            helperText={errors.description}
+                            label="Category"
+                        />
+                    )}
                 />
                 <TextField
                     fullWidth

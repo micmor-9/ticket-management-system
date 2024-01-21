@@ -15,7 +15,7 @@ import EngineeringOutlinedIcon from "@mui/icons-material/EngineeringOutlined";
 import ProfilesAPI from "../../api/profiles/profilesApi";
 import TicketsPieChart from "../../components/TicketsPieChart";
 import ExpertsBarChart from "../../components/ExpertsBarChart";
-import {Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const Dashboard = () => {
     const theme = useTheme();
@@ -320,7 +320,7 @@ const Dashboard = () => {
                                     p="5px 10px"
                                     borderRadius="4px"
                                 >
-                                    {ticket.status}
+                                    {ticket.status.replace("_", " ")}
                                 </Box>
                             </Box>
                         ))}
