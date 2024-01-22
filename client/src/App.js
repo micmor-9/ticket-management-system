@@ -13,12 +13,12 @@ import Ticket from "./views/tickets/[id]";
 import Products from "./views/products";
 import Orders from "./views/orders";
 import CreateTicket from "./views/tickets/create";
-import { CreateUser, CreateExpert } from "./views/users/create";
+import {CreateUser, CreateExpert} from "./views/users/create";
 import MyAccount from "./views/myaccount";
 
 import {NotificationsContext, useNotifications} from "./utils/NotificationsContext";
 import CreateProduct from "./views/products/create";
-import ForgotPassword from "./views/ForgotPassword";
+import ForgotPassword from "./views/login/forgotPassword";
 import Cookies from "js-cookie";
 
 
@@ -79,7 +79,7 @@ function App() {
                                     <Route path="/tickets/create/:orderId" element={<CreateTicket/>}/>
                                     <Route path="/tickets/create" element={<CreateTicket/>}/>
                                     <Route path="/myaccount" element={<MyAccount/>}/>
-                                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                                    <Route path="/forgot-password" element={<ForgotPassword/>}/>
                                 </Routes>
                             </main>
                         </div>

@@ -6,7 +6,7 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Login from "./views/login";
 import {DialogProvider} from "./utils/DialogContext";
 import Signup from "./views/signup";
-import ForgotPassword from "./views/ForgotPassword";
+import ForgotPassword from "./views/login/forgotPassword";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

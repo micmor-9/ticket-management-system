@@ -121,6 +121,11 @@ const Orders = () => {
                             sx={{
                                 height: "70vh",
                             }}
+                            initialState={{
+                                sorting: {
+                                    sortModel: [{field: "date", sort: "desc"}],
+                                },
+                            }}
                         />
                     </Box>
                 ) : (!isLoading && orders.length > 0) ? (
@@ -134,6 +139,11 @@ const Orders = () => {
                             }}
                             sx={{
                                 height: "70vh",
+                            }}
+                            initialState={{
+                                sorting: {
+                                    sortModel: [{field: "date", sort: "desc"}],
+                                },
                             }}
                         />
                     </Box>
