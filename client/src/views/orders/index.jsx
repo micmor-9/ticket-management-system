@@ -68,7 +68,7 @@ const Orders = () => {
             field: "product",
             headerName: "Product",
             flex: 1,
-            valueGetter: ({value}) => value && value.name,
+            valueGetter: ({value}) => value && value.description,
         },
         {
             field: "quantity",

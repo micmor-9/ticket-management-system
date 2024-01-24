@@ -62,6 +62,7 @@ class ExpertController(private val expertService: ExpertService) {
     }
 
     @GetMapping("/experts/specializations/")
+    @PreAuthorize("hasAnyRole('Manager', 'Expert', 'Client')")
     @Observed(
         name = "/experts/specializations/",
         contextualName = "get-expert-specializations-request"

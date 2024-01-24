@@ -159,13 +159,6 @@ const CreateTicketForm = () => {
         gridColumn: "span 2",
     };
 
-    /*const ticketAreas = [
-        "Battery",
-        "Display",
-        "Keyboard",
-        "Mouse",
-        "Power Supply",
-    ];*/
 
     const handleFieldChange = (fieldName, value) => {
         setTicket({...ticket, [fieldName]: value});
@@ -239,7 +232,7 @@ const CreateTicketForm = () => {
                 label="Product"
                 value={
                     order
-                        ? order.product.name
+                        ? order.product.description
                         : orderTemp && orderTemp.product.name
                             ? orderTemp.product.name
                             : ""
