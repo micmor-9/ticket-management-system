@@ -409,7 +409,7 @@ const Tickets = () => {
       field: "order",
       headerName: "Product",
       flex: 1,
-      valueGetter: ({ value }) => value && value.product.description,
+      valueGetter: ({ value }) => value && value.product.name,
     },
     {
       field: "customer",

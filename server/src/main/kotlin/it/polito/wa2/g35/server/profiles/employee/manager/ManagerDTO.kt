@@ -5,15 +5,14 @@ data class ManagerDTO(
     val name: String,
     val surname: String,
     val email: String,
-    val managedArea: String
 ) {
-    constructor() : this("", "", "", "", "")
+    constructor() : this("", "", "", "")
 }
 
 fun Manager.toDTO(): ManagerDTO {
-    return ManagerDTO(this.id, this.name, this.surname, this.email, this.managedArea)
+    return ManagerDTO(this.id, this.name, this.surname, this.email)
 }
 
 fun ManagerDTO.toManager(): Manager {
-    return Manager(this.id, this.name, this.surname, this.email, this.managedArea)
+    return Manager(this.id, this.name, this.surname, this.email)
 }

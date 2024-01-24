@@ -8,5 +8,4 @@ class Manager(
     name: String = "",
     surname: String = "",
     email: String = "",
-    var managedArea: String = ""
-) : Employee(id, name, surname, email) 
+) : Employee(id, name, surname, email)
