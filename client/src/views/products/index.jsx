@@ -42,6 +42,8 @@ const Products = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -51,7 +53,11 @@ const Products = () => {
         showDialog("Error while fetching products", "error");
       }
     };
-    fetchProducts();
+    fetchProducts().then(() =>
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000)
+    );
   }, [currentUser.role, currentUser.id, showDialog]);
 
   const handleBuyNow = (event, warrantyDuration) => {
@@ -290,7 +296,7 @@ const Products = () => {
   }
 
   return (
-    <Box m="20px" sx={{flex: 1}}>
+    <Box m="20px" sx={{ flex: 1 }}>
       <Header title="PRODUCTS" subtitle="Products catalog">
         {currentUser.role === "Manager" && (
           <HeaderActions>
