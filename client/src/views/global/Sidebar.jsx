@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {
     Sidebar as ProSidebar,
     Menu,
@@ -41,11 +41,15 @@ const Sidebar = () => {
     const [currentUser] = useContext(AuthContext);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const location = useLocation();
-    const [selected, setSelected] = useState(
-        location.pathname.split("/")[1] === ""
-            ? "dashboard"
-            : location.pathname.split("/")[1]
-    );
+    const [selected, setSelected] = useState("");
+
+    useEffect(() => {
+      setSelected(
+        location.pathname.split("/")[1] === "" 
+        ? "dashboard"
+        : location.pathname.split("/")[1]
+      );
+    }, [location.pathname]);
 
     return (
         <Box

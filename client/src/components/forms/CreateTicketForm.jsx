@@ -128,8 +128,8 @@ const CreateTicketForm = () => {
             };
 
             TicketsAPI.createTicket(createTicketRequest)
-                .then((response) => {
-                    setTimeout(navigate(-1), 1000);
+                .then(() => {
+                    setTimeout(navigate(`/tickets`), 1000);
                     showDialog("Ticket created successfully", "success");
                 })
                 .catch((error) => {
