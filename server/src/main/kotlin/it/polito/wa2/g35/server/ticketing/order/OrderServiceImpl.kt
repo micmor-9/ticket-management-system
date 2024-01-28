@@ -90,7 +90,6 @@ class OrderServiceImpl(private val orderRepository: OrderRepository) : OrderServ
     )
     override fun getOrderByOrderId(orderId: String): OrderDTO? {
         log.info("Get order by id from repository request successful")
-        println(orderId.toLong())
         return orderRepository.findById(orderId.toLong()).map { it.toDTO() }.orElse(null)
     }
 

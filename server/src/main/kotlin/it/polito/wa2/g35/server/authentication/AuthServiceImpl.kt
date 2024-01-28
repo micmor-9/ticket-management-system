@@ -120,15 +120,11 @@ class AuthServiceImpl() : AuthService {
             )
             val loginResult = login(authRequest)
             if (loginResult != null) {
-                println(request.newPassword)
-
                 val credentialRepresentation = CredentialRepresentation().apply {
                     type = CredentialRepresentation.PASSWORD
                     value = request.newPassword
                 }
-
                 userResource.get(user.id).resetPassword(credentialRepresentation)
-
                 return true
             }
             return false

@@ -135,9 +135,7 @@ const CreateTicketForm = () => {
                 .catch((error) => {
                     console.log(error)
                     const error_msg =
-                        "Ticket already opened for order number " +
-                        orderId +
-                        ". Contact the customer service via Chat";
+                        "Ticket already opened for this order. Contact the customer service via Chat";
                     showDialog(error_msg, "error");
                 });
         }
