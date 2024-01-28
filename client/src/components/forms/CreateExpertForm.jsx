@@ -82,12 +82,13 @@ const CreateExpertForm = () => {
         };
 
         try {
-            showDialog("Creating new expert", "info");
             const response = await authApi.createExpert(profileData);
-            console.log(response);
-            navigate(-1);
+            showDialog("Expert created successfully", "success");
+            setTimeout(() => {
+                navigate(-1);
+            }, [1000]);
         } catch (error) {
-            console.error("An error occurred:", error);
+            showDialog("Error while creating expert", "error");
         }
 
 

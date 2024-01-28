@@ -142,13 +142,16 @@ const getUsernameByEmail = async (email) => {
 
 const createUser = async (userData) => {
     try {
-        const response = await api.post("/customers/", userData);
+        const response = await api.post("/customers/", userData, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(atob(Cookies.get('token'))).access_token}`,
+            }
+        });
         return response.data;
     } catch (error) {
         handleApiError(error);
     }
 };
-
 
 
 const updateUser = async (email, userData) => {
@@ -168,8 +171,6 @@ const updateUser = async (email, userData) => {
         handleApiError(error);
     }
 };
-
-
 
 
 const ProfilesAPI = {
