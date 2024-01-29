@@ -10,6 +10,8 @@ import Autocomplete, {createFilterOptions} from '@mui/material/Autocomplete';
 import TicketsAPI from "../../api/tickets/ticketsApi";
 import {useDialog} from "../../utils/DialogContext";
 
+const emailRegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
 const CreateExpertForm = () => {
     const navigate = useNavigate();
     const theme = useTheme();
@@ -82,19 +84,20 @@ const CreateExpertForm = () => {
         };
 
         try {
-            showDialog("Creating new expert", "info");
-            const response = await authApi.createExpert(profileData);
-            console.log(response);
-            navigate(-1);
+            await authApi.createExpert(profileData);
+            showDialog("Expert created successfully", "success");
+            setTimeout(() => {
+                navigate(-1);
+            }, 1000);
         } catch (error) {
-            console.error("An error occurred:", error);
+            showDialog("Error while creating expert", "error");
         }
 
 
         try {
             const expert = await profilesApi.getAllExperts();
             const emailFound = expert.find(
-                (expert) => expert.email === expert.email)
+                (exp) => exp.email === expert.email)
             if (emailFound) {
                 newErrors.email = "Profile with given email already exists";
             }
@@ -118,7 +121,6 @@ const CreateExpertForm = () => {
             } catch (error) {
                 console.error("An error occurred:", error);
             }
-
 
         }
     };
@@ -296,9 +298,5 @@ const CreateExpertForm = () => {
         </Box>
     );
 };
-
-const phoneRegExp =
-    /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-const emailRegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
 export default CreateExpertForm;

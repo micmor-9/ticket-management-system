@@ -1,20 +1,45 @@
 package it.polito.wa2.g35.server.profiles.customer
 
-import it.polito.wa2.g35.server.authentication.AuthService
-import it.polito.wa2.g35.server.authentication.SignupCustomerRequest
 import it.polito.wa2.g35.server.profiles.DuplicateProfileException
 import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
 import it.polito.wa2.g35.server.profiles.UnauthorizedProfileException
 import it.polito.wa2.g35.server.security.SecurityConfig
-import it.polito.wa2.g35.server.ticketing.ticket.TicketController
+import org.keycloak.admin.client.CreatedResponseUtil
+import org.keycloak.admin.client.Keycloak
+import org.keycloak.representations.idm.CredentialRepresentation
+import org.keycloak.representations.idm.UserRepresentation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import java.util.*
+import javax.mail.Message
+import javax.mail.PasswordAuthentication
+import javax.mail.Session
+import javax.mail.Transport
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeMessage
+import kotlin.collections.ArrayList
+import kotlin.random.Random
 
 @Service
 class CustomerServiceImpl(private val profileRepository: CustomerRepository) : CustomerService {
+    @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    lateinit var keycloakUrlIssuer: String
+
+    @Value("\${spring.security.oauth2.resourceserver.jwt.resource-id}")
+    final lateinit var resourceId: String
+
+    @Value("\${keycloak.realm-name}")
+    final lateinit var realmName: String
+
+    @Value("\${keycloak.admin-username}")
+    final lateinit var adminUsername: String
+
+    @Value("\${keycloak.admin-password}")
+    final lateinit var adminPassword: String
+
     private val log: Logger = LoggerFactory.getLogger(javaClass)
     override fun getCustomer(customerEmail: String): CustomerDTO? {
         val profile = profileRepository.findByEmail(customerEmail)?.toDTO()
@@ -57,8 +82,45 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
         }
     }
 
+    fun generateRandomPassword(length: Int): String {
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?"
+        return (1..length)
+            .map { chars[Random.nextInt(chars.length)] }
+            .joinToString("")
+    }
+
+    private fun sendPasswordEmail(email: String, password: String) {
+        val smtpProperties = Properties()
+        smtpProperties["mail.smtp.auth"] = "true"
+        smtpProperties["mail.smtp.starttls.enable"] = "true"
+        smtpProperties["mail.smtp.host"] = "smtp.gmail.com"
+        smtpProperties["mail.smtp.port"] = "587"
+
+        val session = Session.getInstance(smtpProperties, object : javax.mail.Authenticator() {
+            override fun getPasswordAuthentication(): PasswordAuthentication {
+                return PasswordAuthentication("frittycash@gmail.com", "ukpu nixg qrsn mvek")
+            }
+        })
+
+        try {
+            val message = MimeMessage(session)
+            message.setFrom(InternetAddress("no-reply-support@example.com"))
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email))
+            message.subject = "Your New Password"
+            message.setText(
+                "Dear User, the password associated to this email account: $email " + " is: " + "\n" +
+                        " $password"
+            )
+
+            Transport.send(message)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Gestisci l'eccezione in base alle tue esigenze
+        }
+    }
+
     override fun createCustomer(profile: CustomerDTO?): CustomerDTO? {
-        return if (profile != null) {
+        if (profile != null) {
             val checkIfProfileExists = profileRepository.findByEmail(profile.email)
             if (checkIfProfileExists == null) {
                 log.info("Create Customer request successful (repository)")
@@ -77,9 +139,71 @@ class CustomerServiceImpl(private val profileRepository: CustomerRepository) : C
                 log.error("Profile with given email already exists!")
                 throw DuplicateProfileException("Profile with given email already exists!")
             }
+            val pwd = generateRandomPassword(10)
+            val customerRepresentation = UserRepresentation().apply {
+                firstName = profile.name
+                lastName = profile.surname
+                username = profile.email
+                isEnabled = true
+                email = profile.email
+                isEmailVerified = true
+            }
+
+            val passwordCredentials = ArrayList<CredentialRepresentation>()
+            val passwordCredential = CredentialRepresentation().apply {
+                type = CredentialRepresentation.PASSWORD
+                value = pwd
+                isTemporary = false
+            }
+            passwordCredentials.add(passwordCredential)
+            customerRepresentation.credentials = passwordCredentials
+
+            val keycloak: Keycloak = Keycloak.getInstance(
+                "http://host.docker.internal:8080",
+                "master",
+                adminUsername,
+                adminPassword,
+                "admin-cli"
+            )
+
+            val realmResource = keycloak.realm(realmName)
+
+            try {
+                val customerResource = realmResource.users()
+                val customers = customerResource.search(profile.email)
+                if (customers.isNotEmpty()) {
+                    log.error("Customer already exists!")
+                    throw DuplicateProfileException("Customer already exists!")
+                }
+                val response = customerResource.create(customerRepresentation)
+                val userId = CreatedResponseUtil.getCreatedId(response)
+                val user = customerResource.get(userId)
+
+                val roleRepresentation = realmResource.roles().get("app_client").toRepresentation()
+                val rolesResource = user.roles()
+                rolesResource.realmLevel().add(listOf(roleRepresentation))
+                try {
+                    // Invia l'email con la password al nuovo utente
+                    sendPasswordEmail(profile.email, pwd)
+                    return CustomerDTO(
+                        profile.id,
+                        profile.email,
+                        profile.name,
+                        profile.surname,
+                        profile.contact,
+                        profile.address1,
+                        profile.address2
+                    )
+                } catch (e: Exception) {
+                    // Gestisci l'eccezione in base alle tue esigenze
+                    return null
+                }
+            } catch (e: RuntimeException) {
+                return null
+            }
         } else {
             log.error("Create Customer request failed")
-            null
+            return null
         }
     }
 

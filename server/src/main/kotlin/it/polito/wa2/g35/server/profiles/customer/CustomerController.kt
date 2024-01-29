@@ -64,7 +64,6 @@ class CustomerController(private val customerService: CustomerService) {
     }
 
 
-
     @PostMapping("/customers/")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('Client', 'Manager', 'Expert')")
@@ -75,19 +74,15 @@ class CustomerController(private val customerService: CustomerService) {
     fun postProfile(
         @RequestBody @Valid p: CustomerDTO,
         br: BindingResult
-    ) : CustomerDTO? {
+    ): CustomerDTO? {
         if (br.hasErrors()) {
             log.error("Create Profile request failed by bad request format")
             throw BadRequestException("Bad request format!")
-        }
-        else {
+        } else {
             log.info("Create Profile request successful")
             return customerService.createCustomer(p)
         }
     }
-
-
-
 
     @PutMapping("/customers/{email}")
     @ResponseStatus(HttpStatus.OK)
@@ -100,12 +95,11 @@ class CustomerController(private val customerService: CustomerService) {
         @PathVariable("email") email: String,
         @RequestBody @Valid p: CustomerDTO,
         br: BindingResult
-    ) : CustomerDTO? {
-        if (br.hasErrors()){
+    ): CustomerDTO? {
+        if (br.hasErrors()) {
             log.error("Update Profile failed by bad request format")
             throw BadRequestException("Bad request format!")
-        }
-        else
+        } else
             if (email == p.email) {
                 log.info("Update Profile request successful")
                 return customerService.updateCustomer(p)

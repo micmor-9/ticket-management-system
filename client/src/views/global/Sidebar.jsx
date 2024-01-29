@@ -44,11 +44,11 @@ const Sidebar = () => {
     const [selected, setSelected] = useState("");
 
     useEffect(() => {
-      setSelected(
-        location.pathname.split("/")[1] === "" 
-        ? "dashboard"
-        : location.pathname.split("/")[1]
-      );
+        setSelected(
+            location.pathname.split("/")[1] === ""
+                ? "dashboard"
+                : location.pathname.split("/")[1]
+        );
     }, [location.pathname]);
 
     return (

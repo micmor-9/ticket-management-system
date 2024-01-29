@@ -361,84 +361,6 @@ class TicketServiceImpl(
         return ticketToUpdate
     }
 
-    /*@Observed(
-        name = "tickets/{ticketId}/status/{status}",
-        contextualName = "put-ticket-status-request-service"
-    )
-    @Transactional
-    override fun updateTicketStatus(ticketId: Long, statusValue: String): TicketDTO? {
-        val ticket = getTicketById(ticketId)?.toTicket()
-        if (ticket == null) {
-            log.error("No Ticket found with this Id: $ticketId")
-            throw TicketNotFoundException("Ticket not found!")
-        }
-        val status = try {
-            TicketStatusValues.valueOf(statusValue.uppercase())
-        } catch (e: IllegalArgumentException) {
-            log.error("Update ticket status failed by ticket status not valid")
-            throw TicketStatusValueInvalidException("Ticket Status not valid!")
-        }
-        if (!TicketStatusValues.checkStatusUpdateConsistency(ticket.status, statusValue)) {
-            log.error("Update ticket status failed by ticket status conflict")
-            throw TicketStatusUpdateConflictException("Ticket Status update conflict!")
-        }
-        val authentication = SecurityContextHolder.getContext().authentication
-        when (authentication.authorities.map { it.authority }[0]) {
-            SecurityConfig.MANAGER_ROLE -> {
-                accessGrantedUpdateTicketStatus(ticket, status, authentication)
-                log.info("Create ticket status successful (repository)")
-                return ticket.toDTO()
-            }
-
-            SecurityConfig.EXPERT_ROLE -> {
-                if (ticket.expert?.email == authentication.name) {
-                    accessGrantedUpdateTicketStatus(ticket, status, authentication)
-                    log.info("Create ticket status successful (repository)")
-                    return ticket.toDTO()
-                } else {
-                    log.error("Update ticket status failed by unauthorized access")
-                    throw UnauthorizedTicketException("You can't access this ticket!")
-                }
-            }
-
-            else -> {
-                log.error("Update ticket status failed by unauthorized access")
-                throw UnauthorizedTicketException("You can't access this ticket!")
-            }
-        }
-    }
-
-
-    fun accessGrantedUpdateTicketStatus(ticket: Ticket, status: TicketStatusValues, authentication: Authentication) {
-        ticket.status = status
-        ticketRepository.save(ticket)
-        ticketStatusService.createTicketStatus(
-            TicketStatusDTO(
-                id = null,
-                statusTimestamp = null,
-                status = ticket.status,
-                description = ticket.issueDescription,
-                ticket = ticket,
-                expert = ticket.expert,
-                category = ticket.category
-            )
-        )
-        val currentUserId = profileService.getUserIdByEmail(authentication.name)
-        notificationService.send(
-            Notification(
-                url = "/tickets/${ticket.id}",
-                description = "Ticket #${ticket.id} status has changed to \"${
-                    ticket.status.toString().replace("_", " ")
-                }\".",
-                title = "Ticket status updated.",
-                type = "TICKET_STATUS_UPDATE",
-                recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id.toString()),
-                senderId = currentUserId,
-                timestamp = Date()
-            )
-        )
-    }
-*/
     @Observed(
         name = "tickets/{ticketId}/priority/{priority}",
         contextualName = "put-ticket-priority-request-service"
@@ -457,7 +379,6 @@ class TicketServiceImpl(
         }
         ticket.priority = priority
         val authentication = SecurityContextHolder.getContext().authentication
-        println(authentication.details)
         val currentUserId = profileService.getUserIdByEmail(authentication.name)
         notificationService.send(
             Notification(
@@ -487,57 +408,4 @@ class TicketServiceImpl(
         ticket.rating = rating
         return ticketRepository.save(ticket).toDTO()
     }
-
-
-    /*fun accessGrantedUpdateTicketExpert(ticket: Ticket, expertId: String) {
-        val expert = expertService.getExpertById(expertId)?.toExpert()
-        if (expert == null) {
-            log.error("No Expert found with this ID: $expertId")
-        }
-
-        ticket.expert = expert
-        ticketRepository.save(ticket)
-
-        ticketStatusService.createTicketStatus(
-            TicketStatusDTO(
-                id = null,
-                statusTimestamp = null,
-                status = ticket.status,
-                description = ticket.issueDescription,
-                ticket = ticket,
-                expert = ticket.expert,
-                category = ticket.category
-            )
-        )
-    }
-
-    @Observed(
-        name = "tickets/{ticketId}/expertId/{expertId}",
-        contextualName = "put-ticket-expertId-request-service"
-    )
-    override fun updateTicketExpert(ticketId: Long, expertId: String): TicketDTO? {
-        val ticket = getTicketById(ticketId)?.toTicket()
-        if (ticket == null) {
-            log.error("No Ticket found with this Id: $ticketId")
-            throw TicketNotFoundException("Ticket not found!")
-        }
-
-        accessGrantedUpdateTicketExpert(ticket, expertId)
-        val authentication = SecurityContextHolder.getContext().authentication
-        val currentUserId = profileService.getUserIdByEmail(authentication.name)
-        notificationService.send(
-            Notification(
-                url = "/tickets/${ticket.id}",
-                description = "Ticket #${ticket.id} has been assigned to ${ticket.expert?.name} ${ticket.expert?.surname}.",
-                title = "Ticket expert updated.",
-                type = "TICKET_EXPERT_UPDATE",
-                recipientIds = listOfNotNull(ticket.expert?.id, ticket.customer.id.toString()),
-                senderId = currentUserId,
-                timestamp = Date()
-            )
-        )
-        log.info("Update expert successful (repository)")
-        return ticketRepository.save(ticket).toDTO()
-    }
-*/
 }

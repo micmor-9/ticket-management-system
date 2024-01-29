@@ -111,7 +111,6 @@ class AuthServiceImpl() : AuthService {
     }
 
     override fun changePassword(request: ChangePasswordRequest): Boolean {
-        println(request.newPassword)
         val userResource = getUserResource()
         val user = userResource.search(request.email).firstOrNull()
         if (user != null) {
@@ -121,15 +120,11 @@ class AuthServiceImpl() : AuthService {
             )
             val loginResult = login(authRequest)
             if (loginResult != null) {
-                println(request.newPassword)
-
                 val credentialRepresentation = CredentialRepresentation().apply {
                     type = CredentialRepresentation.PASSWORD
                     value = request.newPassword
                 }
-
                 userResource.get(user.id).resetPassword(credentialRepresentation)
-
                 return true
             }
             return false
@@ -261,13 +256,13 @@ class AuthServiceImpl() : AuthService {
             signupRequest.email,
             signupRequest.specialization
         )
-        println(expertDTO)
 
         try {
             val expertResource = realmResource.users()
             val experts = expertResource.search(signupRequest.email)
             if (experts.isNotEmpty()) {
-                return null
+                log.error("Expert already exists!")
+                throw DuplicateProfileException("Expert already exists!")
             }
             val response = expertResource.create(expertRepresentation)
             val userId = CreatedResponseUtil.getCreatedId(response)

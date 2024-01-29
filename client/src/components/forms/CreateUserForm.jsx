@@ -5,10 +5,12 @@ import React, {useState} from "react";
 import {tokens} from "../../theme";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
+import {useDialog} from "../../utils/DialogContext";
 
 const CreateUserForm = () => {
     const navigate = useNavigate();
     const theme = useTheme();
+    const {showDialog} = useDialog();
     const [profile, setProfile] = useState({
         firstName: "",
         lastName: "",
@@ -86,10 +88,11 @@ const CreateUserForm = () => {
 
             try {
                 const response = await profilesApi.createUser(profileData);
-                console.log(response);
+                showDialog("User created successfully", "success");
                 navigate(-1);
             } catch (error) {
                 console.error("An error occurred:", error);
+                showDialog("An error has occurred while creating user", "error");
             }
 
 
@@ -233,26 +236,5 @@ const CreateUserForm = () => {
 const phoneRegExp =
     /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 const emailRegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-/*
-const checkoutSchema = yup.object().shape({
-    firstName: yup.string()
-        .min(2, "First name is too short")
-        .max(50, "First name is too long"),
-    lastName: yup.string()
-        .min(2, "Last name is too short")
-        .max(50, "Last name is too long"),
-    email: yup.string()
-        .email("Invalid email format")
-        .min(2, "Email is too short")
-        .max(50, "Email is too long"),
-    contact: yup.string()
-        .matches(phoneRegExp, "Phone number is not valid"),
-    address1: yup.string()
-        .min(5, "Address 1 is too short")
-        .max(100, "Address 1 is too long"),
-    address2: yup.string()
-        .min(5, "Address 2 is too short")
-        .max(100, "Address 2 is too long"),
-});*/
 
 export default CreateUserForm;

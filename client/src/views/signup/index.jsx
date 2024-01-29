@@ -15,7 +15,7 @@ const phoneRegExp =
     /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
 const Signup = () => {
-    const showDialog = useDialog();
+    const {showDialog} = useDialog();
     const navigate = useNavigate();
     const [profile, setProfile] = useState({
         firstName: "",
@@ -98,7 +98,7 @@ const Signup = () => {
                     navigate("/login")
                 }, 1000);
             } catch (error) {
-                console.error("An error occurred:", error);
+                showDialog("An error occurred while signing up", "error");
             }
         }
     };
