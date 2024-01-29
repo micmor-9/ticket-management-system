@@ -17,6 +17,7 @@ import { AuthContext, useAuth } from "../../utils/AuthContext";
 import authApi from "../../api/auth/authApi";
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
+import { useDialog } from "../../utils/DialogContext";
 
 const MyAccount = () => {
   const theme = useTheme();
@@ -25,11 +26,9 @@ const MyAccount = () => {
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
-  const navigate = useNavigate();
-
-  const handleEditPasswordClick = () => {
-    setIsEditingPassword(true);
-  };
+  const navigate = useNavigate(); 
+  const { showDialog } = useDialog();
+  const [, logout] = useContext(AuthContext);
 
   const handleSavePasswordClick = async () => {
     try {
@@ -38,10 +37,11 @@ const MyAccount = () => {
         setIsEditingPassword(false);
         setNewPassword("");
         setOldPassword("");
-        navigate(`/login`);
+        showDialog("Password changed successfully", "success");
+        setTimeout(() => {logout(); navigate(`/login`)}, 1000);
       });
   } catch(error) {
-    console.log("Error while changing password", error);
+    showDialog("Error while changing password", "error");
   }
   }
 
@@ -195,117 +195,8 @@ const MyAccount = () => {
       </Paper>
     </Box>
 
-    // <Box m="20px" sx={{ position: "relative" }}>
-    //   <Header title="MY ACCOUNT" subtitle="Personal information" />
-    //   <Paper
-    //     elevation={3}
-    //     sx={{
-    //       backgroundColor: colors.primary[400],
-    //       padding: "16px",
-    //       borderRadius: "8px",
-    //     }}
-    //   >
-    //     <List>
-    //       <ListItem>
-    //         <Typography variant="h3" sx={titleStyle}>
-    //           Name
-    //         </Typography>
-    //       </ListItem>
-    //       <ListItem>
-    //         <Typography variant="h5">{currentUser.name || "N/A"}</Typography>
-    //       </ListItem>
-    //       <ListItem>
-    //         <Typography variant="h3" sx={titleStyle}>
-    //           Surname
-    //         </Typography>
-    //       </ListItem>
-    //       <ListItem>
-    //         <Typography variant="h5">{currentUser.surname || "N/A"}</Typography>
-    //       </ListItem>
-    //       <ListItem>
-    //         <Typography variant="h3" sx={titleStyle}>
-    //           Email
-    //         </Typography>
-    //       </ListItem>
-    //       <ListItem>
-    //         <Typography variant="h5">{currentUser.email || "N/A"}</Typography>
-    //       </ListItem>
-    //       {currentUser.role === "Client" && (
-    //         <>
-    //           <ListItem>
-    //             <Typography
-    //               variant="h3"
-    //               sx={{ color: colors.greenAccent[500] }}
-    //             >
-    //               Contact
-    //             </Typography>
-    //           </ListItem>
-    //           <ListItem>
-    //             <Typography variant="h5">
-    //               {currentUser.contact || "N/A"}
-    //             </Typography>
-    //           </ListItem>
-    //         </>
-    //       )}
-    //       {currentUser.role === "Client" && (
-    //         <>
-    //           <ListItem>
-    //             <Typography variant="h3" sx={titleStyle}>
-    //               Address 1
-    //             </Typography>
-    //           </ListItem>
-    //           <ListItem>
-    //             <Typography variant="h5">
-    //               {currentUser.address1 || "N/A"}
-    //             </Typography>
-    //           </ListItem>
-    //           <ListItem>
-    //             <Typography variant="h3" sx={titleStyle}>
-    //               Address 2
-    //             </Typography>
-    //           </ListItem>
-    //           <ListItem>
-    //             <Typography variant="h5">
-    //               {currentUser.address2 || "N/A"}
-    //             </Typography>
-    //           </ListItem>
-    //         </>
-    //       )}
-    //     </List>
-    //   </Paper>
-    // </Box>
+    
   );
 };
 
 export default MyAccount;
-
-{
-  /* <ListItem>
-  {isEditingPassword ? (
-    <>
-      <TextField
-        label="Old Password"
-        type="password"
-        value={oldPassword}
-        onChange={(e) => setOldPassword(e.target.value)}
-      />
-      <TextField
-        label="New Password"
-        type="password"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-      />
-    </>
-  ) : (
-    <Button onClick={handleEditPasswordClick}>Edit Password</Button>
-  )}
-</ListItem>; */
-}
-
-// {
-//   isEditingPassword && (
-//     <ListItem>
-//       <Button onClick={handleSavePasswordClick}>Save Password</Button>
-//     </ListItem>
-//   );
-// }

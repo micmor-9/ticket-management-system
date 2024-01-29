@@ -231,7 +231,7 @@ const Tickets = () => {
         }
     };
 
-    const columns = [
+    let columns = [
         {field: "id", headerName: "ID", flex: 0.2},
         {
             field: "creationTimestamp",
@@ -489,6 +489,8 @@ const Tickets = () => {
                 );
             },
         });
+    } else {
+        columns = columns.filter((column) => column.field !== "priority");
     }
 
     return (
