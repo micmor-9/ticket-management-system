@@ -23,6 +23,7 @@ services:
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
     container_name: spring-boot-keycloak
+    restart: always
 
   server:
     image: springboot-server:latest
@@ -49,6 +50,7 @@ services:
     ports:
       - "14268" # jaeger ingest
       - "9411:9411" # zipkin
+    restart: always
 
   loki:
     image: grafana/loki
@@ -61,6 +63,7 @@ services:
       - JAEGER_ENDPOINT=http://tempo:14268/api/traces # send traces to Tempo
       - JAEGER_SAMPLER_TYPE=const
       - JAEGER_SAMPLER_PARAM=1
+    restart: always
 
   prometheus:
     image: prom/prometheus
@@ -72,6 +75,7 @@ services:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
       - "9090:9090"
+    restart: always
 
   grafana:
     image: grafana/grafana
@@ -85,6 +89,7 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     ports:
       - "3000:3000"
+    restart: always
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -93,6 +98,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "22181:2181"
+    restart: always
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -106,6 +112,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    restart: always
 
 volumes:
   db-data:
