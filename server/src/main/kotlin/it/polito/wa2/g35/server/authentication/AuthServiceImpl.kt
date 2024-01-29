@@ -2,6 +2,7 @@ package it.polito.wa2.g35.server.authentication
 
 import io.micrometer.observation.annotation.Observed
 import it.polito.wa2.g35.server.profiles.DuplicateProfileException
+import it.polito.wa2.g35.server.profiles.ProfileNotFoundException
 import it.polito.wa2.g35.server.profiles.customer.CustomerDTO
 import it.polito.wa2.g35.server.profiles.customer.CustomerServiceImpl
 import it.polito.wa2.g35.server.profiles.employee.expert.ExpertDTO
@@ -126,10 +127,12 @@ class AuthServiceImpl() : AuthService {
                 }
                 userResource.get(user.id).resetPassword(credentialRepresentation)
                 return true
+            } else {
+                throw InvalidUserCredentialsException("Invalid username or password!")
             }
-            return false
+        } else {
+            throw ProfileNotFoundException("User not found!")
         }
-        return false
     }
 
     override fun resetPassword(email: String): Boolean {

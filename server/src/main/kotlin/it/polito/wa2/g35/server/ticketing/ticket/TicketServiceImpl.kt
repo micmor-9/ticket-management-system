@@ -355,7 +355,7 @@ class TicketServiceImpl(
                 currentTicket.order,
                 currentTicket.customer,
                 ticket.category,
-                currentTicket.rating
+                null
             )
         )
         return ticketToUpdate
