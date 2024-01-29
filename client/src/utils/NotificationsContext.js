@@ -50,17 +50,17 @@ export const useNotifications = () => {
                         }
                     }
                 );
-                console.log(`Connected to notifications-${currentUser.id}!`);
+                //console.log(`Connected to notifications-${currentUser.id}!`);
             };
 
             client.onStompError = function (frame) {
-                console.log("Broker reported error: " + frame.headers["message"]);
-                console.log("Additional details: " + frame.body);
+                //console.log("Broker reported error: " + frame.headers["message"]);
+                //console.log("Additional details: " + frame.body);
             };
 
             client.onWebSocketError = function (frame) {
-                console.log("WS reported error: ");
-                console.log(frame);
+                //console.log("WS reported error: ");
+                //console.log(frame);
                 if (clientRef.current) {
                     if (clientRef.current.active) {
                         try {
@@ -68,14 +68,14 @@ export const useNotifications = () => {
                                 subscriptionRef.current.unsubscribe();
                             clientRef.current.deactivate();
                         } catch (error) {
-                            console.log(error);
+                            //console.log(error);
                         }
                     }
                 }
             };
 
             client.onDisconnect = () => {
-                console.log("Disconnected!");
+                //console.log("Disconnected!");
             };
 
             client.activate();
@@ -90,7 +90,7 @@ export const useNotifications = () => {
                                 subscriptionRef.current.unsubscribe();
                             clientRef.current.deactivate();
                         } catch (error) {
-                            console.log(error);
+                            //console.log(error);
                         }
                     }
                 }

@@ -11,7 +11,7 @@ class NotificationDeserializer : Deserializer<Notification> {
     private val log = LoggerFactory.getLogger(javaClass)
 
     override fun deserialize(topic: String?, data: ByteArray?): Notification? {
-        log.info("Deserializing...")
+        //log.info("Deserializing...")
         return objectMapper.readValue(
             data?.toString(Charsets.UTF_8),
             Notification::class.java

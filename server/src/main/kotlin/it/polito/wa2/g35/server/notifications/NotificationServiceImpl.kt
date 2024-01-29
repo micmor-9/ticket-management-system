@@ -11,7 +11,7 @@ import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Service
 
 @Service
-class NotificationServiceImpl: NotificationService {
+class NotificationServiceImpl : NotificationService {
     @Autowired
     lateinit var kafkaTemplate: KafkaTemplate<String, Any>
 
@@ -20,14 +20,14 @@ class NotificationServiceImpl: NotificationService {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass)
     override fun send(notification: Notification) {
-        log.info("Receiving notification request")
-        log.info("Sending notification to Kafka {}", notification)
+        //log.info("Receiving notification request")
+        //log.info("Sending notification to Kafka {}", notification)
         val message: Message<Notification> = MessageBuilder
             .withPayload(notification)
             .setHeader(KafkaHeaders.TOPIC, topic)
             .setHeader(KafkaHeaders.GROUP_ID, "kafka-notifications")
             .build()
         kafkaTemplate.send(message)
-        log.info("Message sent with success")
+        //log.info("Message sent with success")
     }
 }

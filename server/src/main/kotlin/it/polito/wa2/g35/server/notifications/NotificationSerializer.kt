@@ -10,7 +10,7 @@ class NotificationSerializer : Serializer<Notification> {
     private val log = LoggerFactory.getLogger(javaClass)
 
     override fun serialize(topic: String?, data: Notification?): ByteArray? {
-        log.info("Serializing...")
+        //log.info("Serializing...")
         return objectMapper.writeValueAsString(data)
             ?.toByteArray(Charsets.UTF_8)
     }

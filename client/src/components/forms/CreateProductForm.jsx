@@ -33,10 +33,7 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
         quantity: "",
         warrantyDuration: ""
     });
-    const [category, setCategory] = useState(product ? {
-        inputValue: product.specialization,
-        title: product.specialization
-    } : "");
+    const [category, setCategory] = useState(initialProductData ? initialProductData.description : "");
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
@@ -75,16 +72,6 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
         if (product.quantity.length > 0) {
             validateLength("quantity", product.quantity, "Quantity", 1, 10);
         }
-        /*if (product.warrantyDuration.length > 0) {
-            const warranty = product.warrantyDuration.split(" ");
-            if (!isNaN(parseInt(warranty[0]))) {
-                if (warranty[1] !== "years" && warranty[1] !== "months") {
-                    newErrors["warrantyDuration"] = "Wrong format"
-                }
-            } else {
-                newErrors["warrantyDuration"] = "Wrong format"
-            }
-        }*/
         setErrors(newErrors);
         if (Object.keys(newErrors).length === 0) {
             const productData = {
@@ -170,16 +157,6 @@ const CreateProductForm = ({isUpdateMode, initialProductData}) => {
                     sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
                     onChange={(e) => handleFieldChange("name", e.target.value)}
                 />
-                {/*<TextField
-                    fullWidth
-                    type="text"
-                    label="Category"
-                    value={product.description}
-                    error={Boolean(errors.description)}
-                    helperText={errors.description}
-                    sx={{...disabledTextFieldStyle, gridColumn: "span 2"}}
-                    onChange={(e) => handleFieldChange("description", e.target.value)}
-                />*/}
                 <Autocomplete
                     value={category}
                     onChange={(event, newValue) => {
