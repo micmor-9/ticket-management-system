@@ -64,6 +64,7 @@ const CreateExpertForm = () => {
             }
         };
 
+        validateLength("id", profile.id, "Id", 1, 50);
         validateLength("firstName", profile.firstName, "First Name", 2, 50);
         validateLength("lastName", profile.lastName, "Last Name", 2, 50);
 
@@ -121,6 +122,8 @@ const CreateExpertForm = () => {
             }).catch(() => {
                 showDialog("Error while creating expert", "error");
             });
+        } else {
+            setErrors(newErrors);
         }
     };
     const handleFieldChange = (fieldName, value) => {
