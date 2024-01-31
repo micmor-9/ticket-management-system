@@ -222,6 +222,19 @@ class AuthServiceImpl() : AuthService {
         contextualName = "create-expert-request"
     )
     override fun signupExpert(signupRequest: SignupExpertRequest): ExpertDTO? {
+        val expertDTO = ExpertDTO(
+            signupRequest.id,
+            signupRequest.name,
+            signupRequest.surname,
+            signupRequest.email,
+            signupRequest.specialization
+        )
+        try {
+            expertService.createExpert(expertDTO)
+        } catch (e: DuplicateProfileException) {
+            log.error("Expert already exists!")
+            throw DuplicateProfileException("Expert already exists!")
+        }
         val pwd = generateRandomPassword(10)
         val expertRepresentation = UserRepresentation().apply {
 
@@ -252,14 +265,6 @@ class AuthServiceImpl() : AuthService {
 
         val realmResource = keycloak.realm(realmName)
 
-        val expertDTO = ExpertDTO(
-            signupRequest.id,
-            signupRequest.name,
-            signupRequest.surname,
-            signupRequest.email,
-            signupRequest.specialization
-        )
-
         try {
             val expertResource = realmResource.users()
             val experts = expertResource.search(signupRequest.email)
@@ -284,7 +289,7 @@ class AuthServiceImpl() : AuthService {
         } catch (e: RuntimeException) {
             return null
         }
-        expertService.createExpert(expertDTO)
+
         return expertDTO
     }
 

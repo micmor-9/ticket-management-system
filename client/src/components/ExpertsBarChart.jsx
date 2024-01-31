@@ -37,6 +37,30 @@ export default function ExpertsBarChart({experts, tickets}) {
             setFreeData(freeData);
             setBusyData(busyData);
             setChartLabels(labels);
+        } else {
+            const specializationCounts = {};
+            experts.forEach(expert => {
+                specializationCounts[expert.specialization] = {free: 0, busy: 0};
+            });
+
+            experts.forEach(expert => {
+                specializationCounts[expert.specialization].free++;
+            });
+
+            const data = Object.keys(specializationCounts).map(specialization => ({
+                label: specialization,
+                data: [
+                    specializationCounts[specialization].free,
+                    specializationCounts[specialization].busy
+                ]
+            }));
+
+            const freeData = data.map(data => data.data[0]);
+            const busyData = data.map(data => data.data[1]);
+            const labels = Object.keys(specializationCounts);
+            setFreeData(freeData);
+            setBusyData(busyData);
+            setChartLabels(labels);
         }
     }, [experts, tickets]);
 

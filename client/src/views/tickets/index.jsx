@@ -172,15 +172,6 @@ const Tickets = () => {
                 },
             }));
         }
-
-        // TicketsAPI.updateTicketPriority(ticketId, newPriority)
-        //   .then(() => {
-        //     setTicketUpdated(() => !ticketUpdated);
-        //     showDialog("Ticket Priority updated successfully", "success");
-        //   })
-        //   .catch((error) => {
-        //     showDialog("Error while updating ticket", "error");
-        //   });
     };
 
     const handleChange = async (event, ticketId) => {
