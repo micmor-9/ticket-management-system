@@ -44,6 +44,11 @@ const Tickets = () => {
 
     const [isLoading, setIsLoading] = useState(true);
 
+    const isExpertSet = (id) => {
+        const ticket = tickets.find((ticket) => ticket.id === id);
+        return ticket.expert !== null;
+    }
+
     const getAllowedStatuses = (status) => {
         switch (status) {
             case "OPEN":
@@ -259,7 +264,7 @@ const Tickets = () => {
                             <Box width="20%" m="0 25px 0 0" p="5px">
                                 <PriorityBadge priority={row.priority}/>
                             </Box>
-                            {modify.active && modify.id === row.id && (
+                            {modify.active && modify.id === row.id && isExpertSet(row.id) && (
                                 <Select
                                     sx={{
                                         width: "30%",
@@ -304,7 +309,7 @@ const Tickets = () => {
                                     {status.replace("_", " ")}
                                 </Typography>
                             </Box>
-                            {modify.active && modify.id === id && (
+                            {modify.active && modify.id === id && isExpertSet(id) && (
                                 <Select
                                     sx={{
                                         width: "20%",
