@@ -105,14 +105,13 @@ class AuthController {
         contextualName = "create-expert-request"
     )
     fun createExpert(@RequestBody signupRequest: SignupExpertRequest): ResponseEntity<String> {
-        if (authService.signupExpert(signupRequest) != null) {
+        return try {
             authService.signupExpert(signupRequest)
-
             log.info("Expert created: ${signupRequest.email}")
-            return ResponseEntity.ok("Expert created!")
-        } else {
+            ResponseEntity.ok("Expert created!")
+        } catch (e: Exception) {
             log.error("Wrong creation request of the expert ${signupRequest.email}: expert already exists")
-            return ResponseEntity("Expert already exists", HttpStatus.CONFLICT)
+            ResponseEntity("Expert already exists", HttpStatus.CONFLICT)
         }
     }
 

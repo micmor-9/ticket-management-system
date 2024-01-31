@@ -89,8 +89,13 @@ class ExpertServiceImpl(private val expertRepository: ExpertRepository) : Expert
         contextualName = "post-expert-request-service"
     )
     override fun createExpert(expert: ExpertDTO): ExpertDTO? {
-        val checkIfProfileExists = expertRepository.findByEmail(expert.email)
+        var checkIfProfileExists = expertRepository.findByEmail(expert.email)
         if (checkIfProfileExists == null) {
+            checkIfProfileExists = expertRepository.findByIdOrNull(expert.id)
+            if (checkIfProfileExists != null) {
+                log.error("Profile with given id already exists!")
+                throw DuplicateProfileException("Profile with given id already exists!")
+            }
             log.info("Create expert request successful (repository)")
             return expertRepository.save(
                 Expert(

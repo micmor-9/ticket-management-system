@@ -75,7 +75,7 @@ const CreateExpertForm = () => {
             validateLength("email", profile.email, "Email", 2, 50);
         }
 
-        const profileData = {
+        /*const profileData = {
             id: profile.id,
             email: profile.email,
             name: profile.firstName,
@@ -102,8 +102,7 @@ const CreateExpertForm = () => {
                 newErrors.email = "Profile with given email already exists";
             }
         } catch (error) {
-        }
-
+        }*/
 
         if (Object.keys(newErrors).length === 0) {
             const profileData = {
@@ -114,14 +113,14 @@ const CreateExpertForm = () => {
                 specialization: profile.specialization
             };
 
-            try {
-                const response = await authApi.createExpert(profileData);
+            authApi.createExpert(profileData).then(() => {
                 showDialog("Expert created successfully", "success");
-                setTimeout(() => navigate(-1), 1000);
-            } catch (error) {
+                setTimeout(() => {
+                    navigate(-1);
+                }, 1000);
+            }).catch(() => {
                 showDialog("Error while creating expert", "error");
-            }
-
+            });
         }
     };
     const handleFieldChange = (fieldName, value) => {
