@@ -227,7 +227,7 @@ const CreateTicketForm = () => {
                 label="Product"
                 value={
                     order
-                        ? order.product.description
+                        ? order.product.name
                         : orderTemp && orderTemp.product.name
                             ? orderTemp.product.name
                             : ""

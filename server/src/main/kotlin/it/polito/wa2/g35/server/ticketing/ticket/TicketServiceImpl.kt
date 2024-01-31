@@ -255,7 +255,7 @@ class TicketServiceImpl(
             notificationService.send(
                 Notification(
                     url = "/tickets/${ticketToSave.id}",
-                    description = "New ticket #${ticket.id} has been created.",
+                    description = "New ticket #${ticketToSave.id} has been created.",
                     title = "New Ticket created.",
                     type = "TICKET_CREATE",
                     recipientIds = managerService.getAllManagers().map { it.id },

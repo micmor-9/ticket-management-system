@@ -35,6 +35,7 @@ const Tickets = () => {
     const [experts, setExperts] = useState([]);
     const [ticketUpdated, setTicketUpdated] = useState(false);
     const [currentUser] = useContext(AuthContext);
+    const [currentStatus, setCurrentStatus] = useState(null);
     const navigate = useNavigate();
     const {showDialog} = useDialog();
     const [modify, setModify] = useState({id: "", active: false});
@@ -52,15 +53,15 @@ const Tickets = () => {
     const getAllowedStatuses = (status) => {
         switch (status) {
             case "OPEN":
-                return ["IN_PROGRESS", "RESOLVED", "CLOSED"];
+                return ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"];
             case "IN_PROGRESS":
-                return ["RESOLVED", "CLOSED"];
+                return ["IN_PROGRESS", "RESOLVED", "CLOSED"];
             case "CLOSED":
-                return ["REOPENED"];
-            case "RESOLVED":
                 return ["CLOSED", "REOPENED"];
+            case "RESOLVED":
+                return ["RESOLVED", "CLOSED", "REOPENED"];
             case "REOPENED":
-                return ["IN_PROGRESS", "CLOSED", "RESOLVED"];
+                return ["REOPENED", "IN_PROGRESS", "CLOSED", "RESOLVED"];
             default:
                 return [];
         }
@@ -214,6 +215,9 @@ const Tickets = () => {
                 await TicketsAPI.updateTicket(ticketId, updateData);
                 setTicketUpdated(() => !ticketUpdated);
                 showDialog("Ticket updated successfully", "success");
+                setTimeout(() => {
+                    navigate("/tickets");
+                }, 1000);
             }
 
             setPendingChanges((prevChanges) => ({
@@ -320,8 +324,9 @@ const Tickets = () => {
                                     value={""}
                                     onChange={(event) => handleStatusChange(event, id)}
                                 >
-                                    {getAllowedStatuses(status).map((status) => (
-                                        <MenuItem value={status}>{status.replace("_", " ")}</MenuItem>
+                                    {getAllowedStatuses(currentStatus).map((_status) => (
+                                        (status != _status) ?
+                                            <MenuItem value={_status}>{_status.replace("_", " ")}</MenuItem> : null
                                     ))}
                                 </Select>
                             )}
@@ -463,6 +468,7 @@ const Tickets = () => {
                         sx={{color: colors.greenAccent[400]}}
                         onClick={() => {
                             setModify({id: row.id, active: !modify.active});
+                            setCurrentStatus(row.status);
                         }}
                     >
                         {modify.active === false && (
